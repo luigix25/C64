@@ -10,9 +10,12 @@ bool fetch();
 uint8_t immediate();
 void ORA(uint8_t);
 uint16_t absolute();
+uint16_t absolute_X();
+
 uint8_t zero_page();
 uint8_t zero_page_addr_X();
 
+uint8_t indirect_Y();
 
 void dump_reg(){
 
@@ -188,6 +191,39 @@ uint16_t absolute(){
 	return addr;
 
 }
+
+uint16_t absolute_X(){
+
+	uint16_t addr = absolute();
+	addr+= regs.regX;
+
+	return addr;
+
+}
+
+
+uint8_t indirect_Y(){
+
+	uint16_t addr;
+
+	//zero page addr!!
+	uint8_t zero_page_addr = immediate();
+	uint16_t tmp;
+
+	//address is stored inside the zero-page
+	//Least significant byte
+	addr = memory[zero_page_addr];
+
+	//Most sig. byte
+	tmp = memory[zero_page_addr+1];
+	tmp = tmp << 8;
+	addr |= tmp;
+
+
+	addr += regs.regY;
+
+}
+
 
 void ORA(uint8_t operand){
 
