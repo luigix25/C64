@@ -15,6 +15,9 @@
 #define BASIC_START 0xA000
 #define BASIC_END 0xBFFF
 
+#define STACK_START 0x0100
+#define STACK_END 0x01FF
+
 void hexDump(void*, int);
 
 //void loadKernalAndBasic(const char*);

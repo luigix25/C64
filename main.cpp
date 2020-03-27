@@ -31,13 +31,6 @@ int main(){
   	}
 
   	//hexDump(memory+BASIC_START,2);
-  	cout<<"ciao"<<endl;
-
-  	cout<<*(memory+BASIC_START)<<endl;
-  	cout<<"ciaon1e"<<endl;
-
-  	cout<<memory[BASIC_START]<<endl;
-  	cout<<"ciaone"<<endl;
 
   	decode(memory[BASIC_START]);
 
@@ -45,9 +38,17 @@ int main(){
 
 
 void decode(uint8_t opcode){
-	cout<<"decode"<<endl;
-	cout<<opcode<<endl;
-	cout<<hex<<opcode<<endl;
+
+  uint8_t high = opcode & 0xFF00;
+  uint8_t low = opcode & 0x00FF;
+
+  switch(opcode){
+    case 0x0000:        //BRK
+      return;
+    case 0x0001:        //ORA indirect with X
+
+
+  }
 
 
 }
