@@ -42,3 +42,26 @@ void hexDump(void *addr, int len)
     // And print the final ASCII bit.
     printf("  %s\n", buff);
 }
+
+void loadKernalAndBasic(uint8_t *memory,const char* filename){
+
+    ifstream file(ROM_CHIPS,ios::in | ios::binary | ios::ate);
+    streampos size;
+
+    if (file.is_open())
+    {
+
+        uint8_t *rom = new uint8_t[sixteenK];
+
+        size = file.tellg();
+        file.seekg (0, ios::beg);
+        file.read ((char*)rom, size);
+        file.close();
+
+        memcpy(memory+BASIC_START,rom,eigthK);
+        memcpy(memory+KERNAL_START,rom+eigthK,eigthK);
+
+        delete[] rom;
+
+    }
+}

@@ -3,6 +3,9 @@
 #include <string.h>
 #include <stdint.h>
 
+using namespace std;
+
+
 #define ROM_CHIPS "kernel_and_basic.bin"
 
 #define eigthK 8192
@@ -23,7 +26,7 @@
 
 void hexDump(void*, int);
 
-//void loadKernalAndBasic(const char*);
+void loadKernalAndBasic(const char*);
 
 struct registers{
 	uint8_t regA;
