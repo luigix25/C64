@@ -8,7 +8,7 @@ char convert(char);
 bool decode(uint8_t);
 bool fetch();
 uint8_t immediate();
-void ORA(uint8_t);
+void OR(register_name, uint8_t);
 uint16_t absolute();
 uint16_t absolute_X();
 
@@ -20,7 +20,7 @@ uint8_t indirect_Y();
 void dump_reg(){
 
 	cout<<"RegA: "<<endl;
-	hexDump(&regs.regA,1);
+	hexDump(&regs.reg[regA],1);
 
 	cout<<"PC: "<<endl;
 	hexDump(&regs.PC,1);
@@ -90,12 +90,12 @@ bool decode(uint8_t opcode){
       //read from the zero page
       addr = zero_page_addr_X();
 
-      ORA(memory[addr]);
+      OR(regA,memory[addr]);
       break;
 
     case 0x05:      //ORA zpg
     	addr = zero_page();
-    	ORA(memory[addr]);
+    	OR(regA, memory[addr]);
     	break;
 
     case 0x06:			//ASL
@@ -106,29 +106,27 @@ bool decode(uint8_t opcode){
 
     case 0x09:			//ORA imm
     	addr = immediate();
-    	ORA(addr);
+    	OR(regA,addr);
     	break;
 
     case 0x0D:
       cout<<"ORA ABS"<<endl;
 
     	addr = absolute();		//ORA ABS
-    	ORA(memory[addr]);
+    	OR(regA,memory[addr]);
     	break;
 
     case 0x8D:						//STA abs
     	cout<<"STA ABS"<<endl;
 
     	addr = absolute();
-    	memory[addr] = regs.regA;
+    	memory[addr] = regs.reg[regA];
     	break;
 
     case 0xA9:						//LDA imm
     	cout<<"LOAD IMM"<<endl;
     	addr = immediate();
-    	regs.regA = (uint8_t)addr;
-    	//cout<<"rega: "<<regs.regA<<endl;
-
+    	regs.reg[regA] = (uint8_t)addr;
     	break;
 
   }
@@ -144,7 +142,7 @@ uint8_t zero_page_addr_X(){
   addr = memory[regs.PC];
 
   //Sum X register
-  addr += regs.regX;
+  addr += regs.reg[regX];
 	regs.PC++;
 
 	return addr;
@@ -195,7 +193,7 @@ uint16_t absolute(){
 uint16_t absolute_X(){
 
 	uint16_t addr = absolute();
-	addr+= regs.regX;
+	addr+= regs.reg[regX];
 
 	return addr;
 
@@ -220,14 +218,19 @@ uint8_t indirect_Y(){
 	addr |= tmp;
 
 
-	addr += regs.regY;
+	addr += regs.reg[regY];
 
 }
 
 
-void ORA(uint8_t operand){
+void OR(register_name index, uint8_t operand){
 
-	regs.regA |= operand;
+	regs.reg[index] |= operand;
+
+}
+
+void LD(register_name index, uint8_t operand){
+
 
 }
 

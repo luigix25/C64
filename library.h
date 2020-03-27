@@ -28,11 +28,19 @@ void hexDump(void*, int);
 
 void loadKernalAndBasic(const char*);
 
+enum register_name
+{
+	regA,regX,regY
+	
+};
+
 struct registers{
-	uint8_t regA;
+	uint8_t reg[3];
+
+	/*uint8_t regA;
 	uint8_t regX;
 	uint8_t regY;
-
+*/
 	uint16_t SP;
 	uint16_t PC;
 
