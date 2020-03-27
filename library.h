@@ -15,6 +15,9 @@
 #define BASIC_START 0xA000
 #define BASIC_END 0xBFFF
 
+#define ZERO_START 0x0000
+#define ZERO_END 0x00FF
+
 #define STACK_START 0x0100
 #define STACK_END 0x01FF
 

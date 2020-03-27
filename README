@@ -4,4 +4,7 @@ Secondi 8KB è il KERNAL del C64 mappato da 0xE000 a 0xFFFF
 
 0xD000 - 0xDFFF I/O
 
+
+0x0000 - 0x00FF	zero page ( "registers" )
+
 0x0100 - 0x01FF stack 1° memory page
