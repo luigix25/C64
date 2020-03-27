@@ -1,0 +1,5 @@
+Primi 8KB di kernel_and_basic e' l'interpete basic mappato da 0xA000 a 0xBFFF
+
+Secondi 8KB è il KERNAL del C64 mappato da 0xE000 a 0xFFFF
+
+0xD000 - 0xDFFF I/O
