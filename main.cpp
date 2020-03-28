@@ -27,6 +27,7 @@ int main(){
 	*/
 
 	loadKernalAndBasic(memory,KERNAL_BASIC_ROM);
+	loadKernalAndBasic(memory,CHARSET_ROM);
 
 	//hexDump(memory+0xFFFC,10);
 

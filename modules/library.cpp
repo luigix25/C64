@@ -65,3 +65,25 @@ void loadKernalAndBasic(uint8_t *memory,const char* filename){
 
     }
 }
+
+void loadCharset(uint8_t *memory,const char* filename){
+
+    ifstream file(filename,ios::in | ios::binary | ios::ate);
+    streampos size;
+
+    if (file.is_open())
+    {
+
+        uint8_t *rom = new uint8_t[fourK];
+
+        size = file.tellg();
+        file.seekg (0, ios::beg);
+        file.read ((char*)rom, size);
+        file.close();
+
+        memcpy(memory+0xD000,rom,fourK);
+
+        delete[] rom;
+
+    }
+}

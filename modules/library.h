@@ -15,6 +15,7 @@ using namespace std;
 #define KERNAL_BASIC_ROM "roms/251913-01.bin"
 #define CHARSET_ROM "roms/901225-01.bin"
 
+#define fourK 4096
 #define eigthK 8192
 #define sixteenK  16384
 #define sixtyfourK 65536
@@ -31,12 +32,16 @@ using namespace std;
 #define STACK_START 0x0100
 #define STACK_END 0x01FF
 
+#define CHAR_START 0xD000
+#define CHAR_END 0x0DFFF
+
 #define RESET_routine 0xFCE2
 
 
 void hexDump(void*, int);
 
 void loadKernalAndBasic(uint8_t *,const char*);
+void loadCharset(uint8_t *,const char*);
 
 enum register_name
 {
