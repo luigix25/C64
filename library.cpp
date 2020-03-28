@@ -45,7 +45,7 @@ void hexDump(void *addr, int len)
 
 void loadKernalAndBasic(uint8_t *memory,const char* filename){
 
-    ifstream file(ROM_CHIPS,ios::in | ios::binary | ios::ate);
+    ifstream file(filename,ios::in | ios::binary | ios::ate);
     streampos size;
 
     if (file.is_open())

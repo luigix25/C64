@@ -24,9 +24,12 @@ using namespace std;
 #define STACK_START 0x0100
 #define STACK_END 0x01FF
 
+#define RESET_routine 0xFCE2
+
+
 void hexDump(void*, int);
 
-void loadKernalAndBasic(const char*);
+void loadKernalAndBasic(uint8_t *,const char*);
 
 enum register_name
 {
@@ -43,6 +46,10 @@ struct registers{
 */
 	uint16_t SP;
 	uint16_t PC;
+
+
+	bool interrupt_flag;
+	bool decimal_mode_flag;
 
 	uint8_t Flags;
 };
