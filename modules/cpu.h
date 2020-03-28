@@ -72,4 +72,7 @@ private:
 	void OR(register_name, uint8_t);
 	void AND(uint8_t);
 
+	void TA(register_name);
+
+
 };

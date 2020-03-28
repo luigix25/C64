@@ -318,6 +318,13 @@ void CPU::DE(register_name index)
 	SET_NF(regs.reg[index]);
 }
 
+void CPU::TA(register_name index){
+
+	regs.reg[regA] = regs.reg[index];
+	SET_ZF(regs.reg[index]);
+	SET_NF(regs.reg[index]);
+}
+
 //DEBUG
 void CPU::dump_reg(){
 
@@ -408,8 +415,8 @@ bool CPU::decode(uint8_t opcode){
 			break;
 		
 		case 0x20:						//JSR 
-			DEBUG_PRINT("JSR"<<endl);
 			addr = absolute();
+			DEBUG_PRINT("JSR "<<hex<<unsigned(addr)<<endl);
 			JSR(addr);
 			break;
 		
@@ -597,11 +604,21 @@ bool CPU::decode(uint8_t opcode){
 			addr = zero_page();
 			LD(regX,memory[addr]);
 			break;
+		
+		case 0xA8:						//TAY
+			DEBUG_PRINT("TAY"<<endl);
+			TA(regY);
+			break;
 
 		case 0xA9:						//LDA imm
 			addr = immediate();
 			DEBUG_PRINT("LDA "<<hex<<unsigned(addr)<<endl);
 			LD(regA,addr);
+			break;
+		
+		case 0xAA:						//TAX
+			DEBUG_PRINT("TAX"<<endl);
+			TA(regX);
 			break;
 
 		case 0xAC:						//LDY abs
@@ -726,6 +743,7 @@ bool CPU::decode(uint8_t opcode){
 		
 		default:
 			DEBUG_PRINT("unimplemented: "<<hex<<unsigned(opcode)<<endl);
+			return false;
  	}
 
  	addr = 0;
