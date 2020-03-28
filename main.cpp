@@ -1,8 +1,6 @@
-#define DEBUG_MODE 1
-
 #include "modules/library.h"
 #include "modules/cpu.h"
-
+#include "modules/debug.h"
 
 uint8_t memory[sixtyfourK];
 
@@ -32,7 +30,7 @@ int main(){
 
 	//hexDump(memory+0xFFFC,10);
 
-	DEBUG_PRINT("ciao"<<" "<<"we");
+	//DEBUG_PRINT("ciao"<<" "<<"we"<<endl);
 
 	bool loop = true;
 	uint8_t opcode;

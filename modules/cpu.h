@@ -8,6 +8,8 @@ class CPU
 public:
 
 	CPU(uint8_t*);
+	CPU(uint8_t*,uint16_t);
+
 	//~CPU();
 
 	uint8_t fetch();

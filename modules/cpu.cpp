@@ -1,5 +1,11 @@
 #include "cpu.h"
 
+CPU::CPU(uint8_t* memory, uint16_t PC){
+
+	this->memory = memory;
+	regs.PC = PC;
+
+}
 
 CPU::CPU(uint8_t* memory){
 
@@ -185,16 +191,16 @@ uint8_t CPU::fetch(){
 //DEBUG
 void CPU::dump_reg(){
 
-	cout<<endl<<endl;
-	cout<<"---------REG STATUS-----------"<<endl;
-	cout<<"RegA: 0x"<<hex<<unsigned(regs.reg[regA])<<endl;
-	cout<<"RegX: 0x"<<hex<<unsigned(regs.reg[regX])<<endl;
-	cout<<"RegY: 0x"<<hex<<unsigned(regs.reg[regY])<<endl;
-	cout<<"PC  : 0x"<<hex<<unsigned(regs.PC)<<endl;
+	DEBUG_PRINT(endl<<endl);
+	DEBUG_PRINT("---------REG STATUS-----------"<<endl);
+	DEBUG_PRINT("RegA: 0x"<<hex<<unsigned(regs.reg[regA])<<endl);
+	DEBUG_PRINT("RegX: 0x"<<hex<<unsigned(regs.reg[regX])<<endl);
+	DEBUG_PRINT("RegY: 0x"<<hex<<unsigned(regs.reg[regY])<<endl);
+	DEBUG_PRINT("PC  : 0x"<<hex<<unsigned(regs.PC)<<endl);
 	//hexDump(&regs.PC,1);
-	cout<<"------------------------------"<<endl;
+	DEBUG_PRINT("------------------------------"<<endl);
 
-	cout<<endl<<endl;
+	DEBUG_PRINT(endl<<endl);
 
 }
 
@@ -206,7 +212,7 @@ bool CPU::decode(uint8_t opcode){
 
 	switch(opcode){
 		case 0x00:        //BRK
-		cout<<"BRK"<<endl;
+		DEBUG_PRINT("BRK"<<endl);
 		return false;
 
 		case 0x01:        //ORA (ind,X)		
@@ -233,7 +239,7 @@ bool CPU::decode(uint8_t opcode){
 			break;
 
 		case 0x0D:
-			cout<<"ORA ABS"<<endl;
+			DEBUG_PRINT("ORA ABS"<<endl);
 			addr = absolute();		//ORA ABS
 			OR(regA,memory[addr]);
 			break;
@@ -278,12 +284,12 @@ bool CPU::decode(uint8_t opcode){
 			break;
 
 		case 0x78:						//SEI
-			cout<<"SEI"<<endl;
+			DEBUG_PRINT("SEI"<<endl);
 			regs.interrupt_flag = true;
 			break;
 
 	    case 0x81:						//STA (ind,X)
-	    	cout<<"STA indirect X"<<endl;
+	    	DEBUG_PRINT("STA indirect X"<<endl);
 
 	    	addr = indirect_X();
 	    	ST(regA,addr);
@@ -292,7 +298,7 @@ bool CPU::decode(uint8_t opcode){
 	    	break;
 
 	    case 0x84:						//STY zpg
-	    	cout<<"STY zpg"<<endl;
+	    	DEBUG_PRINT("STY zpg"<<endl);
 
 	    	addr = zero_page();
 	    	ST(regY,addr);
@@ -301,7 +307,7 @@ bool CPU::decode(uint8_t opcode){
 	    	break;
 
 	    case 0x85:						//STA zpg
-	    	cout<<"STA zpg"<<endl;
+	    	DEBUG_PRINT("STA zpg"<<endl);
 
 	    	addr = zero_page();
 	    	ST(regA,addr);
@@ -310,7 +316,7 @@ bool CPU::decode(uint8_t opcode){
 	    	break;
 
 	    case 0x86:						//STX zpg
-	    	cout<<"STX zpg"<<endl;
+	    	DEBUG_PRINT("STX zpg"<<endl);
 
 	    	addr = zero_page();
 	    	ST(regX,addr);
@@ -319,7 +325,7 @@ bool CPU::decode(uint8_t opcode){
 	    	break;
 
 	    case 0x8C:						//STY abs
-	    	cout<<"STY abs"<<endl;
+	    	DEBUG_PRINT("STY abs"<<endl);
 
 	    	addr = absolute();
 	    	ST(regY,addr);
@@ -328,185 +334,185 @@ bool CPU::decode(uint8_t opcode){
 	    	break;
 
 	    case 0x8D:						//STA abs
-	    	cout<<"STA ABS"<<endl;
+	    	DEBUG_PRINT("STA ABS"<<endl);
 
 	    	addr = absolute();
 	    	ST(regA,addr);
 	    	break;
 
 	    case 0x8E:						//STX abs
-	    	cout<<"STX ABS"<<endl;
+	    	DEBUG_PRINT("STX ABS"<<endl);
 
 	    	addr = absolute();
 	    	ST(regX,addr);
 	    	break;
 
 		case 0x91:						//STA (ind,x)
-	    	cout<<"STA ind y"<<endl;
+	    	DEBUG_PRINT("STA ind y"<<endl);
 
 	    	addr = indirect_Y();
 	    	ST(regA,addr);
 	    	break;
 
 		case 0x94:						//STA zpg,X
-	    	cout<<"STY zero page x"<<endl;
+	    	DEBUG_PRINT("STY zero page x"<<endl);
 
 	    	addr = zero_page(regX);
 	    	ST(regY,addr);
 	    	break;
 
 		case 0x95:						//STA zpg,X
-	    	cout<<"STA zero page x"<<endl;
+	    	DEBUG_PRINT("STA zero page x"<<endl);
 
 	    	addr = zero_page(regX);
 	    	ST(regA,addr);
 	    	break;
 
 		case 0x96:						//STA zpg,Y
-	    	cout<<"STX zero page x"<<endl;
+	    	DEBUG_PRINT("STX zero page x"<<endl);
 
 	    	addr = zero_page(regY);
 	    	ST(regX,addr);
 	    	break;
 		
 		case 0x99:						//STA abs,Y
-	    	cout<<"STA abs y"<<endl;
+	    	DEBUG_PRINT("STA abs y"<<endl);
 
 	    	addr = absolute(regY);
 	    	ST(regA,addr);
 	    	break;
 		
 		case 0x9A:						//TXS
-	    	cout<<"TXS"<<endl;
+	    	DEBUG_PRINT("TXS"<<endl);
 	    	regs.SP = regs.reg[regX];
 	    	break;
 
 		case 0x9D:						//STA abs,X
-	    	cout<<"STA abs X"<<endl;
+	    	DEBUG_PRINT("STA abs X"<<endl);
 
 	    	addr = absolute(regX);
 	    	ST(regA,addr);
 	    	break;
 
 		case 0xA0:						//LDY imm
-			cout<<"LDY IMM"<<endl;
+			DEBUG_PRINT("LDY IMM"<<endl);
 			addr = immediate();
 			LD(regY,addr);
 			break;
 
 		case 0xA1:						//LDA (ind,X)
-			cout<<"LDY IMM"<<endl;
+			DEBUG_PRINT("LDY IMM"<<endl);
 			addr = indirect_X();
 			LD(regA,memory[addr]);
 			break;
 
 		case 0xA2:						//LDX imm
-			cout<<"LDX IMM"<<endl;
+			DEBUG_PRINT("LDX IMM"<<endl);
 			addr = immediate();
 			LD(regX,addr);
 			break;
 
 		case 0xA4:						//LDY zpg
-			cout<<"LDY zero"<<endl;
+			DEBUG_PRINT("LDY zero"<<endl);
 			addr = zero_page();
 			LD(regY,memory[addr]);
 			break;
 
 		case 0xA5:						//LDA zpg
-			cout<<"LDA zero"<<endl;
+			DEBUG_PRINT("LDA zero"<<endl);
 			addr = zero_page();
 			LD(regA,memory[addr]);
 			break;
 
 		case 0xA6:						//LDX zpg
-			cout<<"LDX zero"<<endl;
+			DEBUG_PRINT("LDX zero"<<endl);
 			addr = zero_page();
 			LD(regX,memory[addr]);
 			break;
 
 		case 0xA9:						//LDA imm
-			cout<<"LOAD IMM"<<endl;
+			DEBUG_PRINT("LOAD IMM"<<endl);
 			addr = immediate();
 			LD(regA,addr);
 			break;
 
 		case 0xAC:						//LDY abs
-			cout<<"LOAD abs"<<endl;
+			DEBUG_PRINT("LOAD abs"<<endl);
 			addr = absolute();
 			LD(regY,memory[addr]);
 			break;
 
 		case 0xAD:						//LDA abs
-			cout<<"LOAD abs"<<endl;
+			DEBUG_PRINT("LOAD abs"<<endl);
 			addr = absolute();
 			LD(regA,memory[addr]);
 			break;
 
 		case 0xAE:						//LDX abs
-			cout<<"LOAD abs"<<endl;
+			DEBUG_PRINT("LOAD abs"<<endl);
 			addr = absolute();
 			LD(regX,memory[addr]);
 			break;
 
 		case 0xB1:						//LDA ind y
-			cout<<"LOAD ind y"<<endl;
+			DEBUG_PRINT("LOAD ind y"<<endl);
 			addr = indirect_Y();
 			LD(regA,memory[addr]);
 			break;
 
 		case 0xB4:						//LDY zpg,X
-			cout<<"LOAD ind y"<<endl;
+			DEBUG_PRINT("LOAD ind y"<<endl);
 			addr = indirect_X();
 			LD(regY,memory[addr]);
 			break;
 
 		case 0xB5:						//LDA zpg,X
-			cout<<"LOAD ind y"<<endl;
+			DEBUG_PRINT("LOAD ind y"<<endl);
 			addr = indirect_X();
 			LD(regA,memory[addr]);
 			break;
 				
 		case 0xB6:						//LDX zpg,Y
-			cout<<"LOAD ind y"<<endl;
+			DEBUG_PRINT("LOAD ind y"<<endl);
 			addr = indirect_Y();
 			LD(regX,memory[addr]);
 			break;
 
 		case 0xB9:						//LDA abs,Y
-			cout<<"LOAD abs y"<<endl;
+			DEBUG_PRINT("LOAD abs y"<<endl);
 			addr = absolute(regY);
 			LD(regA,memory[addr]);
 			break;
 
 		case 0xBC:						//LDY abs,X
-			cout<<"LOAD abs X"<<endl;
+			DEBUG_PRINT("LOAD abs X"<<endl);
 			addr = absolute(regX);
 			LD(regY,memory[addr]);
 			break;
 
 		case 0xBD:						//LDA abs,X
-			cout<<"LOAD abs X"<<endl;
+			DEBUG_PRINT("LOAD abs X"<<endl);
 			addr = absolute(regX);
 			LD(regA,memory[addr]);
 			break;
 
 		case 0xBE:						//LDX abs,X
-			cout<<"LOAD abs Y"<<endl;
+			DEBUG_PRINT("LOAD abs Y"<<endl);
 			addr = absolute(regY);
 			LD(regX,memory[addr]);
 			break;
 
 		case 0xEA:						//NOP
-			cout<<"NOP"<<endl;
+			DEBUG_PRINT("NOP"<<endl);
 			break;
 		
 		case 0xD8:						//CLD
-			cout<<"CLD"<<endl;
+			DEBUG_PRINT("CLD"<<endl);
 			regs.decimal_mode_flag = false;
 			break;
 		
 		default:
-			cout<<"unimplemented: "<<hex<<unsigned(opcode)<<endl;
+			DEBUG_PRINT("unimplemented: "<<hex<<unsigned(opcode)<<endl);
  	}
 
   return true;

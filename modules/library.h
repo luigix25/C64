@@ -1,13 +1,18 @@
 #pragma once
 
+//#ifndef LIBRARY_GUARD
+//#define LIBRARY_GUARD
+
 #include <iostream>
-#include<fstream>
+#include <fstream>
 #include <string.h>
 #include <stdint.h>
 
+#include "debug.h"
+
 using namespace std;
 
-#define ROM_CHIPS "kernel_and_basic.bin"
+#define ROM_CHIPS "roms/kernel_and_basic.bin"
 
 #define eigthK 8192
 #define sixteenK  16384
@@ -26,13 +31,6 @@ using namespace std;
 #define STACK_END 0x01FF
 
 #define RESET_routine 0xFCE2
-
-#ifdef DEBUG_MODE
-	#define DEBUG_PRINT(x) cout<<x;
-#else
-	#define DEBUG_PRINT(x) ;
-#endif
-
 
 
 void hexDump(void*, int);
@@ -57,3 +55,5 @@ struct registers{
 
 	uint8_t Flags;
 };
+
+//#endif
