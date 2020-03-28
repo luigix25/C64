@@ -8,14 +8,22 @@ char convert(char);
 bool decode(uint8_t);
 bool fetch();
 uint8_t immediate();
+
+uint16_t read_two_bytes(uint16_t);
+
+void LD(register_name, uint8_t);
 void OR(register_name, uint8_t);
+void ST(register_name, uint16_t);
+void JMP(uint16_t);
+
 uint16_t absolute();
-uint16_t absolute_X();
+uint16_t absolute(register_name);
 
 uint8_t zero_page();
-uint8_t zero_page_addr_X();
+uint8_t zero_page(register_name);
 
-uint8_t indirect_Y();
+uint16_t indirect_Y();
+uint16_t indirect_X();
 
 void dump_reg(){
 
@@ -56,11 +64,9 @@ int main(){
 	while(loop){
 
 		loop = fetch();
-		dump_reg();
-
 	}
 
-
+	dump_reg();
 
 	//hexDump(memory+BASIC_START,2);
 
@@ -77,18 +83,21 @@ bool fetch(){
 
 bool decode(uint8_t opcode){
 
+
+	//OR LD E ST fatte
+
   uint8_t high = opcode & 0xFF00;
   uint8_t low = opcode & 0x00FF;
 
-  uint16_t addr;
+  uint16_t addr,tmp;
 
   switch(opcode){
     case 0x00:        //BRK
       return false;
-    case 0x01:        //ORA (ind,X)
 
-      //read from the zero page
-      addr = zero_page_addr_X();
+    case 0x01:        //ORA (ind,X)		
+
+      addr = indirect_X();			
 
       OR(regA,memory[addr]);
       break;
@@ -110,40 +119,276 @@ bool decode(uint8_t opcode){
     	break;
 
     case 0x0D:
-      cout<<"ORA ABS"<<endl;
+		cout<<"ORA ABS"<<endl;
+		addr = absolute();		//ORA ABS
+		OR(regA,memory[addr]);
+		break;
+		
+	case 0x0E:						//ASL ABS
+		break;
 
-    	addr = absolute();		//ORA ABS
-    	OR(regA,memory[addr]);
+	case 0x10:						//BPL(?)
+		break;
+	
+	case 0x11:						//ORA (ind),Y
+
+		addr = indirect_Y();
+		OR(regA,memory[addr]);
+		break;
+
+	case 0x15:						//ORA zpg,X
+
+		addr = zero_page(regX);
+		OR(regA,memory[addr]);
+		break;
+
+	case 0x1D:						//ORA abs,X
+
+		addr = absolute(regX);
+		OR(regA,memory[addr]);
+		break;
+
+	case 0x4C:						//JMP abs
+
+		addr = absolute();
+		JMP(addr);
+		break;
+	
+	case 0x6C:						//JMP (ind)
+
+		tmp = absolute();
+
+		addr = read_two_bytes(tmp);
+
+		JMP(tmp);
+		break;
+
+    case 0x81:						//STA (ind,X)
+    	cout<<"STA indirect X"<<endl;
+
+    	addr = indirect_X();
+    	ST(regA,addr);
+
+    	//memory[addr] = regs.reg[regA];
+    	break;
+
+    case 0x84:						//STY zpg
+    	cout<<"STY zpg"<<endl;
+
+    	addr = zero_page();
+    	ST(regY,addr);
+
+    	//memory[addr] = regs.reg[regA];
+    	break;
+
+    case 0x85:						//STA zpg
+    	cout<<"STA zpg"<<endl;
+
+    	addr = zero_page();
+    	ST(regA,addr);
+
+    	//memory[addr] = regs.reg[regA];
+    	break;
+
+    case 0x86:						//STX zpg
+    	cout<<"STX zpg"<<endl;
+
+    	addr = zero_page();
+    	ST(regX,addr);
+
+    	//memory[addr] = regs.reg[regA];
+    	break;
+
+    case 0x8C:						//STY abs
+    	cout<<"STY abs"<<endl;
+
+    	addr = absolute();
+    	ST(regY,addr);
+
+    	//memory[addr] = regs.reg[regA];
     	break;
 
     case 0x8D:						//STA abs
     	cout<<"STA ABS"<<endl;
 
     	addr = absolute();
-    	memory[addr] = regs.reg[regA];
+    	ST(regA,addr);
     	break;
 
-    case 0xA9:						//LDA imm
-    	cout<<"LOAD IMM"<<endl;
-    	addr = immediate();
-    	regs.reg[regA] = (uint8_t)addr;
+    case 0x8E:						//STX abs
+    	cout<<"STX ABS"<<endl;
+
+    	addr = absolute();
+    	ST(regX,addr);
     	break;
 
+	case 0x91:						//STA (ind,x)
+    	cout<<"STA ind y"<<endl;
+
+    	addr = indirect_Y();
+    	ST(regA,addr);
+    	break;
+
+	case 0x94:						//STA zpg,X
+    	cout<<"STY zero page x"<<endl;
+
+    	addr = zero_page(regX);
+    	ST(regY,addr);
+    	break;
+
+	case 0x95:						//STA zpg,X
+    	cout<<"STA zero page x"<<endl;
+
+    	addr = zero_page(regX);
+    	ST(regA,addr);
+    	break;
+
+	case 0x96:						//STA zpg,Y
+    	cout<<"STX zero page x"<<endl;
+
+    	addr = zero_page(regY);
+    	ST(regX,addr);
+    	break;
+	
+	case 0x99:						//STA abs,Y
+    	cout<<"STA abs y"<<endl;
+
+    	addr = absolute(regY);
+    	ST(regA,addr);
+    	break;
+	
+	case 0x9D:						//STA abs,X
+    	cout<<"STA abs X"<<endl;
+
+    	addr = absolute(regX);
+    	ST(regA,addr);
+    	break;
+
+	case 0xA0:						//LDY imm
+		cout<<"LDY IMM"<<endl;
+		addr = immediate();
+		LD(regY,addr);
+		break;
+
+	case 0xA1:						//LDA (ind,X)
+		cout<<"LDY IMM"<<endl;
+		addr = indirect_X();
+		LD(regA,memory[addr]);
+		break;
+
+	case 0xA2:						//LDX imm
+		cout<<"LDX IMM"<<endl;
+		addr = immediate();
+		LD(regX,addr);
+		break;
+
+	case 0xA4:						//LDY zpg
+		cout<<"LDY zero"<<endl;
+		addr = zero_page();
+		LD(regY,memory[addr]);
+		break;
+
+	case 0xA5:						//LDA zpg
+		cout<<"LDA zero"<<endl;
+		addr = zero_page();
+		LD(regA,memory[addr]);
+		break;
+
+	case 0xA6:						//LDX zpg
+		cout<<"LDX zero"<<endl;
+		addr = zero_page();
+		LD(regX,memory[addr]);
+		break;
+
+	case 0xA9:						//LDA imm
+		cout<<"LOAD IMM"<<endl;
+		addr = immediate();
+		LD(regA,addr);
+		break;
+
+	case 0xAC:						//LDY abs
+		cout<<"LOAD abs"<<endl;
+		addr = absolute();
+		LD(regY,memory[addr]);
+		break;
+
+	case 0xAD:						//LDA abs
+		cout<<"LOAD abs"<<endl;
+		addr = absolute();
+		LD(regA,memory[addr]);
+		break;
+
+	case 0xAE:						//LDX abs
+		cout<<"LOAD abs"<<endl;
+		addr = absolute();
+		LD(regX,memory[addr]);
+		break;
+
+	case 0xB1:						//LDA ind y
+		cout<<"LOAD ind y"<<endl;
+		addr = indirect_Y();
+		LD(regA,memory[addr]);
+		break;
+
+	case 0xB4:						//LDY zpg,X
+		cout<<"LOAD ind y"<<endl;
+		addr = indirect_X();
+		LD(regY,memory[addr]);
+		break;
+
+	case 0xB5:						//LDA zpg,X
+		cout<<"LOAD ind y"<<endl;
+		addr = indirect_X();
+		LD(regA,memory[addr]);
+		break;
+			
+	case 0xB6:						//LDX zpg,Y
+		cout<<"LOAD ind y"<<endl;
+		addr = indirect_Y();
+		LD(regX,memory[addr]);
+		break;
+
+	case 0xB9:						//LDA abs,Y
+		cout<<"LOAD abs y"<<endl;
+		addr = absolute(regY);
+		LD(regA,memory[addr]);
+		break;
+
+	case 0xBC:						//LDY abs,X
+		cout<<"LOAD abs X"<<endl;
+		addr = absolute(regX);
+		LD(regY,memory[addr]);
+		break;
+
+	case 0xBD:						//LDA abs,X
+		cout<<"LOAD abs X"<<endl;
+		addr = absolute(regX);
+		LD(regA,memory[addr]);
+		break;
+
+	case 0xBE:						//LDX abs,X
+		cout<<"LOAD abs Y"<<endl;
+		addr = absolute(regY);
+		LD(regX,memory[addr]);
+		break;
+
+	case 0xEA:						//NOP
+		break;
   }
 
   return true;
 
 }
 
-uint8_t zero_page_addr_X(){
+uint8_t zero_page(register_name index){
   //Immediate operand
   
-  uint8_t addr;
-  addr = memory[regs.PC];
+	uint8_t addr;
 
-  //Sum X register
-  addr += regs.reg[regX];
-	regs.PC++;
+	addr = immediate();
+
+ 	//Sum X register
+	addr += regs.reg[index];
 
 	return addr;
 
@@ -170,6 +415,21 @@ uint8_t immediate(){
 	return addr;
 }
 
+uint16_t read_two_bytes(uint16_t addr){
+
+	uint16_t data = memory[addr];
+
+	uint16_t tmp = memory[addr+1];
+
+	tmp = tmp <<8;
+
+	data |= tmp;
+
+
+	return data;
+
+}
+
 uint16_t absolute(){
 
 	//Prima parte bassa e poi parte alta
@@ -190,17 +450,39 @@ uint16_t absolute(){
 
 }
 
-uint16_t absolute_X(){
+uint16_t absolute(register_name index){
 
 	uint16_t addr = absolute();
-	addr+= regs.reg[regX];
+	addr+= regs.reg[index];
 
 	return addr;
 
 }
 
+uint16_t indirect_X(){
 
-uint8_t indirect_Y(){
+	uint16_t addr;
+
+	//zero page addr!!
+	uint8_t zero_page_addr = immediate();
+	uint16_t tmp;
+
+	zero_page_addr += regs.reg[regX];
+
+	//least significant byte
+	addr = memory[zero_page_addr];
+
+	tmp = memory[zero_page_addr+1];
+	tmp = tmp << 8;
+
+	addr |= tmp;
+
+	return addr; 
+
+
+}
+
+uint16_t indirect_Y(){
 
 	uint16_t addr;
 
@@ -220,6 +502,8 @@ uint8_t indirect_Y(){
 
 	addr += regs.reg[regY];
 
+	return addr;
+
 }
 
 
@@ -231,6 +515,19 @@ void OR(register_name index, uint8_t operand){
 
 void LD(register_name index, uint8_t operand){
 
+	regs.reg[index] = operand;
+
+}
+
+void ST(register_name index, uint16_t addr){
+
+	memory[addr] = regs.reg[index];
+
+}
+
+void JMP(uint16_t addr){
+
+	regs.PC = memory[addr];
 
 }
 
