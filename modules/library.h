@@ -12,7 +12,8 @@
 
 using namespace std;
 
-#define ROM_CHIPS "roms/kernel_and_basic.bin"
+#define KERNAL_BASIC_ROM "roms/251913-01.bin"
+#define CHARSET_ROM "roms/901225-01.bin"
 
 #define eigthK 8192
 #define sixteenK  16384

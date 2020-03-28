@@ -26,7 +26,7 @@ int main(){
 	memory[10] = 0x00;
 	*/
 
-	loadKernalAndBasic(memory,ROM_CHIPS);
+	loadKernalAndBasic(memory,KERNAL_BASIC_ROM);
 
 	//hexDump(memory+0xFFFC,10);
 
