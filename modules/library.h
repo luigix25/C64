@@ -55,11 +55,14 @@ struct registers{
 	uint16_t SP;
 	uint16_t PC;
 
-
+	bool sign_flag;
+	bool overflow_flag;
+	bool zero_flag;
+	bool carry_flag;
 	bool interrupt_flag;
 	bool decimal_mode_flag;
 
-	uint8_t Flags;
+	uint8_t flags;
 };
 
 //#endif

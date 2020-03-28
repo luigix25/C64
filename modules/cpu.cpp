@@ -4,12 +4,15 @@ CPU::CPU(uint8_t* memory, uint16_t PC){
 
 	this->memory = memory;
 	regs.PC = PC;
+	regs.SP = 0;
 
 }
 
 CPU::CPU(uint8_t* memory){
 
 	this->memory = memory;
+
+	regs.SP = 0;
 	regs.PC = RESET_routine;
 
 }
@@ -174,9 +177,21 @@ void CPU::ST(register_name index, uint16_t addr){
 }
 
 void CPU::JMP(uint16_t addr){
-
 	regs.PC = memory[addr];
+}
 
+void CPU::PUSH(register_name index){
+
+	uint16_t addr = STACK_START + regs.SP;
+	memory[addr] = regs.reg[index];
+	regs.SP--;
+}
+
+void CPU::PUSH(uint8_t value){
+
+	uint16_t addr = STACK_START + regs.SP;
+	memory[addr] = value;
+	regs.SP--;
 }
 
 uint8_t CPU::fetch(){
@@ -186,6 +201,24 @@ uint8_t CPU::fetch(){
 	regs.PC++;
 	return opcode;
 
+}
+
+uint8_t CPU::flags()
+{
+	uint8_t v = 0;
+
+	v |= regs.carry_flag  << 0;
+	v |= regs.zero_flag  << 1;
+	v |= regs.interrupt_flag << 2;
+	v |= regs.decimal_mode_flag << 3;
+
+	v |= 1 << 4;
+	/* unused, always set */
+	v |= 1     << 5;
+	v |= regs.overflow_flag  << 6;
+	v |= regs.sign_flag  << 7;
+
+	return v;
 }
 
 //DEBUG
@@ -206,7 +239,7 @@ void CPU::dump_reg(){
 
 bool CPU::decode(uint8_t opcode){
 
-	//OR LD E ST fatte
+	//OR LD ST PH fatte
 
 	uint16_t addr,tmp;
 
@@ -230,7 +263,9 @@ bool CPU::decode(uint8_t opcode){
 		case 0x06:			//ASL
 			break;
 	    
+	    //TODO
 		case 0x08:			//PHP
+			PUSH(flags());
 			break;
 
 		case 0x09:			//ORA imm
@@ -267,7 +302,12 @@ bool CPU::decode(uint8_t opcode){
 			addr = absolute(regX);
 			OR(regA,memory[addr]);
 			break;
+		
+		case 0x48:						//PHA
 
+			PUSH(regA);
+			break;
+		
 		case 0x4C:						//JMP abs
 
 			addr = absolute();

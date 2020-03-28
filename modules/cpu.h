@@ -43,11 +43,15 @@ private:
 	uint16_t indirect_Y();
 	uint16_t indirect_X();
 
+	uint8_t flags();
+
 	//Istructions
 
 	void LD(register_name, uint8_t);
 	void OR(register_name, uint8_t);
 	void ST(register_name, uint16_t);
 	void JMP(uint16_t);
-	
+	void PUSH(register_name);
+	void PUSH(uint8_t);
+
 };
