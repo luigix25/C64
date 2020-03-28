@@ -2,6 +2,9 @@
 
 #define RESET_routine 0xFCE2
 
+#define SET_ZF(val)     (regs.zero_flag = !(uint8_t)(val))
+#define SET_NF(val)     (regs.sign_flag = ((uint8_t)(val)&0x80)!=0)
+
 class CPU
 {
 
@@ -48,10 +51,25 @@ private:
 	//Istructions
 
 	void LD(register_name, uint8_t);
-	void OR(register_name, uint8_t);
 	void ST(register_name, uint16_t);
-	void JMP(uint16_t);
+
 	void PUSH(register_name);
 	void PUSH(uint8_t);
+	uint8_t POP();
+	
+	void JMP(uint16_t);
+	void JSR(uint16_t);
+	void CMP(uint16_t);
+
+	void BNE(uint8_t);
+	void BEQ(uint8_t);
+
+	void DE(register_name);
+	void INY();
+	void INX();
+	void CP(register_name, uint8_t);
+
+	void OR(register_name, uint8_t);
+	void AND(uint8_t);
 
 };

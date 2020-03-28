@@ -29,7 +29,7 @@ int main(){
 	loadKernalAndBasic(memory,KERNAL_BASIC_ROM);
 	loadKernalAndBasic(memory,CHARSET_ROM);
 
-	//hexDump(memory+0xFFFC,10);
+	//hexDump(memory+0xFD02,10);
 
 	//DEBUG_PRINT("ciao"<<" "<<"we"<<endl);
 
@@ -41,6 +41,7 @@ int main(){
 
 		opcode = cpu.fetch();
 		loop = cpu.decode(opcode);
+		//cpu.dump_reg();
 
 	}
 
