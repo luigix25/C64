@@ -25,6 +25,9 @@ using namespace std;
 #define STACK_START 0x0100
 #define STACK_END 0x01FF
 
+#define RESET_routine 0xFCE2
+
+
 void hexDump(void*, int);
 
 void loadKernalAndBasic(uint8_t *,const char*);
