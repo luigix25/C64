@@ -1,5 +1,8 @@
+#define DEBUG_MODE 1
+
 #include "modules/library.h"
 #include "modules/cpu.h"
+
 
 uint8_t memory[sixtyfourK];
 
@@ -28,6 +31,8 @@ int main(){
 	loadKernalAndBasic(memory,ROM_CHIPS);
 
 	//hexDump(memory+0xFFFC,10);
+
+	DEBUG_PRINT("ciao"<<" "<<"we");
 
 	bool loop = true;
 	uint8_t opcode;

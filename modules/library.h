@@ -27,6 +27,13 @@ using namespace std;
 
 #define RESET_routine 0xFCE2
 
+#ifdef DEBUG_MODE
+	#define DEBUG_PRINT(x) cout<<x;
+#else
+	#define DEBUG_PRINT(x) ;
+#endif
+
+
 
 void hexDump(void*, int);
 
