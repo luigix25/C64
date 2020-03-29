@@ -22,6 +22,9 @@ public:
 	//DEBUG
 	void dump_reg();
 
+	//active low
+	bool irq_line;
+	bool nmi_line;
 
 private:
 

@@ -8,6 +8,10 @@ CPU::CPU(Memory* memory, uint16_t PC){
 	
 	reset_flags();
 
+	//ative low
+	nmi_line = true;
+	irq_line = true;
+
 }
 
 CPU::CPU(Memory* memory){
@@ -18,6 +22,10 @@ CPU::CPU(Memory* memory){
 	regs.PC = RESET_routine;
 
 	reset_flags();
+
+	//ative low
+	nmi_line = true;
+	irq_line = true;
 
 }
 
@@ -541,6 +549,11 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("JMP to "<<hex<<unsigned(addr)<<endl);
 
 			regs.PC = addr;
+			break;
+
+		case 0x58:						//CLI
+			DEBUG_PRINT("CLI"<<endl);
+			regs.interrupt_flag = false;
 			break;
 		
 		case 0x60:						//RTS
