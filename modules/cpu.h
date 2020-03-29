@@ -65,10 +65,15 @@ private:
 
 	void BNE(uint8_t);
 	void BEQ(uint8_t);
+	void BCS(uint8_t);
+	void BCC(uint8_t);
+	void BPL(uint8_t);
+	void BMI(uint8_t);
 
 	void DE(register_name);
 	void INC(register_name index);
 	void INC(uint16_t);
+	void ADC(uint8_t);
 
 	void CP(register_name, uint8_t);
 

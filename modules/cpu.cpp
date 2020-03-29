@@ -217,6 +217,7 @@ void CPU::JSR(uint16_t addr){
 uint8_t CPU::fetch(){
 
 	uint8_t opcode = read_byte(regs.PC);
+	//DEBUG_PRINT(hex<<unsigned(opcode)<<endl);
 
 	regs.PC++;
 	return opcode;
@@ -268,6 +269,54 @@ void CPU::BNE(uint8_t addr){
 
 }
 
+void CPU::BCC(uint8_t addr){
+
+	uint16_t new_addr = (int8_t) addr + regs.PC;
+	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
+
+	if(!regs.carry_flag){
+		cout<<"BCC to "<<hex<<unsigned(new_addr)<<endl;
+		regs.PC = new_addr;
+	}
+
+}
+
+void CPU::BMI(uint8_t addr){
+
+	uint16_t new_addr = (int8_t) addr + regs.PC;
+	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
+
+	if(regs.sign_flag){
+		cout<<"BMI to "<<hex<<unsigned(new_addr)<<endl;
+		regs.PC = new_addr;
+	}
+
+}
+
+void CPU::BCS(uint8_t addr){
+
+	uint16_t new_addr = (int8_t) addr + regs.PC;
+	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
+
+	if(regs.carry_flag){
+		cout<<"BCS to "<<hex<<unsigned(new_addr)<<endl;
+		regs.PC = new_addr;
+	}
+
+}
+
+void CPU::BPL(uint8_t addr){
+
+	uint16_t new_addr = (int8_t) addr + regs.PC;
+	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
+
+	if(regs.sign_flag){
+		cout<<"BPL to "<<hex<<unsigned(new_addr)<<endl;
+		regs.PC = new_addr;
+	}
+
+}
+
 void CPU::BEQ(uint8_t addr){
 
 	uint16_t new_addr = (int8_t) addr + regs.PC;
@@ -293,7 +342,40 @@ void CPU::INC(uint16_t addr)
 	memory->write_byte(addr,value);
 	SET_ZF(value);
 	SET_NF(value);
+
+}
+
+void CPU::ADC(uint8_t value)
+{
+
+	uint16_t t;
+	if(regs.decimal_mode_flag)
+	{
+		/*
+		t = (a()&0xf) + (v&0xf) + (cf() ? 1 : 0);
+		
+		if (t > 0x09) 
+			t += 0x6;
+		t += (a()&0xf0) + (v&0xf0);
+		
+		if((t & 0x1f0) > 0x90) 
+			t += 0x60;
+		*/
+	} else{
+		t = regs.reg[regA] + value + (regs.carry_flag ? 1 : 0);
+	}
+
+	regs.carry_flag = t > 0xff;
+	t = t & 0xff;
+
+	regs.overflow_flag = !(( regs.reg[regA] ^ value )&0x80) && (( regs.reg[regA] ^ t) & 0x80);
+
 	
+	SET_ZF(t);
+	SET_NF(t);
+
+	regs.reg[regA] = (uint8_t)t;
+
 }
 
 void CPU::CP(register_name index, uint8_t v)
@@ -397,7 +479,10 @@ bool CPU::decode(uint8_t opcode){
 		case 0x0E:						//ASL ABS
 			break;
 
-		case 0x10:						//BPL(?)
+		case 0x10:						//BPL
+			DEBUG_PRINT("BPL"<<endl);
+			addr = immediate();
+			BPL(addr);
 			break;
 		
 		case 0x11:						//ORA (ind),Y
@@ -412,8 +497,8 @@ bool CPU::decode(uint8_t opcode){
 			OR(regA,memory->read_byte(addr));
 			break;
 		
-		case 0x18:						//ORA zpg,X
-
+		case 0x18:						//CLC
+			DEBUG_PRINT("CLC"<<endl);
 			regs.carry_flag = false;
 			break;
 
@@ -435,6 +520,12 @@ bool CPU::decode(uint8_t opcode){
 			AND(addr);
 			break;
 		
+		case 0x30:						//BMI 
+			addr = immediate();
+			DEBUG_PRINT("BMI "<<hex<<unsigned(addr)<<endl);
+			BMI(addr);
+			break;
+
 		case 0x2A:						//ROL A 
 			DEBUG_PRINT("ROL A"<<endl);
 			ROL(regA);
@@ -451,10 +542,17 @@ bool CPU::decode(uint8_t opcode){
 
 			regs.PC = addr;
 			break;
+		
 		case 0x60:						//RTS
 			DEBUG_PRINT("RTS"<<endl);
 			addr = (POP() + (POP() << 8)) + 1;
   			regs.PC = addr;
+			break;
+
+		case 0x69:						//ADC imm
+			DEBUG_PRINT("ADC"<<endl);
+			addr = immediate();
+			ADC(addr);
 			break;
 
 		case 0x6C:						//JMP (ind)
@@ -488,9 +586,10 @@ bool CPU::decode(uint8_t opcode){
 	    	break;
 
 	    case 0x85:						//STA zpg
-	    	DEBUG_PRINT("STA zpg"<<endl);
 
 	    	addr = zero_page();
+	    	DEBUG_PRINT("STA "<<hex<<unsigned(addr)<<endl);
+
 	    	ST(regA,addr);
 
 	    	break;
@@ -536,12 +635,19 @@ bool CPU::decode(uint8_t opcode){
 	    	ST(regX,addr);
 	    	break;
 
-		case 0x91:						//STA (ind),Y
-	    	DEBUG_PRINT("STA ind y"<<endl);
+		case 0x90:						//BCC
+	    	DEBUG_PRINT("BCC"<<endl);
 
-	    	addr = indirect_Y();
-	    	ST(regA,addr);
+	    	addr = immediate();
+	    	BCC(addr);
 	    	break;
+
+		case 0x91:						//STA (ind),Y
+			DEBUG_PRINT("STA ind y"<<endl);
+
+			addr = indirect_Y();
+			ST(regA,addr);
+			break;
 
 		case 0x94:						//STA zpg,X
 	    	DEBUG_PRINT("STY zero page x"<<endl);
@@ -564,11 +670,18 @@ bool CPU::decode(uint8_t opcode){
 	    	ST(regX,addr);
 	    	break;
 		
-		case 0x99:						//STA abs,Y
-	    	addr = absolute(regY);
-	    	DEBUG_PRINT("STA abs y"<<endl);
-	    	ST(regA,addr);
+		case 0x98:						//TYA
+	    	DEBUG_PRINT("TYA"<<endl);
+	    	regs.reg[regA] = regs.reg[regY];
+			SET_ZF(regs.reg[regA]);
+			SET_NF(regs.reg[regA]);
 	    	break;
+
+		case 0x99:						//STA abs,Y
+			addr = absolute(regY);
+			DEBUG_PRINT("STA abs y"<<endl);
+			ST(regA,addr);
+			break;
 		
 		case 0x9A:						//TXS
 	    	DEBUG_PRINT("TXS"<<endl);
@@ -601,8 +714,8 @@ bool CPU::decode(uint8_t opcode){
 			break;
 
 		case 0xA4:						//LDY zpg
-			DEBUG_PRINT("LDY zero"<<endl);
 			addr = zero_page();
+			DEBUG_PRINT("LDY "<<hex<<unsigned(addr)<<endl);
 			LD(regY,memory->read_byte(addr));
 			break;
 
@@ -650,6 +763,12 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("LOAD abs"<<endl);
 			addr = absolute();
 			LD(regX,memory->read_byte(addr));
+			break;
+		
+		case 0xB0:						//BCS
+			DEBUG_PRINT("BCS"<<endl);
+			addr = immediate();
+			BCS(addr);
 			break;
 
 		case 0xB1:						//LDA ind y
