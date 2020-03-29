@@ -16,7 +16,7 @@ using namespace std;
 #define CHARSET_ROM "roms/901225-01.bin"
 
 #define fourK 4096
-#define eigthK 8192
+#define eightK 8192
 #define sixteenK  16384
 #define sixtyfourK 65536
 
@@ -36,6 +36,8 @@ using namespace std;
 #define CHAR_END 0x0DFFF
 
 #define RESET_routine 0xFCE2
+
+#define null 0
 
 
 void hexDump(void*, int);

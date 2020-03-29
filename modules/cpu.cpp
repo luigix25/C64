@@ -49,7 +49,7 @@ uint8_t CPU::zero_page(register_name index){
 uint8_t CPU::zero_page(){
   
 	uint8_t addr;
-	addr = memory[regs.PC];
+	addr = memory->read_byte(regs.PC);
 
 	regs.PC++;
 
@@ -69,7 +69,7 @@ uint8_t CPU::immediate(){
 
 uint8_t CPU::read_byte(uint16_t addr){
 
-	uint8_t data = memory[addr];
+	uint8_t data = memory->read_byte(addr);
 
 	return data;
 
@@ -77,8 +77,8 @@ uint8_t CPU::read_byte(uint16_t addr){
 
 uint16_t CPU::read_word(uint16_t addr){
 
-	uint16_t data = memory[addr];
-	uint16_t tmp = memory[addr+1];
+	uint16_t data = memory->read_byte(addr);
+	uint16_t tmp = memory->read_byte(addr+1);
 
 	tmp = tmp <<8;
 	data |= tmp;
@@ -88,20 +88,6 @@ uint16_t CPU::read_word(uint16_t addr){
 }
 
 uint16_t CPU::absolute(){
-
-	/*Prima parte bassa e poi parte alta
-	uint16_t addr;
-	addr = read_byte(regs.PC);
-
-	regs.PC++;
-
-	uint16_t tmp;
-	tmp = memory[regs.PC];
-	regs.PC++;
-
-	tmp = tmp <<8;
-	addr |= tmp;
-*/
 
 	uint16_t addr = read_word(regs.PC);
 
@@ -126,19 +112,9 @@ uint16_t CPU::indirect_X(){
 
 	//zero page addr!!
 	uint8_t zero_page_addr = immediate();
-	//uint16_t tmp;
 
 	zero_page_addr += regs.reg[regX];
-
-	//least significant byte
 	addr = read_word(zero_page_addr);
-
-	/*addr = memory[zero_page_addr];
-
-	tmp = memory[zero_page_addr+1];
-	tmp = tmp << 8;
-
-	addr |= tmp;*/
 
 	return addr; 
 
@@ -155,18 +131,6 @@ uint16_t CPU::indirect_Y(){
 	//uint16_t tmp;
 
 	addr = read_word(zero_page_addr);
-
-
-	//address is stored inside the zero-page
-	//Least significant byte
-	/*addr = memory[zero_page_addr];
-
-	//Most sig. byte
-	tmp = memory[zero_page_addr+1];
-	tmp = tmp << 8;
-	addr |= tmp;
-*/
-
 	addr += regs.reg[regY];
 
 	return addr;
@@ -211,25 +175,25 @@ void CPU::LD(register_name index, uint8_t operand){
 
 void CPU::ST(register_name index, uint16_t addr){
 
-	memory[addr] = regs.reg[index];
+	memory->write_byte(addr,regs.reg[index]);
 
 }
 
 void CPU::JMP(uint16_t addr){
-	regs.PC = memory[addr];
+	regs.PC = memory->read_byte(addr);
 }
 
 void CPU::PUSH(register_name index){
 
 	uint16_t addr = STACK_START + regs.SP;
-	memory[addr] = regs.reg[index];
+	memory->write_byte(addr,regs.reg[index]);
 	regs.SP--;
 }
 
 void CPU::PUSH(uint8_t value){
 
 	uint16_t addr = STACK_START + regs.SP;
-	memory[addr] = value;
+	memory->write_byte(addr, value);
 	regs.SP--;
 }
 
@@ -237,7 +201,7 @@ uint8_t CPU::POP(){
 
   	uint16_t addr = ++regs.SP + STACK_START;
 
-  	return memory[addr];
+  	return memory->read_byte(addr);
 
 }
 
@@ -279,7 +243,7 @@ uint8_t CPU::flags()
 
 void CPU::CMP(uint16_t addr){
 
-	uint8_t data = memory[addr];
+	uint8_t data = memory->read_byte(addr);
 
 	uint16_t t;
 	t = regs.reg[regA] - data;
@@ -323,9 +287,13 @@ void CPU::INC(register_name index)
 
 void CPU::INC(uint16_t addr)
 {
-	memory[addr] +=1;
-	SET_ZF(memory[addr]);
-	SET_NF(memory[addr]);
+
+	uint8_t value = memory->read_byte(addr);
+	value++;
+	memory->write_byte(addr,value);
+	SET_ZF(value);
+	SET_NF(value);
+	
 }
 
 void CPU::CP(register_name index, uint8_t v)
@@ -398,12 +366,12 @@ bool CPU::decode(uint8_t opcode){
 
 			addr = indirect_X();			
 
-			OR(regA,memory[addr]);
+			OR(regA,memory->read_byte(addr));
 			break;
 
 		case 0x05:      //ORA zpg
 			addr = zero_page();
-			OR(regA, memory[addr]);
+			OR(regA, memory->read_byte(addr));
 			break;
 
 		case 0x06:			//ASL
@@ -423,7 +391,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0x0D:
 			DEBUG_PRINT("ORA ABS"<<endl);
 			addr = absolute();		//ORA ABS
-			OR(regA,memory[addr]);
+			OR(regA,memory->read_byte(addr));
 			break;
 			
 		case 0x0E:						//ASL ABS
@@ -435,13 +403,13 @@ bool CPU::decode(uint8_t opcode){
 		case 0x11:						//ORA (ind),Y
 
 			addr = indirect_Y();
-			OR(regA,memory[addr]);
+			OR(regA,memory->read_byte(addr));
 			break;
 
 		case 0x15:						//ORA zpg,X
 
 			addr = zero_page(regX);
-			OR(regA,memory[addr]);
+			OR(regA,memory->read_byte(addr));
 			break;
 		
 		case 0x18:						//ORA zpg,X
@@ -452,7 +420,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0x1D:						//ORA abs,X
 
 			addr = absolute(regX);
-			OR(regA,memory[addr]);
+			OR(regA,memory->read_byte(addr));
 			break;
 		
 		case 0x20:						//JSR 
@@ -509,7 +477,6 @@ bool CPU::decode(uint8_t opcode){
 	    	addr = indirect_X();
 	    	ST(regA,addr);
 
-	    	//memory[addr] = regs.reg[regA];
 	    	break;
 
 	    case 0x84:						//STY zpg
@@ -518,7 +485,6 @@ bool CPU::decode(uint8_t opcode){
 	    	addr = zero_page();
 	    	ST(regY,addr);
 
-	    	//memory[addr] = regs.reg[regA];
 	    	break;
 
 	    case 0x85:						//STA zpg
@@ -527,7 +493,6 @@ bool CPU::decode(uint8_t opcode){
 	    	addr = zero_page();
 	    	ST(regA,addr);
 
-	    	//memory[addr] = regs.reg[regA];
 	    	break;
 
 	    case 0x86:						//STX zpg
@@ -536,7 +501,6 @@ bool CPU::decode(uint8_t opcode){
 	    	addr = zero_page();
 	    	ST(regX,addr);
 
-	    	//memory[addr] = regs.reg[regA];
 	    	break;
 
 		case 0x88:						//DEY
@@ -555,7 +519,6 @@ bool CPU::decode(uint8_t opcode){
 	    	addr = absolute();
 	    	ST(regY,addr);
 
-	    	//memory[addr] = regs.reg[regA];
 	    	break;
 
 	    case 0x8D:						//STA abs
@@ -628,7 +591,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0xA1:						//LDA (ind,X)
 			DEBUG_PRINT("LDY IMM"<<endl);
 			addr = indirect_X();
-			LD(regA,memory[addr]);
+			LD(regA,memory->read_byte(addr));
 			break;
 
 		case 0xA2:						//LDX imm
@@ -640,19 +603,19 @@ bool CPU::decode(uint8_t opcode){
 		case 0xA4:						//LDY zpg
 			DEBUG_PRINT("LDY zero"<<endl);
 			addr = zero_page();
-			LD(regY,memory[addr]);
+			LD(regY,memory->read_byte(addr));
 			break;
 
 		case 0xA5:						//LDA zpg
 			DEBUG_PRINT("LDA zero"<<endl);
 			addr = zero_page();
-			LD(regA,memory[addr]);
+			LD(regA,memory->read_byte(addr));
 			break;
 
 		case 0xA6:						//LDX zpg
 			DEBUG_PRINT("LDX zero"<<endl);
 			addr = zero_page();
-			LD(regX,memory[addr]);
+			LD(regX,memory->read_byte(addr));
 			break;
 		
 		case 0xA8:						//TAY
@@ -674,67 +637,67 @@ bool CPU::decode(uint8_t opcode){
 		case 0xAC:						//LDY abs
 			DEBUG_PRINT("LOAD abs"<<endl);
 			addr = absolute();
-			LD(regY,memory[addr]);
+			LD(regY,memory->read_byte(addr));
 			break;
 
 		case 0xAD:						//LDA abs
 			DEBUG_PRINT("LOAD abs"<<endl);
 			addr = absolute();
-			LD(regA,memory[addr]);
+			LD(regA,memory->read_byte(addr));
 			break;
 
 		case 0xAE:						//LDX abs
 			DEBUG_PRINT("LOAD abs"<<endl);
 			addr = absolute();
-			LD(regX,memory[addr]);
+			LD(regX,memory->read_byte(addr));
 			break;
 
 		case 0xB1:						//LDA ind y
 			DEBUG_PRINT("LDA ind y"<<endl);
 			addr = indirect_Y();
-			LD(regA,memory[addr]);
+			LD(regA,memory->read_byte(addr));
 			break;
 
 		case 0xB4:						//LDY zpg,X
 			DEBUG_PRINT("LDY ind y"<<endl);
 			addr = indirect_X();
-			LD(regY,memory[addr]);
+			LD(regY,memory->read_byte(addr));
 			break;
 
 		case 0xB5:						//LDA zpg,X
 			DEBUG_PRINT("LDA ind y"<<endl);
 			addr = indirect_X();
-			LD(regA,memory[addr]);
+			LD(regA,memory->read_byte(addr));
 			break;
 				
 		case 0xB6:						//LDX zpg,Y
 			DEBUG_PRINT("LOAD ind y"<<endl);
 			addr = indirect_Y();
-			LD(regX,memory[addr]);
+			LD(regX,memory->read_byte(addr));
 			break;
 
 		case 0xB9:						//LDA abs,Y
 			DEBUG_PRINT("LOAD abs y"<<endl);
 			addr = absolute(regY);
-			LD(regA,memory[addr]);
+			LD(regA,memory->read_byte(addr));
 			break;
 
 		case 0xBC:						//LDY abs,X
 			DEBUG_PRINT("LOAD abs X"<<endl);
 			addr = absolute(regX);
-			LD(regY,memory[addr]);
+			LD(regY,memory->read_byte(addr));
 			break;
 
 		case 0xBD:						//LDA abs,X
 			DEBUG_PRINT("LOAD abs X"<<endl);
 			addr = absolute(regX);
-			LD(regA,memory[addr]);
+			LD(regA,memory->read_byte(addr));
 			break;
 
 		case 0xBE:						//LDX abs,X
 			DEBUG_PRINT("LOAD abs Y"<<endl);
 			addr = absolute(regY);
-			LD(regX,memory[addr]);
+			LD(regX,memory->read_byte(addr));
 			break;
 		
 		case 0xC0:						//CPY imm

@@ -16,8 +16,8 @@ class Memory{
 
 		uint8_t memory[sixtyfourK];
 
-		uint8_t basic[eigthK];
-		uint8_t kernal[eigthK];
+		uint8_t basic[eightK];
+		uint8_t kernal[eightK];
 		uint8_t charset[fourK];
 
 		uint8_t* read_bin_file(const char*);

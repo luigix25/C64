@@ -58,8 +58,8 @@ void loadKernalAndBasic(uint8_t *memory,const char* filename){
         file.read ((char*)rom, size);
         file.close();
 
-        memcpy(memory+BASIC_START,rom,eigthK);
-        memcpy(memory+KERNAL_START,rom+eigthK,eigthK);
+        memcpy(memory+BASIC_START,rom,eightK);
+        memcpy(memory+KERNAL_START,rom+eightK,eightK);
 
         delete[] rom;
 

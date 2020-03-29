@@ -38,7 +38,7 @@ void Memory::load_charset(const char* filename){
 	delete[] rom;
 }
 
-uint8_t* read_bin_file(const char* filename){
+uint8_t* Memory::read_bin_file(const char* filename){
 
     ifstream file(filename,ios::in | ios::binary | ios::ate);
     streampos size;
@@ -56,6 +56,6 @@ uint8_t* read_bin_file(const char* filename){
         return rom;
     }
 
-    return nullptr;
+    return null;
 
 }
