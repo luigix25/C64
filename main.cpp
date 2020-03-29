@@ -36,6 +36,7 @@ int main(){
 	bool loop = true;
 	uint8_t opcode;
 
+	char c;
 
 	while(loop){
 

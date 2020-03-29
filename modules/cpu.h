@@ -47,6 +47,7 @@ private:
 	uint16_t indirect_X();
 
 	uint8_t flags();
+	void reset_flags();
 
 	//Istructions
 
@@ -65,14 +66,18 @@ private:
 	void BEQ(uint8_t);
 
 	void DE(register_name);
-	void INY();
-	void INX();
+	void INC(register_name index);
+	void INC(uint16_t);
+
 	void CP(register_name, uint8_t);
 
 	void OR(register_name, uint8_t);
 	void AND(uint8_t);
+	void ROL(register_name);
 
-	void TA(register_name);
+	void TAX();
+	void TAY();
+	void TXA();
 
 
 };
