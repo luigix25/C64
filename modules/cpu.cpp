@@ -1,6 +1,6 @@
 #include "cpu.h"
 
-CPU::CPU(uint8_t* memory, uint16_t PC){
+CPU::CPU(Memory* memory, uint16_t PC){
 
 	this->memory = memory;
 	regs.PC = PC;
@@ -10,7 +10,7 @@ CPU::CPU(uint8_t* memory, uint16_t PC){
 
 }
 
-CPU::CPU(uint8_t* memory){
+CPU::CPU(Memory* memory){
 
 	this->memory = memory;
 

@@ -1,14 +1,18 @@
 #include "modules/library.h"
 #include "modules/cpu.h"
+#include "modules/memory.h"
+
 #include "modules/debug.h"
 
-uint8_t memory[sixtyfourK];
+//uint8_t memory[sixtyfourK];
 
 char convert(char);
 
 int main(){
 
-	CPU cpu(memory);
+	Memory *mem = new Memory();
+
+	CPU cpu(mem);
 	cpu.dump_reg();
 
 
@@ -26,12 +30,12 @@ int main(){
 	memory[10] = 0x00;
 	*/
 
-	loadKernalAndBasic(memory,KERNAL_BASIC_ROM);
-	loadKernalAndBasic(memory,CHARSET_ROM);
+	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
+	mem->load_charset(CHARSET_ROM);
 
-	//hexDump(memory+0xFD02,10);
-
-	//DEBUG_PRINT("ciao"<<" "<<"we"<<endl);
+	/*loadKernalAndBasic(memory,KERNAL_BASIC_ROM);
+	loadCharset(memory,CHARSET_ROM);
+*/
 
 	bool loop = true;
 	uint8_t opcode;

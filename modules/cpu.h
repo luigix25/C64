@@ -1,4 +1,5 @@
 #include "library.h"
+#include "memory.h"
 
 #define RESET_routine 0xFCE2
 
@@ -10,8 +11,8 @@ class CPU
 
 public:
 
-	CPU(uint8_t*);
-	CPU(uint8_t*,uint16_t);
+	CPU(Memory *);
+	CPU(Memory *,uint16_t);
 
 	//~CPU();
 
@@ -24,7 +25,7 @@ public:
 
 private:
 
-	uint8_t *memory;
+	Memory *memory;
 
 	//registers
 	registers regs;
