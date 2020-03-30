@@ -4,38 +4,52 @@
 
 Memory::Memory(){
 
-	LORAM_enabled = false;
-	HIRAM_enabled = false;
-	CHAR_enabled = false;
+	//Default values
+	LORAM_mode = RAM;
+	HIRAM_mode = RAM;
+	CHAR_mode = RAM;
+
+	vic = nullptr;
+
+	setup_memory_mode(LORAM_MASK | HIRAM_MASK | CHAR_MASK);
+
 }
 
 uint8_t Memory::read_byte(uint16_t addr){
 
 	//uint16_t page = addr & 0xff00;
 
+	//TODO: implementare cartridge!
 	if(addr >= BASIC_START and addr <= BASIC_END){
 		
-		if(LORAM_enabled)
+		if(LORAM_mode == RAM)
 			return memory[addr];
 		else
 			return basic[addr-BASIC_START];
 	
-	} else if(addr >= KERNAL_START /*and addr <= KERNAL_END  inutile */){
+	} else if(addr >= CHAR_START and addr <= CHAR_END){
+
+		if(CHAR_mode == RAM)
+			return memory[addr];
+		else if(CHAR_mode == ROM)					//Charset
+			return charset[addr-CHAR_START];
+		else if(CHAR_mode == IO){					//VIC
+			if(vic != nullptr)
+				return vic->read_register(addr);
+			else
+				return 0xFF;
+		}
 		
-		if(HIRAM_enabled)
+	//TODO: implementare cartridge!
+	}else if(addr >= KERNAL_START /*and addr <= KERNAL_END  inutile */){
+		
+		if(HIRAM_mode == RAM)
 			return memory[addr];
 		else{
 			return kernal[addr-KERNAL_START];
 		}
 	
-	} else if(addr >= CHAR_START and addr <= CHAR_END){
-
-		if(CHAR_enabled)
-			return memory[addr];
-		else
-			return charset[addr-CHAR_START];
-
-	}
+	} 
 	
 	return memory[addr];
 }
@@ -62,9 +76,27 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 void Memory::setup_memory_mode(uint8_t value){
   
   	cout<<"CHANGE IN MEMORY MODE!!"<<endl;
-	LORAM_enabled  = ((value & HIRAM_MASK) == 0);
-	HIRAM_enabled  = ((value & LORAM_MASK) == 0);
-	CHAR_enabled = ((value & CHAR_MASK) == 0);
+	bool loram_en  = ((value & HIRAM_MASK) == 0);
+	bool hiram_en = ((value & LORAM_MASK) == 0);
+	bool char_en = ((value & CHAR_MASK) == 0);
+
+	//Basic
+	if(hiram_en)
+		HIRAM_mode = ROM;
+
+	//Kernal
+	if(loram_en && hiram_en)
+		LORAM_mode = ROM;
+
+	//Char I/O
+	if(char_en && (loram_en || hiram_en))
+		CHAR_mode = IO;
+	else if(char_en && !loram_en && !hiram_en)
+		CHAR_mode = RAM;
+	else 
+		CHAR_mode = ROM;
+	
+	memory[MEMORY_LAYOUT_ADDR] = value;
 
 }
 
@@ -76,11 +108,6 @@ void Memory::load_kernal_and_basic(const char* filename){
 	memcpy(basic, rom, eightK);
 	memcpy(kernal, rom+eightK, eightK);
 
-	/*memcpy(memory+BASIC_START, rom, eightK);
-	memcpy(memory+KERNAL_START, rom+eightK, eightK);
-
-	uint16_t addr = 0xFCE2 - KERNAL_START;
-*/
 	delete[] rom;
 
 }
@@ -114,4 +141,8 @@ uint8_t* Memory::read_bin_file(const char* filename){
 
     return null;
 
+}
+
+void Memory::setVIC(VIC* vic){
+	this->vic = vic;
 }

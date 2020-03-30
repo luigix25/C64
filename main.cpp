@@ -11,6 +11,9 @@ char convert(char);
 int main(){
 
 	Memory *mem = new Memory();
+	VIC *vic = new VIC();
+
+	mem->setVIC(vic);
 
 	CPU cpu(mem);
 	cpu.dump_reg();

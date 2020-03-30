@@ -35,6 +35,9 @@ using namespace std;
 #define CHAR_START 0xD000
 #define CHAR_END 0x0DFFF
 
+#define VIC_START 0xD000
+#define VIC_END 0xD3FF
+
 #define RESET_routine 0xFCE2
 
 #define NMI_vector 0xFF43
