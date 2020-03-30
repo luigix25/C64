@@ -40,6 +40,46 @@ void CPU::reset_flags(){
 
 }
 
+void CPU::handle_irq(){
+
+	//interrupt is masked
+	if(regs.interrupt_flag == false)
+		return;
+
+	uint8_t temp = ((regs.PC >> 8) & 0xFF);
+	PUSH(temp);
+
+	temp = (regs.PC & 0xFF);
+	PUSH(temp);
+
+	//BCD flag is cleared
+	PUSH(flags() & 0xEF);
+
+	regs.interrupt_flag = true;
+
+	uint16_t addr = read_word(IRQ_vector);
+
+	regs.PC = addr;
+
+}
+
+void CPU::handle_nmi(){
+
+	uint8_t temp = ((regs.PC >> 8) & 0xFF);
+	PUSH(temp);
+
+	temp = (regs.PC & 0xFF);
+	PUSH(temp);
+
+	//BCD flag is cleared
+	PUSH(flags() & 0xEF);
+
+	uint16_t addr = read_word(NMI_vector);
+
+	regs.PC = addr;
+
+}
+
 uint8_t CPU::zero_page(register_name index){
   //Immediate operand
   
@@ -224,6 +264,13 @@ void CPU::JSR(uint16_t addr){
 
 uint8_t CPU::fetch(){
 
+	// active low
+	if(nmi_line == false){
+		handle_nmi();
+	} else if(irq_line == false){
+		handle_irq();
+	}
+
 	uint8_t opcode = read_byte(regs.PC);
 	//DEBUG_PRINT(hex<<unsigned(opcode)<<endl);
 
@@ -359,6 +406,8 @@ void CPU::ADC(uint8_t value)
 	uint16_t t;
 	if(regs.decimal_mode_flag)
 	{
+
+		t = 0;		//per eliminare warning
 		/*
 		t = (a()&0xf) + (v&0xf) + (cf() ? 1 : 0);
 		

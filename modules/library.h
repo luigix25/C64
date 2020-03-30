@@ -37,6 +37,11 @@ using namespace std;
 
 #define RESET_routine 0xFCE2
 
+#define NMI_vector 0xFF43
+#define RESET_vector 0xFFFC
+#define IRQ_vector 0xFFFE
+
+
 #define null 0
 
 

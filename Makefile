@@ -1,4 +1,4 @@
-FLAGS = -Wall -Wextra -pedantic -g
+FLAGS = -Wall -Wextra -pedantic -g -O2
 
 all: main.o library.o cpu.o memory.o
 

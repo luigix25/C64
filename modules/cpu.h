@@ -33,10 +33,13 @@ private:
 	//registers
 	registers regs;
 
-	//Utils
+	//utils
 	uint8_t read_byte(uint16_t);
 	uint16_t read_word(uint16_t);
 
+	//IRQs
+	void handle_irq();
+	void handle_nmi();
 
 	//Memory Addressing Modes
 	uint8_t immediate();
