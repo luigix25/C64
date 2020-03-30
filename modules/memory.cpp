@@ -76,9 +76,11 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 void Memory::setup_memory_mode(uint8_t value){
   
   	cout<<"CHANGE IN MEMORY MODE!!"<<endl;
-	bool loram_en  = ((value & HIRAM_MASK) == 0);
-	bool hiram_en = ((value & LORAM_MASK) == 0);
-	bool char_en = ((value & CHAR_MASK) == 0);
+	cout<<hex<<unsigned(value)<<endl;
+
+	bool loram_en  = ((value & HIRAM_MASK) != 0);
+	bool hiram_en = ((value & LORAM_MASK) != 0);
+	bool char_en = ((value & CHAR_MASK) != 0);
 
 	//Basic
 	if(hiram_en)
