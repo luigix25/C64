@@ -12,6 +12,9 @@
 #define IRQ_REQ_REG 0xD019
 #define IRQ_MASK_REG 0xD01A
 
+#define CTRL_REG_1_OFF CTRL_REG_1 - REG_START
+#define CTRL_REG_2_OFF CTRL_REG_2 - REG_START
+
 enum MODES {CHAR_MODE,MCM_TEXT_MODE,EXT_BACK_MODE,BITMAP_MODE,MCB_BITMAP_MODE};
 
 class VIC {
@@ -27,6 +30,7 @@ class VIC {
 		void control_reg_one(uint8_t);
 		void control_reg_two(uint8_t);
 
+		void set_graphic_mode();
 
 	public:
 		VIC();

@@ -347,7 +347,7 @@ void CPU::BNE(uint8_t addr){
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
 
 	if(!regs.zero_flag){
-		cout<<"BNE to "<<hex<<unsigned(new_addr)<<endl;
+		DEBUG_PRINT("BNE to "<<hex<<unsigned(new_addr)<<endl);
 		regs.PC = new_addr;
 	}
 
@@ -359,7 +359,7 @@ void CPU::BCC(uint8_t addr){
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
 
 	if(!regs.carry_flag){
-		cout<<"BCC to "<<hex<<unsigned(new_addr)<<endl;
+		DEBUG_PRINT("BCC to "<<hex<<unsigned(new_addr)<<endl);
 		regs.PC = new_addr;
 	}
 
@@ -371,7 +371,7 @@ void CPU::BMI(uint8_t addr){
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
 
 	if(regs.sign_flag){
-		cout<<"BMI to "<<hex<<unsigned(new_addr)<<endl;
+		DEBUG_PRINT("BMI to "<<hex<<unsigned(new_addr)<<endl);
 		regs.PC = new_addr;
 	}
 
@@ -395,7 +395,7 @@ void CPU::BPL(uint8_t addr){
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
 
 	if(regs.sign_flag){
-		cout<<"BPL to "<<hex<<unsigned(new_addr)<<endl;
+		DEBUG_PRINT("BPL to "<<hex<<unsigned(new_addr)<<endl);
 		regs.PC = new_addr;
 	}
 
@@ -545,7 +545,7 @@ bool CPU::decode(uint8_t opcode){
 
 	switch(opcode){
 		case 0x00:        //BRK
-		DEBUG_PRINT("BRK"<<endl);
+		cout<<"BRK!"<<endl;
 		return false;
 
 		case 0x01:        //ORA (ind,X)		

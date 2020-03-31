@@ -25,9 +25,6 @@ uint8_t VIC::read_register(uint16_t addr){
 	if(addr == RASTER_CNT)
 		return 0;
 
-
-    //exit(1);
-
     return registers[addr-IO_START];
 
 }
@@ -52,9 +49,8 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 void VIC::control_reg_one(uint8_t data){
 
 	//Bitmap Mode
-	if(GET_I_BIT(data,5)){
-		graphic_mode = BITMAP_MODE;
-	}
+
+	set_graphic_mode();
 
 	if(GET_I_BIT(data,3)){
 		visible_rows = 24;
@@ -62,12 +58,14 @@ void VIC::control_reg_one(uint8_t data){
 		visible_rows = 25;
 	}
 
-	registers[CTRL_REG_1 - IO_START] = data;
+	registers[CTRL_REG_1_OFF] = data;
 
 
 }
 
 void VIC::control_reg_two(uint8_t data){
+
+	set_graphic_mode();
 
 	if(GET_I_BIT(data,3)){
 		visible_cols = 40;
@@ -75,4 +73,31 @@ void VIC::control_reg_two(uint8_t data){
 		visible_cols = 38;
 	}
 
+}
+
+void VIC::set_graphic_mode(){
+
+	bool ecm = GET_I_BIT(registers[CTRL_REG_1_OFF],6);
+	bool bmm = GET_I_BIT(registers[CTRL_REG_1_OFF],5); 
+	bool mcm = GET_I_BIT(registers[CTRL_REG_2_OFF],4); 
+
+	if(!ecm && !bmm && !mcm){ 
+		graphic_mode = CHAR_MODE;
+		cout<<"CHAR MODE"<<endl;
+	}
+	else if(!ecm && !bmm && mcm)
+		graphic_mode = MCM_TEXT_MODE;
+	else if(!ecm && bmm && !mcm)
+		graphic_mode = BITMAP_MODE;
+	else if(!ecm && bmm && mcm)
+		graphic_mode = MCB_BITMAP_MODE;
+	else
+		cout<<"UNIMPL MODE"<<endl;
+
+	//Unimplemented
+	/*else if(ecm && !bmm && !mcm)
+		graphic_mode_ = kExtBgMode;
+	else 
+		graphic_mode_ = kIllegalMode;
+	*/
 }
