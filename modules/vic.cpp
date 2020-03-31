@@ -17,6 +17,10 @@ VIC::~VIC(){
 
 }
 
+void VIC::setMemory(Memory *mem){
+	this->memory = mem;
+}
+
 uint8_t VIC::read_register(uint16_t addr){
     
     DEBUG_PRINT("read from VIC memory"<<endl);

@@ -2,6 +2,8 @@
 #include "library.h"
 #include "debug.h"
 
+#include "memory.h"
+
 #define REG_START 0xD000
 #define REG_END 0xD02E
 
@@ -16,6 +18,8 @@
 #define CTRL_REG_2_OFF CTRL_REG_2 - REG_START
 
 enum MODES {CHAR_MODE,MCM_TEXT_MODE,EXT_BACK_MODE,BITMAP_MODE,MCB_BITMAP_MODE};
+
+class Memory;
 
 class VIC {
 	private:
@@ -32,10 +36,14 @@ class VIC {
 
 		void set_graphic_mode();
 
+		Memory *memory;
+
 	public:
 		VIC();
 		~VIC();
 		
+		void setMemory(Memory*);
+
 		uint8_t read_register(uint16_t);
 		void write_register(uint16_t,uint8_t);
 

@@ -1,6 +1,7 @@
 #include "modules/library.h"
-#include "modules/cpu.h"
 #include "modules/memory.h"
+
+#include "modules/cpu.h"
 
 #include "modules/debug.h"
 
@@ -14,6 +15,8 @@ int main(){
 	VIC *vic = new VIC();
 
 	mem->setVIC(vic);
+
+	vic->setMemory(mem);
 
 	CPU cpu(mem);
 	cpu.dump_reg();

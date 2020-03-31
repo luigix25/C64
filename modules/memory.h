@@ -11,6 +11,8 @@
 
 enum bank_mode {RAM,ROM,IO,CARTRIDGE};
 
+class VIC;
+
 class Memory{
 
 	public:
