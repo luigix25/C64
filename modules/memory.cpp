@@ -27,12 +27,13 @@ uint8_t Memory::read_byte(uint16_t addr){
 		else
 			return basic[addr-BASIC_START];
 	
-	} else if(addr >= CHAR_START and addr <= CHAR_END){
+	//VIC CHAR or RAM
+	} else if(addr >= IO_START and addr <= IO_END){
 
 		if(CHAR_mode == RAM)
 			return memory[addr];
 		else if(CHAR_mode == ROM)					//Charset
-			return charset[addr-CHAR_START];
+			return charset[addr-IO_START];
 		else if(CHAR_mode == IO){					//VIC
 			if(vic != nullptr)
 				return vic->read_register(addr);
@@ -56,7 +57,7 @@ uint8_t Memory::read_byte(uint16_t addr){
 
 void Memory::write_byte(uint16_t addr, uint8_t data){
 
-  	uint16_t page = addr & 0xff00;
+  	uint16_t page = (addr & 0xff00) >> 8;
 
   	//Zero Page
   	if(page == 0){
@@ -66,7 +67,13 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
   			return;
   		}
 
-  	}
+  	} else if(addr >= IO_START and addr <= IO_END){
+		if(CHAR_mode == IO){		//VIC
+			vic->write_register(addr,data);
+			return;
+		}  
+
+	  }
 
 	memory[addr] = data;
 

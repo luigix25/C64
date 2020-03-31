@@ -7,6 +7,8 @@
 #define HIRAM_MASK 0x2
 #define CHAR_MASK 0x4
 
+#define VIDEO_MEM_START 
+
 enum bank_mode {RAM,ROM,IO,CARTRIDGE};
 
 class Memory{

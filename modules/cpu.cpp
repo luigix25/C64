@@ -691,9 +691,9 @@ bool CPU::decode(uint8_t opcode){
 	    	break;
 
 	    case 0x8E:						//STX abs
-	    	DEBUG_PRINT("STX ABS"<<endl);
-
 	    	addr = absolute();
+			DEBUG_PRINT("STX "<<hex<<unsigned(addr)<<endl);
+
 	    	ST(regX,addr);
 	    	break;
 
@@ -705,9 +705,8 @@ bool CPU::decode(uint8_t opcode){
 	    	break;
 
 		case 0x91:						//STA (ind),Y
-			DEBUG_PRINT("STA ind y"<<endl);
-
 			addr = indirect_Y();
+			DEBUG_PRINT("STA "<<hex<<unsigned(addr)<<endl);
 			ST(regA,addr);
 			break;
 
@@ -810,8 +809,8 @@ bool CPU::decode(uint8_t opcode){
 			break;
 
 		case 0xAC:						//LDY abs
-			DEBUG_PRINT("LOAD abs"<<endl);
 			addr = absolute();
+			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
 			LD(regY,memory->read_byte(addr));
 			break;
 

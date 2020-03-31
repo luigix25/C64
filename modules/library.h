@@ -32,11 +32,14 @@ using namespace std;
 #define STACK_START 0x0100
 #define STACK_END 0x01FF
 
-#define CHAR_START 0xD000
-#define CHAR_END 0x0DFFF
+#define IO_START 0xD000
+#define IO_END 0x0DFFF
 
 #define VIC_START 0xD000
 #define VIC_END 0xD3FF
+
+#define CIA2_START 0xDD00
+#define CIA2_END 0xDDFF
 
 #define RESET_routine 0xFCE2
 
