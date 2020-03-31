@@ -47,6 +47,7 @@ using namespace std;
 #define RESET_vector 0xFFFC
 #define IRQ_vector 0xFFFE
 
+#define GET_I_BIT(x,i) (x>>i) & 1
 
 #define null 0
 

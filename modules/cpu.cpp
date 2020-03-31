@@ -248,9 +248,14 @@ void CPU::PUSH(uint8_t value){
 uint8_t CPU::POP(){
 
   	uint16_t addr = ++regs.SP + STACK_START;
-
   	return memory->read_byte(addr);
 
+}
+
+void CPU::PLA(){
+	regs.reg[regA] = POP();
+	SET_ZF(regs.reg[regA]);
+	SET_NF(regs.reg[regA]);
 }
 
 void CPU::JSR(uint16_t addr){
@@ -297,9 +302,33 @@ uint8_t CPU::flags()
 	return v;
 }
 
+
+void CPU::flags(uint8_t v)
+{
+	regs.carry_flag = (GET_I_BIT(v,0));
+	regs.zero_flag = (GET_I_BIT(v,1));
+	regs.interrupt_flag = (GET_I_BIT(v,2));
+	regs.decimal_mode_flag = (GET_I_BIT(v,3));
+	regs.overflow_flag = (GET_I_BIT(v,6));
+	regs.sign_flag = (GET_I_BIT(v,7));
+}
+
 void CPU::CMP(uint16_t addr){
 
 	uint8_t data = memory->read_byte(addr);
+
+	uint16_t t;
+	t = regs.reg[regA] - data;
+	regs.carry_flag = (t<0x100);
+	
+	t = t & 0xff;
+	
+	SET_ZF(t);
+	SET_NF(t);
+
+}
+
+void CPU::CMP(uint8_t data){
 
 	uint16_t t;
 	t = regs.reg[regA] - data;
@@ -400,8 +429,7 @@ void CPU::INC(uint16_t addr)
 
 }
 
-void CPU::ADC(uint8_t value)
-{
+void CPU::ADC(uint8_t value){
 
 	uint16_t t;
 	if(regs.decimal_mode_flag)
@@ -435,8 +463,27 @@ void CPU::ADC(uint8_t value)
 
 }
 
-void CPU::CP(register_name index, uint8_t v)
-{
+void CPU::SBC(uint8_t value){
+	
+	uint16_t t;
+	if(regs.decimal_mode_flag){
+		//TODO: decimal mode
+		t = 0;
+	} else {
+		t = regs.reg[regA] - value - (regs.carry_flag ? 0 : 1);
+	}
+
+	regs.carry_flag = t < 0x100;
+	regs.overflow_flag = (( regs.reg[regA] ^ value ) &0x80 ) && (( regs.reg[regA] ^ t) & 0x80);
+
+	SET_ZF(t);
+	SET_NF(t);
+
+	regs.reg[regA] = (uint8_t)t;
+
+}
+
+void CPU::CP(register_name index, uint8_t v){
 	uint16_t t;
 	t = regs.reg[index] - v;
 	regs.carry_flag = t < 0x100;
@@ -570,7 +617,12 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("JSR "<<hex<<unsigned(addr)<<endl);
 			JSR(addr);
 			break;
-		
+
+		case 0x28:						//PLP 
+			DEBUG_PRINT("PLP"<<endl);
+			flags(POP());
+			break;
+
 		case 0x29:						//AND imm 
 			addr = immediate();
 			DEBUG_PRINT("AND "<<hex<<unsigned(addr)<<endl);
@@ -588,6 +640,11 @@ bool CPU::decode(uint8_t opcode){
 			ROL(regA);
 			break;
 		
+		case 0x38:
+			DEBUG_PRINT("SEC"<<endl);
+			regs.carry_flag = true;
+			break;
+
 		case 0x48:						//PHA
 
 			PUSH(regA);
@@ -611,6 +668,17 @@ bool CPU::decode(uint8_t opcode){
   			regs.PC = addr;
 			break;
 
+		case 0x65:						//ADC imm
+			addr = zero_page();
+			DEBUG_PRINT("ADC "<<hex<<unsigned(addr)<<endl);
+			ADC(memory->read_byte(addr));
+			break;
+		
+		case 0x68:						//PLA
+			DEBUG_PRINT("PLA"<<endl);
+			PLA();
+			break;
+		
 		case 0x69:						//ADC imm
 			DEBUG_PRINT("ADC"<<endl);
 			addr = immediate();
@@ -620,10 +688,12 @@ bool CPU::decode(uint8_t opcode){
 		case 0x6C:						//JMP (ind)
 
 			tmp = absolute();
+			DEBUG_PRINT("JMP "<<hex<<unsigned(tmp)<<endl);
 
-			addr = read_word(tmp);
+			addr = read_word(tmp);			
+			regs.PC = addr;
 
-			JMP(tmp);
+			//JMP(tmp);
 			break;
 
 		case 0x78:						//SEI
@@ -815,15 +885,15 @@ bool CPU::decode(uint8_t opcode){
 			break;
 
 		case 0xAD:						//LDA abs
-			DEBUG_PRINT("LOAD abs"<<endl);
+			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
 			addr = absolute();
 			LD(regA,memory->read_byte(addr));
 			break;
 
 		case 0xAE:						//LDX abs
-			DEBUG_PRINT("LOAD abs"<<endl);
 			addr = absolute();
 			LD(regX,memory->read_byte(addr));
+			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
 			break;
 		
 		case 0xB0:						//BCS
@@ -884,11 +954,29 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("CPY"<<endl);
 			addr = immediate();
 			CP(regY,addr);
-			break;	
+			break;
+		
+		case 0xC4:						//CPY zpg
+			DEBUG_PRINT("CPY"<<endl);
+			addr = zero_page();
+			CP(regY,memory->read_byte(addr));
+			break;		
+		
+		case 0xC5:						//CPY zpg
+			DEBUG_PRINT("CMP"<<endl);
+			addr = zero_page();
+			CMP(addr);
+			break;		
 		
 		case 0xC8:						//INY
 			DEBUG_PRINT("INY"<<endl);
 			INC(regY);
+			break;
+		
+		case 0xC9:
+			DEBUG_PRINT("CMP"<<endl);
+			addr = immediate();
+			CMP(addr);
 			break;
 
 		case 0xCA:						//DEX
@@ -939,6 +1027,12 @@ bool CPU::decode(uint8_t opcode){
 		case 0xE8:						//INX
 			DEBUG_PRINT("INX"<<endl);
 			INC(regX);
+			break;
+		
+		case 0xE9:
+			DEBUG_PRINT("SBC"<<endl);
+			addr = immediate();
+			SBC(addr);
 			break;
 		
 		case 0xF0:						//BEQ rel

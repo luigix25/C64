@@ -56,6 +56,8 @@ class CPU
 		uint8_t flags();
 		void reset_flags();
 
+		void flags(uint8_t);
+
 		//Istructions
 
 		void LD(register_name, uint8_t);
@@ -64,10 +66,13 @@ class CPU
 		void PUSH(register_name);
 		void PUSH(uint8_t);
 		uint8_t POP();
+
+		void PLA();
 		
 		void JMP(uint16_t);
 		void JSR(uint16_t);
 		void CMP(uint16_t);
+		void CMP(uint8_t);
 
 		void BNE(uint8_t);
 		void BEQ(uint8_t);
@@ -80,6 +85,7 @@ class CPU
 		void INC(register_name index);
 		void INC(uint16_t);
 		void ADC(uint8_t);
+		void SBC(uint8_t);
 
 		void CP(register_name, uint8_t);
 
