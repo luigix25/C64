@@ -1,4 +1,7 @@
 #pragma once
+
+class VIC;
+
 #include "library.h"
 #include "debug.h"
 
@@ -18,8 +21,6 @@
 #define CTRL_REG_2_OFF CTRL_REG_2 - REG_START
 
 enum MODES {CHAR_MODE,MCM_TEXT_MODE,EXT_BACK_MODE,BITMAP_MODE,MCB_BITMAP_MODE};
-
-class Memory;
 
 class VIC {
 	private:

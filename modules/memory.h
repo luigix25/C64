@@ -1,4 +1,7 @@
 #pragma once
+
+class Memory;
+
 #include "library.h"
 #include "vic.h"
 
@@ -10,8 +13,6 @@
 #define VIDEO_MEM_START 
 
 enum bank_mode {RAM,ROM,IO,CARTRIDGE};
-
-class VIC;
 
 class Memory{
 
