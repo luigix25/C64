@@ -93,6 +93,8 @@ class CPU
 		void AND(uint8_t);
 		void ROL(register_name);
 		void LSR(register_name);
+		void EOR(uint8_t);
+		void BIT(uint16_t);
 
 		void TAX();
 		void TAY();

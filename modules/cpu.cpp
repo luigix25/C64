@@ -213,6 +213,27 @@ void CPU::ROL(register_name index){
 	SET_NF(t);
 }
 
+void CPU::EOR(uint8_t data){
+
+	regs.reg[regA]  = regs.reg[regA] ^ data;
+
+	SET_ZF(regs.reg[regA]);
+	SET_NF(regs.reg[regA]);
+
+}
+
+
+void CPU::BIT(uint16_t addr){
+
+	uint8_t data = memory->read_byte(addr);
+	regs.zero_flag = data & regs.reg[regA];
+
+	regs.overflow_flag = ( data & 0x40 );
+
+	SET_NF(data);
+
+}
+
 void CPU::LSR(register_name index){
 
 	regs.carry_flag = regs.reg[index] & 0x1;
@@ -634,7 +655,13 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("JSR "<<hex<<unsigned(addr)<<endl);
 			JSR(addr);
 			break;
-
+		
+		case 0x24:						//JSR 
+			addr = zero_page();
+			DEBUG_PRINT("BIT "<<hex<<unsigned(addr)<<endl);
+			BIT(addr);
+			break;
+		
 		case 0x28:						//PLP 
 			DEBUG_PRINT("PLP"<<endl);
 			flags(POP());
@@ -662,9 +689,21 @@ bool CPU::decode(uint8_t opcode){
 			regs.carry_flag = true;
 			break;
 
-		case 0x48:						//PHA
+		case 0x45:						//EOR zpg
+			DEBUG_PRINT("EOR"<<endl;)
+			addr = zero_page();
+			EOR(addr);
+			break;
 
+		case 0x48:						//PHA
+			DEBUG_PRINT("PHA"<<endl);
 			PUSH(regA);
+			break;
+		
+		case 0x49:						//EOR
+			DEBUG_PRINT("EOR"<<endl;)
+			addr = immediate();
+			EOR(addr);
 			break;
 
 		case 0x4A:						//PHA
