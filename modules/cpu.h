@@ -73,6 +73,8 @@ class CPU
 		void JSR(uint16_t);
 		void CMP(uint16_t);
 		void CMP(uint8_t);
+		
+		void CPX(uint8_t);
 
 		void BNE(uint8_t);
 		void BEQ(uint8_t);

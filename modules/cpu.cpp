@@ -372,6 +372,19 @@ void CPU::CMP(uint8_t data){
 
 }
 
+void CPU::CPX(uint8_t data){
+
+	uint16_t t;
+	t = regs.reg[regX] - data;
+	regs.carry_flag = (t<0x100);
+	
+	t = t & 0xff;
+	
+	SET_ZF(t);
+	SET_NF(t);
+
+}
+
 void CPU::BNE(uint8_t addr){
 
 	uint16_t new_addr = (int8_t) addr + regs.PC;
@@ -1081,6 +1094,12 @@ bool CPU::decode(uint8_t opcode){
 			CMP(addr);
 			break;
 		
+		case 0xE4:
+			DEBUG_PRINT("CPX"<<endl);
+			addr = zero_page();
+			CPX(memory->read_byte(addr));
+			break;
+
 		case 0xE6:						//INC
 			addr = zero_page();
 			DEBUG_PRINT("INC zpg "<<hex<<unsigned(addr)<<endl);
