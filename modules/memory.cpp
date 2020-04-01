@@ -15,6 +15,18 @@ Memory::Memory(){
 
 }
 
+void Memory::dump_memory(uint16_t addr,uint8_t bytes){
+
+	cout<<"---------------------"<<endl;
+
+	for(uint8_t i=0;i<bytes;i++){
+		cout<<hex<<unsigned(read_byte(addr+i))<<" ";
+	}
+
+	cout<<"---------------------"<<endl;
+
+}
+
 uint8_t Memory::read_byte(uint16_t addr){
 
 	//uint16_t page = addr & 0xff00;
@@ -82,8 +94,8 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 
 void Memory::setup_memory_mode(uint8_t value){
   
-  	cout<<"CHANGE IN MEMORY MODE!!"<<endl;
-	cout<<hex<<unsigned(value)<<endl;
+  	DEBUG_PRINT("CHANGE IN MEMORY MODE!!"<<endl);
+	DEBUG_PRINT(hex<<unsigned(value)<<endl);
 
 	bool loram_en  = ((value & HIRAM_MASK) != 0);
 	bool hiram_en = ((value & LORAM_MASK) != 0);
@@ -154,4 +166,12 @@ uint8_t* Memory::read_bin_file(const char* filename){
 
 void Memory::setVIC(VIC* vic){
 	this->vic = vic;
+}
+
+uint8_t* Memory::getMemPointer(){
+	return memory;
+}
+
+uint8_t* Memory::getKerPointer(){
+	return kernal;
 }

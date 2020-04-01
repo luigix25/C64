@@ -1,5 +1,6 @@
 FLAGS = -Wall -Wextra -pedantic -g -O2 -std=c++11
 DEPENDENCIES = library.o cpu.o memory.o vic.o
+HEADERS = library.h memory.h vic.h cpu.h
 
 all: main.o $(DEPENDENCIES)
 	g++ main.o $(DEPENDENCIES) -o main $(FLAGS)

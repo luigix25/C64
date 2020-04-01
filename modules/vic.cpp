@@ -5,6 +5,10 @@ VIC::VIC(){
     control_reg_one(0x9B);
     control_reg_two(0x08);
 
+	screen_memory_base_addr = 0x400;
+	char_memory_base_addr = 0xd000;
+	//bitmap_memory_base_addr = 0x0;
+
     registers[BASE_ADDR_REG - REG_START] = 0x14;
 	registers[IRQ_REQ_REG - REG_START] = 0x0F;
 	registers[IRQ_MASK_REG - REG_START] = 0x0;
@@ -42,6 +46,14 @@ void VIC::write_register(uint16_t addr, uint8_t data){
         case CTRL_REG_1:
             control_reg_one(data);
             return;
+		case BASE_ADDR_REG:
+			//cout<<"BASE ADDR"<<endl;
+			char_memory_base_addr   = (data & 0xE) << 10;
+    		screen_memory_base_addr = (data & 0xF0) << 6;
+    		//bitmap_memory_base_addr = (data & 0x8) << 10;
+			
+			//cout<<"MEM ADDR"<<hex<<unsigned(screen_memory_base_addr)<<endl;
+			//cout<<"CHAR ADDR"<<hex<<unsigned(char_memory_base_addr)<<endl;
     }
 
     addr -= IO_START;
@@ -87,7 +99,6 @@ void VIC::set_graphic_mode(){
 
 	if(!ecm && !bmm && !mcm){ 
 		graphic_mode = CHAR_MODE;
-		cout<<"CHAR MODE"<<endl;
 	}
 	else if(!ecm && !bmm && mcm)
 		graphic_mode = MCM_TEXT_MODE;

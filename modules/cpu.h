@@ -4,7 +4,7 @@
 #define RESET_routine 0xFCE2
 
 #define SET_ZF(val)     (regs.zero_flag = !(uint8_t)(val))
-#define SET_NF(val)     (regs.sign_flag = ((uint8_t)(val)&0x80)!=0)
+#define SET_NF(val)     (regs.sign_flag =  ((uint8_t)(val) & 0x80 ))
 
 class CPU
 {
@@ -25,13 +25,13 @@ class CPU
 		//active low
 		bool irq_line;
 		bool nmi_line;
+		registers regs;
 
 	private:
 
 		Memory *memory;
 
 		//registers
-		registers regs;
 
 		//utils
 		uint8_t read_byte(uint16_t);
@@ -92,6 +92,7 @@ class CPU
 		void OR(register_name, uint8_t);
 		void AND(uint8_t);
 		void ROL(register_name);
+		void LSR(register_name);
 
 		void TAX();
 		void TAY();

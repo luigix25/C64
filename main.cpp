@@ -22,6 +22,7 @@ int main(){
 	cpu.dump_reg();
 
 
+
 	/*regs.PC = 0;
 	memory[0] = 0xa9;
 	memory[1] = 0x0a;
@@ -39,6 +40,9 @@ int main(){
 	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
 	mem->load_charset(CHARSET_ROM);
 
+
+
+
 	/*loadKernalAndBasic(memory,KERNAL_BASIC_ROM);
 	loadCharset(memory,CHARSET_ROM);
 */
@@ -53,6 +57,13 @@ int main(){
 		opcode = cpu.fetch();
 		loop = cpu.decode(opcode);
 		//cpu.dump_reg();
+
+		/*if(cpu.regs.PC == 0xFD2F){
+			cpu.dump_reg();
+			mem->dump_memory(0x314,32);
+
+			return 0;
+		}*/
 
 	}
 

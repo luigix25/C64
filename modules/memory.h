@@ -27,6 +27,11 @@ class Memory{
 
 		void setVIC(VIC*);
 
+		//Debug
+		uint8_t* getMemPointer();
+		uint8_t* getKerPointer();
+		void dump_memory(uint16_t,uint8_t);
+
 	private:
 
 		VIC *vic;
