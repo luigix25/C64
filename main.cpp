@@ -58,12 +58,13 @@ int main(){
 		loop = cpu.decode(opcode);
 		//cpu.dump_reg();
 
-		/*if(cpu.regs.PC == 0xFD2F){
+		if(cpu.regs.PC == 0xE39D){
+			cout<<"WOOOOOOOOO"<<endl;
 			cpu.dump_reg();
 			mem->dump_memory(0x314,32);
 
 			return 0;
-		}*/
+		}
 
 	}
 

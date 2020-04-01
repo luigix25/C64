@@ -82,8 +82,11 @@ class CPU
 		void BCC(uint8_t);
 		void BPL(uint8_t);
 		void BMI(uint8_t);
+		void BVS(uint8_t);
 
 		void DE(register_name);
+		void DEC(uint16_t);
+
 		void INC(register_name index);
 		void INC(uint16_t);
 		void ADC(uint8_t);
@@ -95,6 +98,7 @@ class CPU
 		void AND(uint8_t);
 		void ROL(register_name);
 		void LSR(register_name);
+		void ASL(uint16_t);
 		void EOR(uint8_t);
 		void BIT(uint16_t);
 

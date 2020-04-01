@@ -46,6 +46,9 @@ void VIC::write_register(uint16_t addr, uint8_t data){
         case CTRL_REG_1:
             control_reg_one(data);
             return;
+		case CTRL_REG_2:
+			control_reg_one(data);
+			return;
 		case BASE_ADDR_REG:
 			//cout<<"BASE ADDR"<<endl;
 			char_memory_base_addr   = (data & 0xE) << 10;

@@ -244,6 +244,26 @@ void CPU::LSR(register_name index){
 	SET_NF(regs.reg[index]);
 
 }
+
+void CPU::ASL(uint16_t addr){
+
+	uint8_t data = memory->read_byte(addr);
+
+	//BUG IN THE 6502!
+	memory->write_byte(addr,data);
+
+	regs.carry_flag = data & 0x80;
+	data = data << 1;
+
+	memory->write_byte(addr,data);
+
+	SET_ZF(data);
+	SET_NF(data);
+	
+
+}
+
+
 void CPU::LD(register_name index, uint8_t operand){
 
 	regs.reg[index] = operand;
@@ -409,6 +429,18 @@ void CPU::BCC(uint8_t addr){
 
 }
 
+void CPU::BVS(uint8_t addr){
+
+	uint16_t new_addr = (int8_t) addr + regs.PC;
+	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
+
+	if(regs.overflow_flag){
+		DEBUG_PRINT("BVS to "<<hex<<unsigned(new_addr)<<endl);
+		regs.PC = new_addr;
+	}
+
+}
+
 void CPU::BMI(uint8_t addr){
 
 	uint16_t new_addr = (int8_t) addr + regs.PC;
@@ -427,7 +459,7 @@ void CPU::BCS(uint8_t addr){
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
 
 	if(regs.carry_flag){
-		cout<<"BCS to "<<hex<<unsigned(new_addr)<<endl;
+		DEBUG_PRINT("BCS to "<<hex<<unsigned(new_addr)<<endl);
 		regs.PC = new_addr;
 	}
 
@@ -542,6 +574,20 @@ void CPU::DE(register_name index)
 	SET_NF(regs.reg[index]);
 }
 
+void CPU::DEC(uint16_t addr)
+{
+	uint8_t data = memory->read_byte(addr);
+	
+	//BUG IN 6502!
+	memory->write_byte(addr,data);
+	data--;
+	memory->write_byte(addr,data);
+
+	SET_ZF(data);
+	SET_NF(data);
+}
+
+
 void CPU::TAX(){
 
 	regs.reg[regX] = regs.reg[regA];
@@ -612,9 +658,10 @@ bool CPU::decode(uint8_t opcode){
 			break;
 
 		case 0x06:			//ASL
+			addr = zero_page();	
+			ASL(addr);
 			break;
 	    
-	    //TODO
 		case 0x08:			//PHP
 			PUSH(flags());
 			break;
@@ -685,16 +732,15 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("AND "<<hex<<unsigned(addr)<<endl);
 			AND(addr);
 			break;
-		
+		case 0x2A:						//ROL A 
+			DEBUG_PRINT("ROL A"<<endl);
+			ROL(regA);
+			break;
+
 		case 0x30:						//BMI 
 			addr = immediate();
 			DEBUG_PRINT("BMI "<<hex<<unsigned(addr)<<endl);
 			BMI(addr);
-			break;
-
-		case 0x2A:						//ROL A 
-			DEBUG_PRINT("ROL A"<<endl);
-			ROL(regA);
 			break;
 		
 		case 0x38:
@@ -719,8 +765,8 @@ bool CPU::decode(uint8_t opcode){
 			EOR(addr);
 			break;
 
-		case 0x4A:						//PHA
-
+		case 0x4A:						//LSR
+			DEBUG_PRINT("LSR"<<endl);
 			LSR(regA);
 			break;
 
@@ -770,6 +816,12 @@ bool CPU::decode(uint8_t opcode){
 			regs.PC = addr;
 
 			//JMP(tmp);
+			break;
+		
+		case 0x70:
+			DEBUG_PRINT("BVS"<<endl);
+			addr = immediate();
+			BVS(addr);
 			break;
 
 		case 0x78:						//SEI
@@ -1044,6 +1096,12 @@ bool CPU::decode(uint8_t opcode){
 			addr = zero_page();
 			CMP(addr);
 			break;		
+		
+		case 0xC6:						//DEC zpg
+			DEBUG_PRINT("DEC"<<endl);
+			addr = zero_page();
+			DEC(addr);
+			break;	
 		
 		case 0xC8:						//INY
 			DEBUG_PRINT("INY"<<endl);
