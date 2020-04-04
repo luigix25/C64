@@ -111,9 +111,6 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 
 void Memory::setup_memory_mode(uint8_t value){
   
-  	DEBUG_PRINT("CHANGE IN MEMORY MODE!!"<<endl);
-	DEBUG_PRINT(hex<<unsigned(value)<<endl);
-
 	bool loram_en  = ((value & HIRAM_MASK) != 0);
 	bool hiram_en = ((value & LORAM_MASK) != 0);
 	bool char_en = ((value & CHAR_MASK) != 0);
@@ -140,7 +137,8 @@ void Memory::setup_memory_mode(uint8_t value){
 
 void Memory::load_kernal_and_basic(const char* filename){
 
-	uint8_t* rom = read_bin_file(filename);
+	streampos size;
+	uint8_t* rom = read_bin_file(filename,size);
 
 	//FIRST 8K are basic
 	memcpy(basic, rom, eightK);
@@ -152,17 +150,19 @@ void Memory::load_kernal_and_basic(const char* filename){
 
 void Memory::load_charset(const char* filename){
 
-	uint8_t* rom = read_bin_file(filename);
+	streampos size;
+
+	uint8_t* rom = read_bin_file(filename,size);
 
 	memcpy(charset, rom, fourK);
 	
 	delete[] rom;
 }
 
-uint8_t* Memory::read_bin_file(const char* filename){
+uint8_t* Memory::read_bin_file(const char* filename, streampos &size){
 
     ifstream file(filename,ios::in | ios::binary | ios::ate);
-    streampos size;
+    //streampos size;
 
     if (file.is_open())
     {
@@ -178,6 +178,14 @@ uint8_t* Memory::read_bin_file(const char* filename){
     }
 
     return null;
+
+}
+
+void Memory::load_custom_memory(const char* filename) {
+
+	streampos size;
+	uint8_t* buffer = read_bin_file(filename,size);
+	memcpy(memory, buffer, size);
 
 }
 

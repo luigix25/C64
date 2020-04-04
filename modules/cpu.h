@@ -38,7 +38,7 @@ class CPU
 		uint16_t read_word(uint16_t);
 
 		//IRQs
-		void handle_irq();
+		void handle_irq(bool);
 		void handle_nmi();
 
 		//Memory Addressing Modes

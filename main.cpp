@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 //uint8_t memory[sixtyfourK];
+void test_cpu(CPU*);
 
 char convert(char);
 Memory *mem;
@@ -37,27 +38,22 @@ int main(){
 	vic->setMemory(mem);
 
 	cpu = new CPU(mem);
+//	cpu->dump_reg();
+
+	//mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
+	//mem->load_charset(CHARSET_ROM);
+
+	mem->load_custom_memory("roms/6502_functional_test.bin");
+	mem->setup_memory_mode(0);
+
+	mem->dump_memory(0x400,100);
+
+	cpu->regs.PC = 0x400;
 	cpu->dump_reg();
 
+	test_cpu(cpu);
 
-
-	/*regs.PC = 0;
-	memory[0] = 0xa9;
-	memory[1] = 0x0a;
-	memory[2] = 0x8d;
-	memory[3] = 0x34;
-	memory[4] = 0x12;
-	memory[5] = 0xa9;
-	memory[6] = 0x00;
-	memory[7] = 0x0d;
-	memory[8] = 0x34;
-	memory[9] = 0x12;
-	memory[10] = 0x00;
-	*/
-
-	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
-	mem->load_charset(CHARSET_ROM);
-
+	return -1;
 
 
 
@@ -96,6 +92,43 @@ int main(){
 
 }
 
+void test_cpu(CPU *cpu)
+{
+	uint16_t pc=0;
+	/* unmap C64 ROMs */
+	uint8_t opcode;
+	bool loop = true;
+
+	while(loop)
+	{
+		
+		if(pc == cpu->regs.PC)
+		{
+			cout<<("infinite loop at %x\n",pc);
+			break;
+
+		} else if(cpu->regs.PC == 0x3463)
+		{
+			cout<<("test passed!\n");
+			break;
+		}
+		
+		pc = cpu->regs.PC;
+		
+		opcode = cpu->fetch();
+		loop = cpu->decode(opcode);
+		if(loop == false){
+			cout<<"Bloccato "<<endl;
+		}
+
+		cpu->dump_reg();
+		cout<<"OPCODE: "<<hex<<unsigned(opcode)<<endl;
+
+		char c;
+		//cin>>c;
+	}
+
+}
 
 
 /*char convert(char c){

@@ -43,10 +43,10 @@ void CPU::reset_flags(){
 
 }
 
-void CPU::handle_irq(){
+void CPU::handle_irq(bool ignore){
 
 	//interrupt is masked
-	if(regs.interrupt_flag == false)
+	if(ignore)
 		return;
 
 	uint8_t temp = ((regs.PC >> 8) & 0xFF);
@@ -391,7 +391,7 @@ uint8_t CPU::fetch(){
 	if(nmi_line == false){
 		handle_nmi();
 	} else if(irq_line == false){
-		handle_irq();
+		handle_irq(regs.interrupt_flag);
 	}
 
 	uint8_t opcode = read_byte(regs.PC);
@@ -714,8 +714,9 @@ bool CPU::decode(uint8_t opcode){
 
 	switch(opcode){
 		case 0x00:        //BRK
-		cout<<"BRK!"<<endl;
-		return false;
+		DEBUG_PRINT("BRK!"<<endl);
+		handle_irq(false);
+		break;
 
 		case 0x01:        //ORA (ind,X)		
 
@@ -1014,7 +1015,7 @@ bool CPU::decode(uint8_t opcode){
 			ST(regA,addr);
 			break;
 
-		case 0x94:						//STA zpg,X
+		case 0x94:						//STY zpg,X
 	    	DEBUG_PRINT("STY zero page x"<<endl);
 
 	    	addr = zero_page(regX);

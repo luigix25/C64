@@ -24,13 +24,17 @@ class Memory{
 
 		void load_kernal_and_basic(const char*);
 		void load_charset(const char*);
+		void load_custom_memory(const char*);
 
 		void setVIC(VIC*);
+
+		void setup_memory_mode(uint8_t value);
 
 		//Debug
 		uint8_t* getMemPointer();
 		uint8_t* getKerPointer();
 		void dump_memory(uint16_t,uint16_t);
+
 
 	private:
 
@@ -42,9 +46,8 @@ class Memory{
 		uint8_t kernal[eightK];
 		uint8_t charset[fourK];
 
-		uint8_t* read_bin_file(const char*);
+		uint8_t* read_bin_file(const char*,streampos&);
 
-		void setup_memory_mode(uint8_t value);
 
 		bank_mode LORAM_mode;
 		bank_mode HIRAM_mode;
