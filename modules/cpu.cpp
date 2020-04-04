@@ -266,6 +266,19 @@ void CPU::left_shift_mem(uint16_t addr){
 
 }
 
+void CPU::ASL(register_name index){
+
+	uint8_t data = regs.reg[index];
+
+	regs.carry_flag = data & 0x80;
+	data = data << 1;
+
+	regs.reg[index] = data;
+
+	SET_ZF(data);
+	SET_NF(data);
+
+}
 
 void CPU::right_shift_mem(uint16_t addr){
 
@@ -301,6 +314,8 @@ void CPU::rotate_right_mem(uint16_t addr){
 
 }
 
+
+
 void CPU::ROR(){
 
 	uint8_t carry = (regs.carry_flag) ? 1:0;
@@ -314,6 +329,7 @@ void CPU::ROR(){
 	regs.reg[regA] = t;
 
 }
+
 
 void CPU::LD(register_name index, uint8_t operand){
 
@@ -613,8 +629,12 @@ void CPU::SBC(uint8_t value){
 void CPU::CP(register_name index, uint8_t v){
 	uint16_t t;
 	t = regs.reg[index] - v;
-	regs.carry_flag = t < 0x100;
+	
+	
+	regs.carry_flag = ((t & 0x8000) != 0);
+
 	t = t & 0xff;
+
 	SET_ZF(t);
 	SET_NF(t);
 }
@@ -722,6 +742,11 @@ bool CPU::decode(uint8_t opcode){
 			addr = immediate();
 			DEBUG_PRINT("ORA "<<hex<<unsigned(addr)<<endl);
 			OR(regA,addr);
+			break;
+		
+		case 0xA:			//ASL
+			DEBUG_PRINT("ASL"<<endl);
+			ASL(regA);
 			break;
 
 		case 0x0D:

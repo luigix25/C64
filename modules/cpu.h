@@ -99,6 +99,7 @@ class CPU
 		void ROL(register_name);
 		void LSR(register_name);
 		void ROR();
+		void ASL(register_name);
 
 		void left_shift_mem(uint16_t);
 		void right_shift_mem(uint16_t);
