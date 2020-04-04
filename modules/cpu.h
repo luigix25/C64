@@ -3,8 +3,8 @@
 
 #define RESET_routine 0xFCE2
 
-#define SET_ZF(val)     (regs.zero_flag = !(uint8_t)(val))
-#define SET_NF(val)     (regs.sign_flag =  ((uint8_t)(val) & 0x80 ))
+#define SET_ZF(val)     (regs.zero_flag = 	!(uint8_t)(val))
+#define SET_NF(val)     (regs.sign_flag =  	((uint8_t)(val) & 0x80 ))
 
 class CPU
 {
@@ -71,8 +71,8 @@ class CPU
 		
 		void JMP(uint16_t);
 		void JSR(uint16_t);
-		void CMP(uint16_t);
-		void CMP(uint8_t);
+		void CMP_addr(uint16_t);
+		void CMP_data(uint8_t);
 		
 		void CPX(uint8_t);
 
@@ -98,7 +98,15 @@ class CPU
 		void AND(uint8_t);
 		void ROL(register_name);
 		void LSR(register_name);
-		void ASL(uint16_t);
+		void ROR();
+
+		void left_shift_mem(uint16_t);
+		void right_shift_mem(uint16_t);
+		void rotate_right_mem(uint16_t);
+
+
+
+		//void ASL(uint16_t);
 		void EOR(uint8_t);
 		void BIT(uint16_t);
 

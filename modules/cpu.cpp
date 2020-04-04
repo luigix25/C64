@@ -1,5 +1,8 @@
 #include "cpu.h"
 
+#include <signal.h>
+#include <stdlib.h>
+
 CPU::CPU(Memory* memory, uint16_t PC){
 
 	this->memory = memory;
@@ -245,7 +248,7 @@ void CPU::LSR(register_name index){
 
 }
 
-void CPU::ASL(uint16_t addr){
+void CPU::left_shift_mem(uint16_t addr){
 
 	uint8_t data = memory->read_byte(addr);
 
@@ -263,6 +266,54 @@ void CPU::ASL(uint16_t addr){
 
 }
 
+
+void CPU::right_shift_mem(uint16_t addr){
+
+	uint8_t data = memory->read_byte(addr);
+	//BUG IN THE 6502!
+	memory->write_byte(addr,data);
+
+	regs.carry_flag = data & 0x1;
+	data = data << 1;
+
+	memory->write_byte(addr,data);
+
+	SET_ZF(data);
+	SET_NF(data);
+}
+
+void CPU::rotate_right_mem(uint16_t addr){
+
+	uint8_t data = memory->read_byte(addr);
+	//BUG IN THE 6502!
+	memory->write_byte(addr,data);
+
+	uint8_t carry = (regs.carry_flag) ? 1:0;
+
+	uint16_t t = (data >> 1) | (carry << 7);
+
+	regs.carry_flag = ((data & 0x1 ) !=0);
+	
+	SET_ZF(t);
+	SET_NF(t);
+	
+	memory->write_byte(addr,t);
+
+}
+
+void CPU::ROR(){
+
+	uint8_t carry = (regs.carry_flag) ? 1:0;
+	uint16_t t = (regs.reg[regA] >> 1) | (carry << 7);
+
+	regs.carry_flag = ((regs.reg[regA] & 0x1 ) !=0);
+	
+	SET_ZF(t);
+	SET_NF(t);
+
+	regs.reg[regA] = t;
+
+}
 
 void CPU::LD(register_name index, uint8_t operand){
 
@@ -364,7 +415,7 @@ void CPU::flags(uint8_t v)
 	regs.sign_flag = (GET_I_BIT(v,7));
 }
 
-void CPU::CMP(uint16_t addr){
+void CPU::CMP_addr(uint16_t addr){
 
 	uint8_t data = memory->read_byte(addr);
 
@@ -379,7 +430,7 @@ void CPU::CMP(uint16_t addr){
 
 }
 
-void CPU::CMP(uint8_t data){
+void CPU::CMP_data(uint8_t data){
 
 	uint16_t t;
 	t = regs.reg[regA] - data;
@@ -410,7 +461,7 @@ void CPU::BNE(uint8_t addr){
 	uint16_t new_addr = (int8_t) addr + regs.PC;
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
 
-	if(!regs.zero_flag){
+	if(regs.zero_flag == 0x0){
 		DEBUG_PRINT("BNE to "<<hex<<unsigned(new_addr)<<endl);
 		regs.PC = new_addr;
 	}
@@ -421,6 +472,7 @@ void CPU::BCC(uint8_t addr){
 
 	uint16_t new_addr = (int8_t) addr + regs.PC;
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
+	DEBUG_PRINT("BCC"<<endl);
 
 	if(!regs.carry_flag){
 		DEBUG_PRINT("BCC to "<<hex<<unsigned(new_addr)<<endl);
@@ -659,7 +711,7 @@ bool CPU::decode(uint8_t opcode){
 
 		case 0x06:			//ASL
 			addr = zero_page();	
-			ASL(addr);
+			left_shift_mem(addr);
 			break;
 	    
 		case 0x08:			//PHP
@@ -688,17 +740,23 @@ bool CPU::decode(uint8_t opcode){
 			break;
 		
 		case 0x11:						//ORA (ind),Y
-
+			DEBUG_PRINT("ORA ind Y"<<endl);
 			addr = indirect_Y();
 			OR(regA,memory->read_byte(addr));
 			break;
 
 		case 0x15:						//ORA zpg,X
-
+			DEBUG_PRINT("ORA ZPG"<<endl);
 			addr = zero_page(regX);
 			OR(regA,memory->read_byte(addr));
 			break;
 		
+		case 0x16:						//ASL zpg,X
+			DEBUG_PRINT("ASL"<<endl);
+			addr = zero_page(regX);
+			left_shift_mem(addr);
+			break;
+
 		case 0x18:						//CLC
 			DEBUG_PRINT("CLC"<<endl);
 			regs.carry_flag = false;
@@ -753,6 +811,12 @@ bool CPU::decode(uint8_t opcode){
 			addr = zero_page();
 			EOR(addr);
 			break;
+		
+		case 0x46:						//LSR zpg
+			DEBUG_PRINT("LSR"<<endl;)
+			addr = zero_page();
+			left_shift_mem(addr);
+			break;
 
 		case 0x48:						//PHA
 			DEBUG_PRINT("PHA"<<endl);
@@ -775,6 +839,12 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("JMP to "<<hex<<unsigned(addr)<<endl);
 
 			regs.PC = addr;
+			break;
+
+		case 0x56:						//LSR zpg_X
+			DEBUG_PRINT("LSR zpg,X"<<endl);
+			addr = zero_page(regX);
+			right_shift_mem(addr);
 			break;
 
 		case 0x58:						//CLI
@@ -804,7 +874,12 @@ bool CPU::decode(uint8_t opcode){
 			addr = immediate();
 			ADC(addr);
 			break;
-
+		
+		case 0x6A:						//ROR 
+			DEBUG_PRINT("ROR"<<endl);
+			ROR();
+			break;
+		
 		case 0x6C:						//JMP (ind)
 
 			tmp = absolute();
@@ -822,6 +897,13 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("BVS"<<endl);
 			addr = immediate();
 			BVS(addr);
+			break;
+
+		case 0x76:									//ROR
+			DEBUG_PRINT("ROR ZPG,X"<<endl);
+			addr = zero_page(regX);
+			rotate_right_mem(addr);
+
 			break;
 
 		case 0x78:						//SEI
@@ -1094,7 +1176,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0xC5:						//CPY zpg
 			DEBUG_PRINT("CMP"<<endl);
 			addr = zero_page();
-			CMP(addr);
+			CMP_addr(addr);
 			break;		
 		
 		case 0xC6:						//DEC zpg
@@ -1109,14 +1191,20 @@ bool CPU::decode(uint8_t opcode){
 			break;
 		
 		case 0xC9:
-			DEBUG_PRINT("CMP"<<endl);
-			addr = immediate();
-			CMP(addr);
+			DEBUG_PRINT("CMP"<<endl);		//CMP ZERO_PAGE
+			addr = zero_page();
+			CMP_data(addr);
 			break;
 
 		case 0xCA:						//DEX
 			DEBUG_PRINT("DEX"<<endl);
 			DE(regX);
+			break;
+
+		case 0xCE:						//DEC ABS
+			DEBUG_PRINT("DEC"<<endl);
+			addr = absolute();
+			DEC(addr);
 			break;
 
 		case 0xE0:						//CPX imm
@@ -1138,7 +1226,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0xD1:						//CMP
 			DEBUG_PRINT("CMP"<<endl);
 			addr = indirect_Y();
-			CMP(addr);
+			CMP_addr(addr);
 			break;	
 
 		case 0xD8:						//CLD
@@ -1149,7 +1237,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0xDD:						//CMP abs,X
 			DEBUG_PRINT("CMP"<<endl);
 			addr = absolute(regX);
-			CMP(addr);
+			CMP_addr(addr);
 			break;
 		
 		case 0xE4:
@@ -1190,7 +1278,7 @@ bool CPU::decode(uint8_t opcode){
 		
 		default:
 			DEBUG_PRINT("unimplemented: "<<hex<<unsigned(opcode)<<endl);
-
+			raise(SIGTSTP);
 			return false;
  	}
 

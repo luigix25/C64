@@ -1,4 +1,6 @@
 //memory.cpp
+#include <signal.h>
+#include <stdlib.h>
 
 #include "memory.h"
 
@@ -15,21 +17,26 @@ Memory::Memory(){
 
 }
 
-void Memory::dump_memory(uint16_t addr,uint8_t bytes){
+void Memory::dump_memory(uint16_t addr,uint16_t bytes){
 
-	cout<<"---------------------"<<endl;
+	cout<<endl<<"---------------------"<<endl;
 
-	for(uint8_t i=0;i<bytes;i++){
+	for(uint16_t i=0;i<bytes;i++){
 		cout<<hex<<unsigned(read_byte(addr+i))<<" ";
 	}
 
-	cout<<"---------------------"<<endl;
+	cout<<endl<<"---------------------"<<endl;
 
 }
 
 uint8_t Memory::read_byte(uint16_t addr){
 
 	//uint16_t page = addr & 0xff00;
+
+	/*if(addr >= 0xE473 && addr <= 0xE498){
+		cout<<"scritta comm"<<endl;
+		//raise(SIGPIPE);
+	}*/
 
 	//TODO: implementare cartridge!
 	if(addr >= BASIC_START and addr <= BASIC_END){
@@ -77,7 +84,9 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
   		if(addr == MEMORY_LAYOUT_ADDR){
   			setup_memory_mode(data);
   			return;
-  		}
+  		} else if(addr == 0x9A){
+			  cout<<"Device Output Change "<<hex<<unsigned(data)<<endl;
+		  }
 
   	} else if(addr >= IO_START and addr <= IO_END){
 		if(CHAR_mode == IO){		//VIC
@@ -86,6 +95,14 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 		}  
 
 	  }
+
+	if(addr >= 0x400 && addr <= 0x400 +1024){
+		if(data != 0x20){
+			cout<<"scrivo mem video"<<endl;
+			cout<<hex<<unsigned(data)<<endl;
+		}
+
+	}
 
 	memory[addr] = data;
 

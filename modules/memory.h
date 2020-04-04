@@ -30,7 +30,7 @@ class Memory{
 		//Debug
 		uint8_t* getMemPointer();
 		uint8_t* getKerPointer();
-		void dump_memory(uint16_t,uint8_t);
+		void dump_memory(uint16_t,uint16_t);
 
 	private:
 
