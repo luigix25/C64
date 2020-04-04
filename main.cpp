@@ -5,8 +5,6 @@
 
 #include "modules/debug.h"
 
-//uint8_t memory[sixtyfourK];
-
 char convert(char);
 
 int main(){
@@ -21,31 +19,13 @@ int main(){
 	CPU cpu(mem);
 	cpu.dump_reg();
 
+    /* Load original Kernal + Basic ROM */
+	// mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
 
+    /* Load custom Kernal rom */
+    mem->load_custom_kernal_rom(CUSTOM_KERNAL_0);
 
-	/*regs.PC = 0;
-	memory[0] = 0xa9;
-	memory[1] = 0x0a;
-	memory[2] = 0x8d;
-	memory[3] = 0x34;
-	memory[4] = 0x12;
-	memory[5] = 0xa9;
-	memory[6] = 0x00;
-	memory[7] = 0x0d;
-	memory[8] = 0x34;
-	memory[9] = 0x12;
-	memory[10] = 0x00;
-	*/
-
-	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
 	mem->load_charset(CHARSET_ROM);
-
-
-
-
-	/*loadKernalAndBasic(memory,KERNAL_BASIC_ROM);
-	loadCharset(memory,CHARSET_ROM);
-*/
 
 	bool loop = true;
 	uint8_t opcode;

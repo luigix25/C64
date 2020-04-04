@@ -10,7 +10,7 @@ class Memory;
 #define HIRAM_MASK 0x2
 #define CHAR_MASK 0x4
 
-#define VIDEO_MEM_START 
+#define VIDEO_MEM_START
 
 enum bank_mode {RAM,ROM,IO,CARTRIDGE};
 
@@ -24,6 +24,8 @@ class Memory{
 
 		void load_kernal_and_basic(const char*);
 		void load_charset(const char*);
+
+        void load_custom_kernal_rom(const char*);
 
 		void setVIC(VIC*);
 

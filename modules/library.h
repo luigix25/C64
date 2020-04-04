@@ -14,6 +14,7 @@ using namespace std;
 
 #define KERNAL_BASIC_ROM "roms/251913-01.bin"
 #define CHARSET_ROM "roms/901225-01.bin"
+#define CUSTOM_KERNAL_0 "roms/custom_0.bin"
 
 #define fourK 4096
 #define eightK 8192
@@ -60,7 +61,7 @@ void loadCharset(uint8_t *,const char*);
 enum register_name
 {
 	regA,regX,regY
-	
+
 };
 
 struct registers{

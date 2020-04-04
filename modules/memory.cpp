@@ -33,12 +33,12 @@ uint8_t Memory::read_byte(uint16_t addr){
 
 	//TODO: implementare cartridge!
 	if(addr >= BASIC_START and addr <= BASIC_END){
-		
+
 		if(LORAM_mode == RAM)
 			return memory[addr];
 		else
 			return basic[addr-BASIC_START];
-	
+
 	//VIC CHAR or RAM
 	} else if(addr >= IO_START and addr <= IO_END){
 
@@ -52,18 +52,18 @@ uint8_t Memory::read_byte(uint16_t addr){
 			else
 				return 0xFF;
 		}
-		
+
 	//TODO: implementare cartridge!
 	}else if(addr >= KERNAL_START /*and addr <= KERNAL_END  inutile */){
-		
+
 		if(HIRAM_mode == RAM)
 			return memory[addr];
 		else{
 			return kernal[addr-KERNAL_START];
 		}
-	
-	} 
-	
+
+	}
+
 	return memory[addr];
 }
 
@@ -83,7 +83,7 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 		if(CHAR_mode == IO){		//VIC
 			vic->write_register(addr,data);
 			return;
-		}  
+		}
 
 	  }
 
@@ -93,7 +93,7 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 }
 
 void Memory::setup_memory_mode(uint8_t value){
-  
+
   	DEBUG_PRINT("CHANGE IN MEMORY MODE!!"<<endl);
 	DEBUG_PRINT(hex<<unsigned(value)<<endl);
 
@@ -114,9 +114,9 @@ void Memory::setup_memory_mode(uint8_t value){
 		CHAR_mode = IO;
 	else if(char_en && !loram_en && !hiram_en)
 		CHAR_mode = RAM;
-	else 
+	else
 		CHAR_mode = ROM;
-	
+
 	memory[MEMORY_LAYOUT_ADDR] = value;
 
 }
@@ -138,8 +138,16 @@ void Memory::load_charset(const char* filename){
 	uint8_t* rom = read_bin_file(filename);
 
 	memcpy(charset, rom, fourK);
-	
+
 	delete[] rom;
+}
+
+void Memory::load_custom_kernal_rom(const char* filename) {
+
+    uint8_t* buffer = read_bin_file(filename);
+
+    memcpy(kernal, buffer, eightK); /* TODO actually it could be < 8k */
+
 }
 
 uint8_t* Memory::read_bin_file(const char* filename){
