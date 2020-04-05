@@ -66,7 +66,7 @@ enum register_name
 struct registers{
 	uint8_t reg[3];
 
-	uint16_t SP;
+	uint8_t SP;
 	uint16_t PC;
 
 	bool sign_flag;

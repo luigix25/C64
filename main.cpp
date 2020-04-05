@@ -46,8 +46,6 @@ int main(){
 	mem->load_custom_memory("roms/6502_functional_test.bin");
 	mem->setup_memory_mode(0);
 
-	mem->dump_memory(0x400,100);
-
 	cpu->regs.PC = 0x400;
 	cpu->dump_reg();
 
@@ -104,25 +102,26 @@ void test_cpu(CPU *cpu)
 		
 		if(pc == cpu->regs.PC)
 		{
-			cout<<("infinite loop at %x\n",pc);
+			cout<<"infinite loop at "<<hex<<unsigned(pc)<<endl;
 			break;
 
 		} else if(cpu->regs.PC == 0x3463)
 		{
-			cout<<("test passed!\n");
+			cout<<"test passed!"<<endl;
 			break;
 		}
 		
 		pc = cpu->regs.PC;
 		
 		opcode = cpu->fetch();
+		cout<<"OPCODE: "<<hex<<unsigned(opcode)<<endl;
+
 		loop = cpu->decode(opcode);
 		if(loop == false){
 			cout<<"Bloccato "<<endl;
 		}
 
 		cpu->dump_reg();
-		cout<<"OPCODE: "<<hex<<unsigned(opcode)<<endl;
 
 		char c;
 		//cin>>c;

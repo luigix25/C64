@@ -65,9 +65,8 @@ uint8_t Memory::read_byte(uint16_t addr){
 		
 		if(HIRAM_mode == RAM)
 			return memory[addr];
-		else{
+		else
 			return kernal[addr-KERNAL_START];
-		}
 	
 	} 
 	
@@ -114,6 +113,11 @@ void Memory::setup_memory_mode(uint8_t value){
 	bool loram_en  = ((value & HIRAM_MASK) != 0);
 	bool hiram_en = ((value & LORAM_MASK) != 0);
 	bool char_en = ((value & CHAR_MASK) != 0);
+
+	//Set everything to RAM as default
+	HIRAM_mode = RAM;
+	LORAM_mode = RAM;
+	CHAR_mode = RAM;
 
 	//Basic
 	if(hiram_en)

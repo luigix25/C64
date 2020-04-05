@@ -63,9 +63,12 @@ class CPU
 		void LD(register_name, uint8_t);
 		void ST(register_name, uint16_t);
 
+		void TSX();
+
 		void PUSH(register_name);
 		void PUSH(uint8_t);
 		uint8_t POP();
+
 
 		void PLA();
 		
@@ -83,6 +86,7 @@ class CPU
 		void BPL(uint8_t);
 		void BMI(uint8_t);
 		void BVS(uint8_t);
+		void BVC(uint8_t);
 
 		void DE(register_name);
 		void DEC(uint16_t);
