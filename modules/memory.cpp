@@ -185,11 +185,11 @@ uint8_t* Memory::read_bin_file(const char* filename, streampos &size){
 
 }
 
-void Memory::load_custom_memory(const char* filename) {
+void Memory::load_custom_memory(const char* filename, uint16_t offset) {
 
 	streampos size;
 	uint8_t* buffer = read_bin_file(filename,size);
-	memcpy(memory, buffer, size);
+	memcpy(memory+offset, buffer, size);
 
 }
 

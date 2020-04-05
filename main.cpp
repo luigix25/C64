@@ -43,7 +43,7 @@ int main(){
 	//mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
 	//mem->load_charset(CHARSET_ROM);
 
-	mem->load_custom_memory("roms/6502_functional_test.bin");
+	mem->load_custom_memory("roms/6502_functional_test.bin",0x400);
 	mem->setup_memory_mode(0);
 
 	cpu->regs.PC = 0x400;

@@ -40,6 +40,7 @@ void CPU::reset_flags(){
 	regs.carry_flag = 0;
 	regs.interrupt_flag = 0;
 	regs.decimal_mode_flag = 0;
+	regs.break_flag = 1;
 
 }
 
@@ -406,16 +407,16 @@ uint8_t CPU::flags()
 {
 	uint8_t v = 0;
 
-	v |= regs.carry_flag  << 0;
-	v |= regs.zero_flag  << 1;
-	v |= regs.interrupt_flag << 2;
-	v |= regs.decimal_mode_flag << 3;
+	v |= (regs.carry_flag != 0)  << 0;
+	v |= (regs.zero_flag != 0) << 1;
+	v |= (regs.interrupt_flag != 0) << 2;
+	v |= (regs.decimal_mode_flag != 0)<< 3;
+	v |= (regs.break_flag != 0) << 4;
 
-	v |= 1 << 4;
 	/* unused, always set */
 	v |= 1     << 5;
-	v |= regs.overflow_flag  << 6;
-	v |= regs.sign_flag  << 7;
+	v |= (regs.overflow_flag != 0)  << 6;
+	v |= (regs.sign_flag != 0) << 7;
 
 	return v;
 }
@@ -427,6 +428,9 @@ void CPU::flags(uint8_t v)
 	regs.zero_flag = (GET_I_BIT(v,1));
 	regs.interrupt_flag = (GET_I_BIT(v,2));
 	regs.decimal_mode_flag = (GET_I_BIT(v,3));
+	
+	//regs.break_flag = (GET_I_BIT(v,4));
+	
 	regs.overflow_flag = (GET_I_BIT(v,6));
 	regs.sign_flag = (GET_I_BIT(v,7));
 }
@@ -706,6 +710,13 @@ void CPU::TXA(){
 	SET_NF(regs.reg[regA]);
 }
 
+void CPU::BRK(){
+
+	regs.break_flag = true;
+	handle_irq(false);
+
+}
+
 //DEBUG
 void CPU::dump_reg(){
 
@@ -722,6 +733,7 @@ void CPU::dump_reg(){
 	DEBUG_PRINT("OF :"<<hex<<unsigned(regs.overflow_flag)<<endl);
 	DEBUG_PRINT("ZF :"<<hex<<unsigned(regs.zero_flag)<<endl);
 	DEBUG_PRINT("IF :"<<hex<<unsigned(regs.interrupt_flag)<<endl);
+	DEBUG_PRINT("BF :"<<hex<<unsigned(regs.break_flag)<<endl);
 
 	//DEBUG_PRINT("DMF:"<<hex<<unsigned(regs.decimal_mode_flag));
 
@@ -739,10 +751,9 @@ bool CPU::decode(uint8_t opcode){
 
 	switch(opcode){
 		case 0x00:        //BRK
-		DEBUG_PRINT("BRK!"<<endl);
-		handle_irq(false);
-		//return false;
-		break;
+			DEBUG_PRINT("BRK!"<<endl);
+			BRK();
+			break;
 
 		case 0x01:        //ORA (ind,X)		
 
@@ -896,7 +907,7 @@ bool CPU::decode(uint8_t opcode){
 
 		case 0x50:						//JMP abs
 			addr = immediate();
-			DEBUG_PRINT("BVC");
+			DEBUG_PRINT("BVC"<<endl);
 			BVC(addr);
 
 			break;

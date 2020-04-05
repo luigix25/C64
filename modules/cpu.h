@@ -69,6 +69,7 @@ class CPU
 		void PUSH(uint8_t);
 		uint8_t POP();
 
+		void BRK();
 
 		void PLA();
 		

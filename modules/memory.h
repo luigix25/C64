@@ -24,7 +24,7 @@ class Memory{
 
 		void load_kernal_and_basic(const char*);
 		void load_charset(const char*);
-		void load_custom_memory(const char*);
+		void load_custom_memory(const char*,uint16_t);
 
 		void setVIC(VIC*);
 

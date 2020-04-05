@@ -75,6 +75,7 @@ struct registers{
 	bool carry_flag;
 	bool interrupt_flag;
 	bool decimal_mode_flag;
+	bool break_flag;
 
 	uint8_t flags;
 };
