@@ -720,10 +720,10 @@ void CPU::BRK(){
 
 	cout<<"BRK RETURN ADDR: "<<hex<<unsigned(regs.PC)<<endl;
 
-	uint8_t temp = ((regs.PC+1 >> 8) & 0xFF);
+	uint8_t temp = (((regs.PC+1) >> 8) & 0xFF);
 	PUSH(temp);
 
-	temp = (regs.PC+1 & 0xFF);
+	temp = ((regs.PC+1) & 0xFF);
 	PUSH(temp);
 
 	PUSH(flags());
