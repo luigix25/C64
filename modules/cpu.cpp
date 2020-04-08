@@ -641,9 +641,9 @@ void CPU::ADC(uint8_t value){
 	regs.carry_flag = t > 0xff;
 	t = t & 0xff;
 
-	regs.overflow_flag = !(( regs.reg[regA] ^ value )&0x80) && (( regs.reg[regA] ^ t) & 0x80);
 
-	
+	regs.overflow_flag = !(( regs.reg[regA] ^ value ) &0x80 ) && (( regs.reg[regA] ^ t) & 0x80);
+
 	SET_ZF(t);
 	SET_NF(t);
 
@@ -670,7 +670,10 @@ void CPU::SBC(uint8_t value){
 	}
 
 	regs.carry_flag = t < 0x100;
-	regs.overflow_flag = (( regs.reg[regA] ^ value ) &0x80 ) && (( regs.reg[regA] ^ t) & 0x80);
+
+	t = t & 0xFF;
+
+	regs.overflow_flag = (( regs.reg[regA] ^ t ) & 0x80 ) && (( regs.reg[regA] ^ value) & 0x80);
 
 	SET_ZF(t);
 	SET_NF(t);
@@ -678,6 +681,35 @@ void CPU::SBC(uint8_t value){
 	regs.reg[regA] = (uint8_t)t;
 
 }
+
+/*
+  uint16_t t;
+  if(dmf())
+  {
+    t = ( a() & 0xf ) - ( v &0xf ) - ( cf() ? 0 : 1);
+    if((t & 0x10) != 0)
+      t = ((t-0x6)&0xf) | ((a()&0xf0) - (v&0xf0) - 0x10);
+    else
+      t = (t&0xf) | ((a()&0xf0) - (v&0xf0));
+    if((t&0x100)!=0)
+      t -= 0x60;
+  }
+  else
+  {
+    t = a() - v - (cf() ? 0 : 1);
+  }
+
+
+  cf ( t<0x100 );
+  t = t & 0xff;
+
+
+  of = (( a() ^ t ) & 0x80) && ( (a() ^ v ) & 0x80) 
+
+
+  a((uint8_t)t);*/
+
+
 
 //Compare
 void CPU::CP(register_name index, uint8_t v){
@@ -884,8 +916,13 @@ bool CPU::decode(uint8_t opcode){
 			regs.carry_flag = false;
 			break;
 
-		case 0x1D:						//ORA abs,X
+		case 0x19:						//ORA ABS Y
+			DEBUG_PRINT("ORA"<<endl);
+			addr = absolute(regY);
+			OR(regA,memory->read_byte(addr));
+			break;
 
+		case 0x1D:						//ORA abs,X
 			addr = absolute(regX);
 			OR(regA,memory->read_byte(addr));
 			break;
@@ -1007,6 +1044,12 @@ bool CPU::decode(uint8_t opcode){
 			rotate_left_mem(addr);
 			break;
 
+		case 0x41:						//EOR (ind,X)
+			DEBUG_PRINT("EOR"<<endl;)
+			addr = indirect_X();
+			EOR(memory->read_byte(addr));
+			break;
+
 		case 0x45:						//EOR zpg
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = zero_page();
@@ -1063,7 +1106,18 @@ bool CPU::decode(uint8_t opcode){
 			addr = immediate();
 			DEBUG_PRINT("BVC"<<endl);
 			BVC(addr);
+			break;
 
+		case 0x51:						//EOR (ind),Y
+			DEBUG_PRINT("EOR"<<endl;)
+			addr = indirect_Y();
+			EOR(memory->read_byte(addr));
+			break;
+
+		case 0x55:						//EOR zpg X
+			DEBUG_PRINT("EOR"<<endl;)
+			addr = zero_page(regX);
+			EOR(memory->read_byte(addr));
 			break;
 
 		case 0x56:						//LSR zpg_X
@@ -1077,6 +1131,18 @@ bool CPU::decode(uint8_t opcode){
 			regs.interrupt_flag = false;
 			break;
 
+		case 0x59:						//EOR abs Y
+			DEBUG_PRINT("EOR"<<endl;)
+			addr = absolute(regY);
+			EOR(memory->read_byte(addr));
+			break;
+
+		case 0x5D:						//EOR abs X
+			DEBUG_PRINT("EOR"<<endl;)
+			addr = absolute(regX);
+			EOR(memory->read_byte(addr));
+			break;
+
 		case 0x5E:
 			DEBUG_PRINT("LSR"<<endl);
 			addr = absolute(regX);
@@ -1087,6 +1153,12 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("RTS"<<endl);
 			addr = (POP() + (POP() << 8)) + 1;
   			regs.PC = addr;
+			break;
+
+		case 0x61:								//ADC (ind X)
+			DEBUG_PRINT("ADC"<<endl);
+			addr = indirect_X();
+			ADC(memory->read_byte(addr));
 			break;
 
 		case 0x65:						//ADC imm
@@ -1130,6 +1202,13 @@ bool CPU::decode(uint8_t opcode){
 			//JMP(tmp);
 			break;
 		
+		case 0x6D:
+			DEBUG_PRINT("ADC"<<endl);	//ADC ABS
+			addr = absolute();
+
+			ADC(memory->read_byte(addr));
+			break;
+
 		case 0x6E:
 
 			DEBUG_PRINT("ROR"<<endl);
@@ -1144,6 +1223,18 @@ bool CPU::decode(uint8_t opcode){
 			BVS(addr);
 			break;
 
+		case 0x71:								//ADC (ind) Y
+			DEBUG_PRINT("ADC"<<endl);
+			addr = indirect_Y();
+			ADC(memory->read_byte(addr));
+			break;
+
+		case 0x75:								//ADC zpg X
+			DEBUG_PRINT("ADC"<<endl);
+			addr = zero_page(regX);
+			ADC(memory->read_byte(addr));
+			break;
+
 		case 0x76:									//ROR
 			DEBUG_PRINT("ROR ZPG,X"<<endl);
 			addr = zero_page(regX);
@@ -1154,6 +1245,18 @@ bool CPU::decode(uint8_t opcode){
 		case 0x78:						//SEI
 			DEBUG_PRINT("SEI"<<endl);
 			regs.interrupt_flag = true;
+			break;
+
+		case 0x79:								//ADC abs Y
+			DEBUG_PRINT("ADC"<<endl);
+			addr = absolute(regY);
+			ADC(memory->read_byte(addr));
+			break;
+
+		case 0x7D:								//ADC abs X
+			DEBUG_PRINT("ADC"<<endl);
+			addr = absolute(regX);
+			ADC(memory->read_byte(addr));
 			break;
 
 		case 0x7E:						//ROR
@@ -1492,16 +1595,6 @@ bool CPU::decode(uint8_t opcode){
 			addr = absolute();
 			CMP_addr(addr);
 			break;
-
-		case 0xE0:						//CPX imm
-			DEBUG_PRINT("CPX"<<endl);
-			addr = immediate();
-			CP(regX,addr);
-			break;	
-
-		case 0xEA:						//NOP
-			DEBUG_PRINT("NOP"<<endl);
-			break;
 		
 		case 0xD0:						//BNE
 			DEBUG_PRINT("BNE"<<endl);
@@ -1550,6 +1643,18 @@ bool CPU::decode(uint8_t opcode){
 			DEC(addr);
 			break;
 		
+		case 0xE0:						//CPX imm
+			DEBUG_PRINT("CPX"<<endl);
+			addr = immediate();
+			CP(regX,addr);
+			break;	
+
+		case 0xE1:								//SBC (ind X)
+			DEBUG_PRINT("SBC"<<endl);
+			addr = indirect_X();
+			SBC(memory->read_byte(addr));
+			break;
+
 		case 0xE4:
 			DEBUG_PRINT("CPX"<<endl);
 			addr = zero_page();
@@ -1563,7 +1668,7 @@ bool CPU::decode(uint8_t opcode){
 			INC(addr);
 			break;
 
-		case 0xE5:						//INX
+		case 0xE5:						//SBC
 			DEBUG_PRINT("SBC"<<endl);
 			addr = zero_page();
 			SBC(memory->read_byte(addr));
@@ -1579,11 +1684,21 @@ bool CPU::decode(uint8_t opcode){
 			addr = immediate();
 			SBC(addr);
 			break;
-		
+
+		case 0xEA:						//NOP
+			DEBUG_PRINT("NOP"<<endl);
+			break;
+
 		case 0xEC:
 			DEBUG_PRINT("CPX abs"<<endl);
 			addr = absolute();
 			CPX(memory->read_byte(addr));
+			break;
+
+		case 0xED:
+			DEBUG_PRINT("SBC"<<endl); 	//SBC ABS
+			addr = absolute();
+			SBC(memory->read_byte(addr));
 			break;
 
 		case 0xEE:
@@ -1597,7 +1712,19 @@ bool CPU::decode(uint8_t opcode){
 			addr = immediate();
 			BEQ(addr);
 			break;
-		
+
+		case 0xF1:								//SBC (ind) Y
+			DEBUG_PRINT("SBC"<<endl);
+			addr = indirect_Y();
+			SBC(memory->read_byte(addr));
+			break;
+
+		case 0xF5:								//SBC zpg X
+			DEBUG_PRINT("ADC"<<endl);
+			addr = zero_page(regX);
+			SBC(memory->read_byte(addr));
+			break;
+
 		case 0xF6:
 			DEBUG_PRINT("INC"<<endl);
 			addr = zero_page(regX);
@@ -1609,10 +1736,22 @@ bool CPU::decode(uint8_t opcode){
 			regs.decimal_mode_flag = true;
 			break;
 		
+		case 0xF9:								//SBC abs Y
+			DEBUG_PRINT("SBC"<<endl);
+			addr = absolute(regY);
+			SBC(memory->read_byte(addr));
+			break;		
+		
 		case 0xFE:						//INC ABS,X
 			DEBUG_PRINT("INC"<<endl);
 			addr = absolute(regX);
 			INC(addr);
+			break;
+
+		case 0xFD:								//SBC abs X
+			DEBUG_PRINT("SBC"<<endl);
+			addr = absolute(regX);
+			SBC(memory->read_byte(addr));
 			break;
 
 		default:
