@@ -411,7 +411,10 @@ uint8_t CPU::flags()
 	v |= (regs.zero_flag != 0) << 1;
 	v |= (regs.interrupt_flag != 0) << 2;
 	v |= (regs.decimal_mode_flag != 0)<< 3;
-	v |= (regs.break_flag != 0) << 4;
+	
+	//v |= (regs.break_flag != 0) << 4;
+	//Always 1
+	v |= 1 << 4;
 
 	/* unused, always set */
 	v |= 1     << 5;
@@ -713,7 +716,23 @@ void CPU::TXA(){
 void CPU::BRK(){
 
 	regs.break_flag = true;
-	handle_irq(false);
+	//interrupt is masked
+
+	cout<<"BRK RETURN ADDR: "<<hex<<unsigned(regs.PC)<<endl;
+
+	uint8_t temp = ((regs.PC >> 8) & 0xFF);
+	PUSH(temp);
+
+	temp = (regs.PC & 0xFF);
+	PUSH(temp);
+
+	PUSH(flags());
+
+	regs.interrupt_flag = true;
+
+	uint16_t addr = read_word(IRQ_vector);
+
+	regs.PC = addr;
 
 }
 
@@ -734,6 +753,9 @@ void CPU::dump_reg(){
 	DEBUG_PRINT("ZF :"<<hex<<unsigned(regs.zero_flag)<<endl);
 	DEBUG_PRINT("IF :"<<hex<<unsigned(regs.interrupt_flag)<<endl);
 	DEBUG_PRINT("BF :"<<hex<<unsigned(regs.break_flag)<<endl);
+
+
+	DEBUG_PRINT("FLAGS: "<<hex<<unsigned(flags())<<endl);
 
 	//DEBUG_PRINT("DMF:"<<hex<<unsigned(regs.decimal_mode_flag));
 
