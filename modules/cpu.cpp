@@ -902,10 +902,22 @@ bool CPU::decode(uint8_t opcode){
 			JSR(addr);
 			break;
 		
+		case 0x21:						//AND (ind X)
+			DEBUG_PRINT("AND"<<endl);
+			addr = indirect_X();
+			AND(memory->read_byte(addr));
+			break;
+
 		case 0x24:						//JSR 
 			addr = zero_page();
 			DEBUG_PRINT("BIT "<<hex<<unsigned(addr)<<endl);
 			BIT(addr);
+			break;
+		
+		case 0x25:						//AND zpg
+			DEBUG_PRINT("AND"<<endl);
+			addr = zero_page();
+			AND(memory->read_byte(addr));
 			break;
 		
 		case 0x26:						//ROL zpg
@@ -936,6 +948,12 @@ bool CPU::decode(uint8_t opcode){
 			BIT(addr);
 			break;
 
+		case 0x2D:						//AND abs
+			DEBUG_PRINT("AND"<<endl);
+			addr = absolute();
+			AND(memory->read_byte(addr));
+			break;	
+
 		case 0x2E:						//ROL ABS
 			DEBUG_PRINT("ROL ABS"<<endl);
 			addr = absolute();
@@ -946,6 +964,18 @@ bool CPU::decode(uint8_t opcode){
 			addr = immediate();
 			DEBUG_PRINT("BMI "<<hex<<unsigned(addr)<<endl);
 			BMI(addr);
+			break;
+
+		case 0x31:						//AND (ind),Y
+			DEBUG_PRINT("AND"<<endl);
+			addr = indirect_Y();
+			AND(memory->read_byte(addr));
+			break;
+
+		case 0x35:						//AND zpg,X
+			DEBUG_PRINT("AND"<<endl);
+			addr = zero_page(regX);
+			AND(memory->read_byte(addr));
 			break;
 
 		case 0x36:						//ROL 
@@ -959,6 +989,18 @@ bool CPU::decode(uint8_t opcode){
 			regs.carry_flag = true;
 			break;
 
+		case 0x39:						//AND abs Y
+			DEBUG_PRINT("AND"<<endl);
+			addr = absolute(regY);
+			AND(memory->read_byte(addr));
+			break;
+
+		case 0x3D:						//AND abs X
+			DEBUG_PRINT("AND"<<endl);
+			addr = absolute(regX);
+			AND(memory->read_byte(addr));
+			break;
+
 		case 0x3E:						//ROL
 			DEBUG_PRINT("ROL"<<endl);
 			addr = absolute(regX);
@@ -968,7 +1010,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0x45:						//EOR zpg
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = zero_page();
-			EOR(addr);
+			EOR(memory->read_byte(addr));
 			break;
 		
 		case 0x40:
@@ -1004,7 +1046,13 @@ bool CPU::decode(uint8_t opcode){
 
 			regs.PC = addr;
 			break;
-
+		
+		case 0x4D:						//EOR abs
+			DEBUG_PRINT("EOR"<<endl;)
+			addr = absolute();
+			EOR(memory->read_byte(addr));
+			break;
+		
 		case 0x4E:
 			DEBUG_PRINT("LSR ABS"<<endl);
 			addr = absolute();
@@ -1473,6 +1521,12 @@ bool CPU::decode(uint8_t opcode){
 			CMP_addr(addr);
 			break;	
 
+		case 0xD6:						//DEC ZPG X
+			DEBUG_PRINT("DEC"<<endl);
+			addr = zero_page(regX);
+			DEC(addr);
+			break;
+
 		case 0xD8:						//CLD
 			DEBUG_PRINT("CLD"<<endl);
 			regs.decimal_mode_flag = false;
@@ -1488,6 +1542,12 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("CMP"<<endl);
 			addr = absolute(regX);
 			CMP_addr(addr);
+			break;
+
+		case 0xDE:						//DEC ABS,X
+			DEBUG_PRINT("DEC"<<endl);
+			addr = absolute(regX);
+			DEC(addr);
 			break;
 		
 		case 0xE4:
@@ -1538,11 +1598,23 @@ bool CPU::decode(uint8_t opcode){
 			BEQ(addr);
 			break;
 		
+		case 0xF6:
+			DEBUG_PRINT("INC"<<endl);
+			addr = zero_page(regX);
+			INC(addr);
+			break;
+
 		case 0xF8:						//SED
 			DEBUG_PRINT("SED"<<endl);
 			regs.decimal_mode_flag = true;
 			break;
 		
+		case 0xFE:						//INC ABS,X
+			DEBUG_PRINT("INC"<<endl);
+			addr = absolute(regX);
+			INC(addr);
+			break;
+
 		default:
 			DEBUG_PRINT("unimplemented: "<<hex<<unsigned(opcode)<<endl);
 			raise(SIGTSTP);
