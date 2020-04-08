@@ -736,6 +736,13 @@ void CPU::BRK(){
 
 }
 
+void CPU::RTI(){
+
+	flags(POP());
+	regs.PC = (POP() + (POP() << 8));
+
+}
+
 //DEBUG
 void CPU::dump_reg(){
 
@@ -898,6 +905,11 @@ bool CPU::decode(uint8_t opcode){
 			EOR(addr);
 			break;
 		
+		case 0x40:
+			DEBUG_PRINT("RTI"<<endl);
+			RTI();
+			break;
+
 		case 0x46:						//LSR zpg
 			DEBUG_PRINT("LSR"<<endl;)
 			addr = zero_page();

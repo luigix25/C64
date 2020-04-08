@@ -70,6 +70,7 @@ class CPU
 		uint8_t POP();
 
 		void BRK();
+		void RTI();
 
 		void PLA();
 		
