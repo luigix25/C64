@@ -3,7 +3,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <iomanip>
-
+/*
 CPU::CPU(Memory* memory, uint16_t PC){
 
 	this->memory = memory;
@@ -28,6 +28,19 @@ CPU::CPU(Memory* memory){
 	reset_flags();
 
 	//ative low
+	nmi_line = true;
+	irq_line = true;
+
+}*/
+
+CPU::CPU(Bus& _bus):bus(_bus) {
+
+	regs.SP = 0;
+	regs.PC = RESET_routine; // TODO RESET VECTOR ?
+
+	reset_flags();
+
+	// active low
 	nmi_line = true;
 	irq_line = true;
 
@@ -102,7 +115,7 @@ uint8_t CPU::zero_page(register_name index){
 uint8_t CPU::zero_page(){
 
 	uint8_t addr;
-	addr = memory->read_byte(regs.PC);
+	addr = bus.read(regs.PC);
 
 	regs.PC++;
 
@@ -122,7 +135,7 @@ uint8_t CPU::immediate(){
 
 uint8_t CPU::read_byte(uint16_t addr){
 
-	uint8_t data = memory->read_byte(addr);
+	uint8_t data = bus.read(addr);
 
 	return data;
 
@@ -130,8 +143,8 @@ uint8_t CPU::read_byte(uint16_t addr){
 
 uint16_t CPU::read_word(uint16_t addr){
 
-	uint16_t data = memory->read_byte(addr);
-	uint16_t tmp = memory->read_byte(addr+1);
+	uint16_t data = bus.read(addr);
+	uint16_t tmp = bus.read(addr+1);
 
 	tmp = tmp <<8;
 	data |= tmp;
@@ -230,7 +243,7 @@ void CPU::EOR(uint8_t data){
 
 void CPU::BIT(uint16_t addr){
 
-	uint8_t data = memory->read_byte(addr);
+	uint8_t data = bus.read(addr);
 	regs.zero_flag = data & regs.reg[regA];
 
 	regs.overflow_flag = ( data & 0x40 );
@@ -252,15 +265,15 @@ void CPU::LSR(register_name index){
 
 void CPU::left_shift_mem(uint16_t addr){
 
-	uint8_t data = memory->read_byte(addr);
+	uint8_t data = bus.read(addr);
 
 	//BUG IN THE 6502!
-	memory->write_byte(addr,data);
+	bus.write(addr,data);
 
 	regs.carry_flag = data & 0x80;
 	data = data << 1;
 
-	memory->write_byte(addr,data);
+	bus.write(addr,data);
 
 	SET_ZF(data);
 	SET_NF(data);
@@ -284,14 +297,14 @@ void CPU::ASL(register_name index){
 
 void CPU::right_shift_mem(uint16_t addr){
 
-	uint8_t data = memory->read_byte(addr);
+	uint8_t data = bus.read(addr);
 	//BUG IN THE 6502!
-	memory->write_byte(addr,data);
+	bus.write(addr,data);
 
 	regs.carry_flag = data & 0x1;
 	data = data << 1;
 
-	memory->write_byte(addr,data);
+	bus.write(addr,data);
 
 	SET_ZF(data);
 	SET_NF(data);
@@ -299,9 +312,9 @@ void CPU::right_shift_mem(uint16_t addr){
 
 void CPU::rotate_right_mem(uint16_t addr){
 
-	uint8_t data = memory->read_byte(addr);
+	uint8_t data = bus.read(addr);
 	//BUG IN THE 6502!
-	memory->write_byte(addr,data);
+	bus.write(addr,data);
 
 	uint8_t carry = (regs.carry_flag) ? 1:0;
 
@@ -312,7 +325,7 @@ void CPU::rotate_right_mem(uint16_t addr){
 	SET_ZF(t);
 	SET_NF(t);
 
-	memory->write_byte(addr,t);
+	bus.write(addr,t);
 
 }
 
@@ -343,32 +356,32 @@ void CPU::LD(register_name index, uint8_t operand){
 
 void CPU::ST(register_name index, uint16_t addr){
 
-	memory->write_byte(addr,regs.reg[index]);
+	bus.write(addr,regs.reg[index]);
 
 }
 
 void CPU::JMP(uint16_t addr){
-	regs.PC = memory->read_byte(addr);
+	regs.PC = bus.read(addr);
 }
 
 void CPU::PUSH(register_name index){
 
 	uint16_t addr = STACK_START + regs.SP;
-	memory->write_byte(addr,regs.reg[index]);
+	bus.write(addr,regs.reg[index]);
 	regs.SP--;
 }
 
 void CPU::PUSH(uint8_t value){
 
 	uint16_t addr = STACK_START + regs.SP;
-	memory->write_byte(addr, value);
+	bus.write(addr, value);
 	regs.SP--;
 }
 
 uint8_t CPU::POP(){
 
   	uint16_t addr = ++regs.SP + STACK_START;
-  	return memory->read_byte(addr);
+  	return bus.read(addr);
 
 }
 
@@ -440,7 +453,7 @@ void CPU::flags(uint8_t v)
 
 void CPU::CMP_addr(uint16_t addr){
 
-	uint8_t data = memory->read_byte(addr);
+	uint8_t data = bus.read(addr);
 
 	uint16_t t;
 	t = regs.reg[regA] - data;
@@ -591,9 +604,9 @@ void CPU::TSX(){
 void CPU::INC(uint16_t addr)
 {
 
-	uint8_t value = memory->read_byte(addr);
+	uint8_t value = bus.read(addr);
 	value++;
-	memory->write_byte(addr,value);
+	bus.write(addr,value);
 	SET_ZF(value);
 	SET_NF(value);
 
@@ -680,12 +693,12 @@ void CPU::DE(register_name index)
 
 void CPU::DEC(uint16_t addr)
 {
-	uint8_t data = memory->read_byte(addr);
+	uint8_t data = bus.read(addr);
 
 	//BUG IN 6502!
-	memory->write_byte(addr,data);
+	bus.write(addr,data);
 	data--;
-	memory->write_byte(addr,data);
+	bus.write(addr,data);
 
 	SET_ZF(data);
 	SET_NF(data);
@@ -782,12 +795,12 @@ bool CPU::decode(uint8_t opcode){
 
 			addr = indirect_X();
 
-			OR(regA,memory->read_byte(addr));
+			OR(regA,bus.read(addr));
 			break;
 
 		case 0x05:      //ORA zpg
 			addr = zero_page();
-			OR(regA, memory->read_byte(addr));
+			OR(regA, bus.read(addr));
 			break;
 
 		case 0x06:			//ASL
@@ -815,7 +828,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0x0D:
 			DEBUG_PRINT("ORA ABS"<<endl);
 			addr = absolute();		//ORA ABS
-			OR(regA,memory->read_byte(addr));
+			OR(regA,bus.read(addr));
 			break;
 
 		case 0x0E:						//ASL ABS
@@ -830,13 +843,13 @@ bool CPU::decode(uint8_t opcode){
 		case 0x11:						//ORA (ind),Y
 			DEBUG_PRINT("ORA ind Y"<<endl);
 			addr = indirect_Y();
-			OR(regA,memory->read_byte(addr));
+			OR(regA,bus.read(addr));
 			break;
 
 		case 0x15:						//ORA zpg,X
 			DEBUG_PRINT("ORA ZPG"<<endl);
 			addr = zero_page(regX);
-			OR(regA,memory->read_byte(addr));
+			OR(regA,bus.read(addr));
 			break;
 
 		case 0x16:						//ASL zpg,X
@@ -853,7 +866,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0x1D:						//ORA abs,X
 
 			addr = absolute(regX);
-			OR(regA,memory->read_byte(addr));
+			OR(regA,bus.read(addr));
 			break;
 
 		case 0x20:						//JSR
@@ -961,7 +974,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0x65:						//ADC imm
 			addr = zero_page();
 			DEBUG_PRINT("ADC "<<hex<<unsigned(addr)<<endl);
-			ADC(memory->read_byte(addr));
+			ADC(bus.read(addr));
 			break;
 
 		case 0x68:						//PLA
@@ -1144,7 +1157,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0xA1:						//LDA (ind,X)
 			DEBUG_PRINT("LDY IMM"<<endl);
 			addr = indirect_X();
-			LD(regA,memory->read_byte(addr));
+			LD(regA,bus.read(addr));
 			break;
 
 		case 0xA2:						//LDX imm
@@ -1156,19 +1169,19 @@ bool CPU::decode(uint8_t opcode){
 		case 0xA4:						//LDY zpg
 			addr = zero_page();
 			DEBUG_PRINT("LDY "<<hex<<unsigned(addr)<<endl);
-			LD(regY,memory->read_byte(addr));
+			LD(regY,bus.read(addr));
 			break;
 
 		case 0xA5:						//LDA zpg
 			DEBUG_PRINT("LDA zero"<<endl);
 			addr = zero_page();
-			LD(regA,memory->read_byte(addr));
+			LD(regA,bus.read(addr));
 			break;
 
 		case 0xA6:						//LDX zpg
 			DEBUG_PRINT("LDX zero"<<endl);
 			addr = zero_page();
-			LD(regX,memory->read_byte(addr));
+			LD(regX,bus.read(addr));
 			break;
 
 		case 0xA8:						//TAY
@@ -1190,18 +1203,18 @@ bool CPU::decode(uint8_t opcode){
 		case 0xAC:						//LDY abs
 			addr = absolute();
 			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
-			LD(regY,memory->read_byte(addr));
+			LD(regY,bus.read(addr));
 			break;
 
 		case 0xAD:						//LDA abs
 			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
 			addr = absolute();
-			LD(regA,memory->read_byte(addr));
+			LD(regA,bus.read(addr));
 			break;
 
 		case 0xAE:						//LDX abs
 			addr = absolute();
-			LD(regX,memory->read_byte(addr));
+			LD(regX,bus.read(addr));
 			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
 			break;
 
@@ -1215,32 +1228,32 @@ bool CPU::decode(uint8_t opcode){
 			addr = indirect_Y();
 			DEBUG_PRINT("LDA "<<hex<<unsigned(addr)<<endl);
 
-			LD(regA,memory->read_byte(addr));
+			LD(regA,bus.read(addr));
 			break;
 
 		case 0xB4:						//LDY zpg,X
 			DEBUG_PRINT("LDY ind y"<<endl);
 			addr = indirect_X();
-			LD(regY,memory->read_byte(addr));
+			LD(regY,bus.read(addr));
 			break;
 
 		case 0xB5:						//LDA zpg,X
 			DEBUG_PRINT("LDA ind y"<<endl);
 			addr = indirect_X();
-			LD(regA,memory->read_byte(addr));
+			LD(regA,bus.read(addr));
 			break;
 
 		case 0xB6:						//LDX zpg,Y
 			DEBUG_PRINT("LOAD ind y"<<endl);
 			addr = indirect_Y();
-			LD(regX,memory->read_byte(addr));
+			LD(regX,bus.read(addr));
 			break;
 
 		case 0xB9:						//LDA abs,Y
 			addr = absolute(regY);
 			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
 
-			LD(regA,memory->read_byte(addr));
+			LD(regA,bus.read(addr));
 			break;
 
 		case 0xBA:						//TSX
@@ -1251,19 +1264,19 @@ bool CPU::decode(uint8_t opcode){
 		case 0xBC:						//LDY abs,X
 			DEBUG_PRINT("LOAD abs X"<<endl);
 			addr = absolute(regX);
-			LD(regY,memory->read_byte(addr));
+			LD(regY,bus.read(addr));
 			break;
 
 		case 0xBD:						//LDA abs,X
 			DEBUG_PRINT("LOAD abs X"<<endl);
 			addr = absolute(regX);
-			LD(regA,memory->read_byte(addr));
+			LD(regA,bus.read(addr));
 			break;
 
 		case 0xBE:						//LDX abs,X
 			DEBUG_PRINT("LOAD abs Y"<<endl);
 			addr = absolute(regY);
-			LD(regX,memory->read_byte(addr));
+			LD(regX,bus.read(addr));
 			break;
 
 		case 0xC0:						//CPY imm
@@ -1275,7 +1288,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0xC4:						//CPY zpg
 			DEBUG_PRINT("CPY"<<endl);
 			addr = zero_page();
-			CP(regY,memory->read_byte(addr));
+			CP(regY,bus.read(addr));
 			break;
 
 		case 0xC5:						//CPY zpg
@@ -1361,7 +1374,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0xE4:
 			DEBUG_PRINT("CPX"<<endl);
 			addr = zero_page();
-			CPX(memory->read_byte(addr));
+			CPX(bus.read(addr));
 			break;
 
 		case 0xE6:						//INC
@@ -1374,7 +1387,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0xE5:						//INX
 			DEBUG_PRINT("SBC"<<endl);
 			addr = zero_page();
-			SBC(memory->read_byte(addr));
+			SBC(bus.read(addr));
 			break;
 
 		case 0xE8:						//INX

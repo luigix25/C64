@@ -31,45 +31,9 @@ void Memory::dump_memory(uint16_t addr,uint16_t bytes){
 
 uint8_t Memory::read_byte(uint16_t addr){
 
-	//uint16_t page = addr & 0xff00;
+	// TODO IS THIS A MEMORY ONLY OR ALSO A BUS?
+	// FIX ME!
 
-	/*if(addr >= 0xE473 && addr <= 0xE498){
-		cout<<"scritta comm"<<endl;
-		//raise(SIGPIPE);
-	}*/
-
-	//TODO: implementare cartridge!
-	if(addr >= BASIC_START and addr <= BASIC_END){
-		
-		if(LORAM_mode == RAM)
-			return memory[addr];
-		else
-			return basic[addr-BASIC_START];
-	
-	//VIC CHAR or RAM
-	} else if(addr >= IO_START and addr <= IO_END){
-
-		if(CHAR_mode == RAM)
-			return memory[addr];
-		else if(CHAR_mode == ROM)					//Charset
-			return charset[addr-IO_START];
-		else if(CHAR_mode == IO){					//VIC
-			if(vic != nullptr)
-				return vic->read_register(addr);
-			else
-				return 0xFF;
-		}
-		
-	//TODO: implementare cartridge!
-	}else if(addr >= KERNAL_START /*and addr <= KERNAL_END  inutile */){
-		
-		if(HIRAM_mode == RAM)
-			return memory[addr];
-		else
-			return kernal[addr-KERNAL_START];
-	
-	} 
-	
 	return memory[addr];
 }
 
@@ -91,7 +55,7 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 		if(CHAR_mode == IO){		//VIC
 			vic->write_register(addr,data);
 			return;
-		}  
+		}
 
 	  }
 
@@ -109,7 +73,7 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 }
 
 void Memory::setup_memory_mode(uint8_t value){
-  
+
 	bool loram_en  = ((value & HIRAM_MASK) != 0);
 	bool hiram_en = ((value & LORAM_MASK) != 0);
 	bool char_en = ((value & CHAR_MASK) != 0);
@@ -132,9 +96,9 @@ void Memory::setup_memory_mode(uint8_t value){
 		CHAR_mode = IO;
 	else if(char_en && !loram_en && !hiram_en)
 		CHAR_mode = RAM;
-	else 
+	else
 		CHAR_mode = ROM;
-	
+
 	memory[MEMORY_LAYOUT_ADDR] = value;
 
 }
@@ -159,7 +123,7 @@ void Memory::load_charset(const char* filename){
 	uint8_t* rom = read_bin_file(filename,size);
 
 	memcpy(charset, rom, fourK);
-	
+
 	delete[] rom;
 }
 

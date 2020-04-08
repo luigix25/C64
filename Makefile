@@ -1,6 +1,6 @@
 FLAGS = -Wall -Wextra -pedantic -g -O2 -std=c++11
-DEPENDENCIES = library.o cpu.o memory.o vic.o
-HEADERS = library.h memory.h vic.h cpu.h
+DEPENDENCIES = library.o cpu.o memory.o vic.o BusDevice.o Rom.o Bus.o
+HEADERS = library.h memory.h vic.h cpu.h BusDevice.h Rom.h Bus.h
 
 all: main.o $(DEPENDENCIES)
 	g++ main.o $(DEPENDENCIES) -o main $(FLAGS)
@@ -19,6 +19,15 @@ memory.o: modules/memory.cpp modules/memory.h
 
 vic.o: modules/vic.cpp modules/vic.h
 	g++ -c modules/vic.cpp $(FLAGS)
+
+Rom.o: modules/Rom.cpp modules/Rom.h
+	g++ -c modules/Rom.cpp $(FLAGS)
+
+BusDevice.o: modules/BusDevice.cpp modules/BusDevice.h
+	g++ -c modules/BusDevice.cpp $(FLAGS)
+
+Bus.o: modules/Bus.cpp modules/Bus.h
+	g++ -c modules/Bus.cpp $(FLAGS)
 
 clean:
 	rm -f *.o

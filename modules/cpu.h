@@ -1,5 +1,6 @@
 #include "library.h"
 #include "memory.h"
+#include "Bus.h"
 
 #define RESET_routine 0xFCE2
 
@@ -10,11 +11,7 @@ class CPU
 {
 
 	public:
-
-		CPU(Memory *);
-		CPU(Memory *,uint16_t);
-
-		//~CPU();
+		CPU(Bus& bus);
 
 		uint8_t fetch();
 		bool decode(uint8_t);
@@ -29,7 +26,7 @@ class CPU
 
 	private:
 
-		Memory *memory;
+		Bus& bus;
 
 		//registers
 
@@ -43,7 +40,7 @@ class CPU
 
 		//Memory Addressing Modes
 		uint8_t immediate();
-		
+
 		uint16_t absolute();
 		uint16_t absolute(register_name);
 
@@ -73,12 +70,12 @@ class CPU
 		void RTI();
 
 		void PLA();
-		
+
 		void JMP(uint16_t);
 		void JSR(uint16_t);
 		void CMP_addr(uint16_t);
 		void CMP_data(uint8_t);
-		
+
 		void CPX(uint8_t);
 
 		void BNE(uint8_t);
