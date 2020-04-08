@@ -109,6 +109,8 @@ class CPU
 
 		void left_shift_mem(uint16_t);
 		void right_shift_mem(uint16_t);
+		
+		void rotate_left_mem(uint16_t);
 		void rotate_right_mem(uint16_t);
 
 

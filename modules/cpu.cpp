@@ -299,14 +299,34 @@ void CPU::right_shift_mem(uint16_t addr){
 void CPU::rotate_right_mem(uint16_t addr){
 
 	uint8_t data = memory->read_byte(addr);
+
 	//BUG IN THE 6502!
 	memory->write_byte(addr,data);
 
 	uint8_t carry = (regs.carry_flag) ? 1:0;
 
-	uint16_t t = (data >> 1) | (carry << 7);
-
 	regs.carry_flag = ((data & 0x1 ) !=0);
+
+	uint16_t t = (data >> 1) | (carry << 7);
+	
+	SET_ZF(t);
+	SET_NF(t);
+
+	memory->write_byte(addr,t);
+
+}
+
+void CPU::rotate_left_mem(uint16_t addr){
+
+	uint8_t data = memory->read_byte(addr);
+	//BUG IN THE 6502!
+	memory->write_byte(addr,data);
+
+	uint8_t carry = (regs.carry_flag) ? 1:0;
+
+	uint16_t t = (data << 1) | (carry);
+
+	regs.carry_flag = ((t & 0x100 ) !=0);
 	
 	SET_ZF(t);
 	SET_NF(t);
@@ -314,8 +334,6 @@ void CPU::rotate_right_mem(uint16_t addr){
 	memory->write_byte(addr,t);
 
 }
-
-
 
 void CPU::ROR(){
 
@@ -881,6 +899,12 @@ bool CPU::decode(uint8_t opcode){
 			BIT(addr);
 			break;
 		
+		case 0x26:						//ROL zpg
+			addr = zero_page();
+			DEBUG_PRINT("ROL "<<endl);
+			rotate_left_mem(addr);
+			break;
+
 		case 0x28:						//PLP 
 			DEBUG_PRINT("PLP"<<endl);
 			flags(POP());
@@ -984,6 +1008,12 @@ bool CPU::decode(uint8_t opcode){
 			ADC(memory->read_byte(addr));
 			break;
 		
+		case 0x66:						//ROR zpg
+			addr = zero_page();
+			DEBUG_PRINT("ROR "<<endl);
+			rotate_right_mem(addr);
+			break;
+
 		case 0x68:						//PLA
 			DEBUG_PRINT("PLA"<<endl);
 			PLA();
