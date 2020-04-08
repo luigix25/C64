@@ -849,9 +849,12 @@ bool CPU::decode(uint8_t opcode){
 			OR(regA,memory->read_byte(addr));
 			break;
 			
-		/*case 0x0E:						//ASL ABS
+		case 0x0E:						//ASL ABS
+			DEBUG_PRINT("ASL"<<endl);
+			addr = absolute();
+			left_shift_mem(addr);
 			break;
-*/
+
 		case 0x10:						//BPL
 			DEBUG_PRINT("BPL"<<endl);
 			addr = immediate();
@@ -887,6 +890,12 @@ bool CPU::decode(uint8_t opcode){
 			OR(regA,memory->read_byte(addr));
 			break;
 		
+		case 0x1E:
+			DEBUG_PRINT("ASL"<<endl);
+			addr = absolute(regX);
+			left_shift_mem(addr);
+			break;
+
 		case 0x20:						//JSR 
 			addr = absolute();
 			DEBUG_PRINT("JSR "<<hex<<unsigned(addr)<<endl);
@@ -927,15 +936,33 @@ bool CPU::decode(uint8_t opcode){
 			BIT(addr);
 			break;
 
+		case 0x2E:						//ROL ABS
+			DEBUG_PRINT("ROL ABS"<<endl);
+			addr = absolute();
+			rotate_left_mem(addr);
+			break;
+
 		case 0x30:						//BMI 
 			addr = immediate();
 			DEBUG_PRINT("BMI "<<hex<<unsigned(addr)<<endl);
 			BMI(addr);
 			break;
-		
+
+		case 0x36:						//ROL 
+			DEBUG_PRINT("ROL"<<endl);
+			addr = zero_page(regX);
+			rotate_left_mem(addr);
+			break;
+
 		case 0x38:
 			DEBUG_PRINT("SEC"<<endl);
 			regs.carry_flag = true;
+			break;
+
+		case 0x3E:						//ROL
+			DEBUG_PRINT("ROL"<<endl);
+			addr = absolute(regX);
+			rotate_left_mem(addr);
 			break;
 
 		case 0x45:						//EOR zpg
@@ -978,6 +1005,12 @@ bool CPU::decode(uint8_t opcode){
 			regs.PC = addr;
 			break;
 
+		case 0x4E:
+			DEBUG_PRINT("LSR ABS"<<endl);
+			addr = absolute();
+			right_shift_mem(addr);
+			break;
+
 		case 0x50:						//JMP abs
 			addr = immediate();
 			DEBUG_PRINT("BVC"<<endl);
@@ -995,7 +1028,13 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("CLI"<<endl);
 			regs.interrupt_flag = false;
 			break;
-		
+
+		case 0x5E:
+			DEBUG_PRINT("LSR"<<endl);
+			addr = absolute(regX);
+			right_shift_mem(addr);
+			break;
+
 		case 0x60:						//RTS
 			DEBUG_PRINT("RTS"<<endl);
 			addr = (POP() + (POP() << 8)) + 1;
@@ -1043,6 +1082,14 @@ bool CPU::decode(uint8_t opcode){
 			//JMP(tmp);
 			break;
 		
+		case 0x6E:
+
+			DEBUG_PRINT("ROR"<<endl);
+
+			addr = absolute();
+			rotate_right_mem(addr);
+			break;
+
 		case 0x70:
 			DEBUG_PRINT("BVS"<<endl);
 			addr = immediate();
@@ -1059,6 +1106,12 @@ bool CPU::decode(uint8_t opcode){
 		case 0x78:						//SEI
 			DEBUG_PRINT("SEI"<<endl);
 			regs.interrupt_flag = true;
+			break;
+
+		case 0x7E:						//ROR
+			DEBUG_PRINT("ROR"<<endl);
+			addr = absolute(regX);
+			rotate_right_mem(addr);
 			break;
 
 	    case 0x81:						//STA (ind,X)
@@ -1383,7 +1436,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0xCE:						//DEC ABS
 			DEBUG_PRINT("CMP"<<endl);
 			addr = absolute();
-			CMP_addr(addr);
+			DEC(addr);
 			break;
 
 		case 0xCD:						//CMP ABS
@@ -1471,6 +1524,12 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("CPX abs"<<endl);
 			addr = absolute();
 			CPX(memory->read_byte(addr));
+			break;
+
+		case 0xEE:
+			DEBUG_PRINT("INC"<<endl);
+			addr = absolute();
+			INC(addr);
 			break;
 
 		case 0xF0:						//BEQ rel
