@@ -230,9 +230,9 @@ void CPU::EOR(uint8_t data){
 void CPU::BIT(uint16_t addr){
 
 	uint8_t data = memory->read_byte(addr);
-	regs.zero_flag = data & regs.reg[regA];
-
-	regs.overflow_flag = ( data & 0x40 );
+	
+	regs.overflow_flag = (( data & 0x40 ) != 0);
+	regs.zero_flag = ((data & regs.reg[regA]) == 0);
 
 	SET_NF(data);
 
@@ -288,7 +288,7 @@ void CPU::right_shift_mem(uint16_t addr){
 	memory->write_byte(addr,data);
 
 	regs.carry_flag = data & 0x1;
-	data = data << 1;
+	data = data >> 1;
 
 	memory->write_byte(addr,data);
 
@@ -891,9 +891,16 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("AND "<<hex<<unsigned(addr)<<endl);
 			AND(addr);
 			break;
+
 		case 0x2A:						//ROL A 
 			DEBUG_PRINT("ROL A"<<endl);
 			ROL(regA);
+			break;
+
+		case 0x2C:						//BIT ABS
+			DEBUG_PRINT("BIT"<<endl);
+			addr = absolute();
+			BIT(addr);
 			break;
 
 		case 0x30:						//BMI 
@@ -921,7 +928,7 @@ bool CPU::decode(uint8_t opcode){
 		case 0x46:						//LSR zpg
 			DEBUG_PRINT("LSR"<<endl;)
 			addr = zero_page();
-			left_shift_mem(addr);
+			right_shift_mem(addr);
 			break;
 
 		case 0x48:						//PHA
@@ -1289,7 +1296,13 @@ bool CPU::decode(uint8_t opcode){
 			addr = immediate();
 			CP(regY,addr);
 			break;
-		
+
+		case 0xC1:						//CPY ind X
+			DEBUG_PRINT("CMP"<<endl);
+			addr = indirect_X();
+			CP(regA,memory->read_byte(addr));
+			break;	
+
 		case 0xC4:						//CPY zpg
 			DEBUG_PRINT("CPY"<<endl);
 			addr = zero_page();
