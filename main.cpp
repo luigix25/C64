@@ -103,6 +103,7 @@ void test_cpu(CPU *cpu)
 		if(pc == cpu->regs.PC)
 		{
 			cout<<"infinite loop at "<<hex<<unsigned(pc)<<endl;
+			mem->dump_memory(0x0, 0x16);
 			break;
 
 		} else if(cpu->regs.PC == 0x3463)
@@ -114,7 +115,7 @@ void test_cpu(CPU *cpu)
 		pc = cpu->regs.PC;
 		
 		opcode = cpu->fetch();
-		cout<<"OPCODE: "<<hex<<unsigned(opcode)<<endl;
+		cout<<"OPCODE: "<<hex<<unsigned(opcode) << " ";
 
 		loop = cpu->decode(opcode);
 		if(loop == false){

@@ -2,6 +2,7 @@
 
 #include <signal.h>
 #include <stdlib.h>
+#include <iomanip>
 
 CPU::CPU(Memory* memory, uint16_t PC){
 
@@ -40,7 +41,7 @@ void CPU::reset_flags(){
 	regs.carry_flag = 0;
 	regs.interrupt_flag = 0;
 	regs.decimal_mode_flag = 0;
-	regs.break_flag = 1;
+	regs.break_flag = 0;
 
 }
 
@@ -428,9 +429,8 @@ void CPU::flags(uint8_t v)
 	regs.zero_flag = (GET_I_BIT(v,1));
 	regs.interrupt_flag = (GET_I_BIT(v,2));
 	regs.decimal_mode_flag = (GET_I_BIT(v,3));
-	
-	//regs.break_flag = (GET_I_BIT(v,4));
-	
+	regs.break_flag = (GET_I_BIT(v,4));
+	//regs.unused_flag = (GET_I_BIT(v,4));
 	regs.overflow_flag = (GET_I_BIT(v,6));
 	regs.sign_flag = (GET_I_BIT(v,7));
 }
@@ -720,26 +720,23 @@ void CPU::BRK(){
 //DEBUG
 void CPU::dump_reg(){
 
-	DEBUG_PRINT(endl<<endl);
-	DEBUG_PRINT("---------REG STATUS-----------"<<endl);
-	DEBUG_PRINT("RegA: 0x"<<hex<<unsigned(regs.reg[regA])<<endl);
-	DEBUG_PRINT("RegX: 0x"<<hex<<unsigned(regs.reg[regX])<<endl);
-	DEBUG_PRINT("RegY: 0x"<<hex<<unsigned(regs.reg[regY])<<endl);
-	DEBUG_PRINT("PC  : 0x"<<hex<<unsigned(regs.PC)<<endl);
-	DEBUG_PRINT("SP  : 0x"<<hex<<unsigned(regs.SP)<<endl);
+	// DEBUG_PRINT(endl);
+	DEBUG_PRINT("REG STATUS");
+	DEBUG_PRINT(" A: 0x"<<setfill('0')<<setw(2)<<hex<<unsigned(regs.reg[regA]));
+	DEBUG_PRINT(" X: 0x"<<setfill('0')<<setw(2)<<hex<<unsigned(regs.reg[regX]));
+	DEBUG_PRINT(" Y: 0x"<<setfill('0')<<setw(2)<<hex<<unsigned(regs.reg[regY]));
+	DEBUG_PRINT(" PC: 0x"<<setfill('0')<<setw(4)<<hex<<unsigned(regs.PC));
+	DEBUG_PRINT(" SP: 0x"<<setfill('0')<<setw(2)<<hex<<unsigned(regs.SP));
 
-	DEBUG_PRINT("CF :"<<hex<<unsigned(regs.carry_flag)<<endl);
-	DEBUG_PRINT("NF :"<<hex<<unsigned(regs.sign_flag)<<endl);
-	DEBUG_PRINT("OF :"<<hex<<unsigned(regs.overflow_flag)<<endl);
-	DEBUG_PRINT("ZF :"<<hex<<unsigned(regs.zero_flag)<<endl);
-	DEBUG_PRINT("IF :"<<hex<<unsigned(regs.interrupt_flag)<<endl);
-	DEBUG_PRINT("BF :"<<hex<<unsigned(regs.break_flag)<<endl);
+	DEBUG_PRINT(" CF: "<<hex<<unsigned(regs.carry_flag));
+	DEBUG_PRINT(" NF: "<<hex<<unsigned(regs.sign_flag));
+	DEBUG_PRINT(" OF: "<<hex<<unsigned(regs.overflow_flag));
+	DEBUG_PRINT(" ZF: "<<hex<<unsigned(regs.zero_flag));
+	DEBUG_PRINT(" IF: "<<hex<<unsigned(regs.interrupt_flag));
+	DEBUG_PRINT(" BF: "<<hex<<unsigned(regs.break_flag));
 
-	//DEBUG_PRINT("DMF:"<<hex<<unsigned(regs.decimal_mode_flag));
-
-	DEBUG_PRINT("------------------------------"<<endl);
-
-	DEBUG_PRINT(endl<<endl);
+	DEBUG_PRINT(" F:"<<hex<<unsigned(flags()));
+	DEBUG_PRINT(" ");
 
 }
 
@@ -774,6 +771,7 @@ bool CPU::decode(uint8_t opcode){
 	    
 		case 0x08:			//PHP
 			DEBUG_PRINT("PHP"<<endl);
+			flags(flags() | 0x30);
 			PUSH(flags());
 			break;
 
@@ -1297,7 +1295,7 @@ bool CPU::decode(uint8_t opcode){
 			break;
 
 		case 0xE0:						//CPX imm
-			DEBUG_PRINT("CPX"<<endl);
+			DEBUG_PRINT("CPX imm"<<endl);
 			addr = immediate();
 			CP(regX,addr);
 			break;	
