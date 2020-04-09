@@ -84,7 +84,7 @@ void CPU::handle_nmi(){
 
 }
 
-uint8_t CPU::zero_page(register_name index){
+uint16_t CPU::zero_page(register_name index){
   //Immediate operand
   
 	uint8_t addr;
@@ -98,7 +98,7 @@ uint8_t CPU::zero_page(register_name index){
 
 }
 
-uint8_t CPU::zero_page(){
+uint16_t CPU::zero_page(){
   
 	uint8_t addr;
 	addr = memory->read_byte(regs.PC);

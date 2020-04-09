@@ -47,8 +47,8 @@ class CPU
 		uint16_t absolute();
 		uint16_t absolute(register_name);
 
-		uint8_t zero_page();
-		uint8_t zero_page(register_name);
+		uint16_t zero_page();
+		uint16_t zero_page(register_name);
 
 		uint16_t indirect_Y();
 		uint16_t indirect_X();

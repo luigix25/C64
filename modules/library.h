@@ -54,8 +54,8 @@ using namespace std;
 
 void hexDump(void*, int);
 
-void loadKernalAndBasic(uint8_t *,const char*);
-void loadCharset(uint8_t *,const char*);
+//void loadKernalAndBasic(uint8_t *,const char*);
+//void loadCharset(uint8_t *,const char*);
 
 enum register_name
 {
