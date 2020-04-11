@@ -4,7 +4,6 @@ class SDLManager;
 #include "library.h"
 #include "vic.h"
 #include <SDL2/SDL.h>
-#include <thread>
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 200
@@ -14,6 +13,8 @@ class SDLManager{
 
 	public:
 		SDLManager();
+		~SDLManager();
+
 		void render_frame();
 		pixel_type* getVideoMemoryPtr();
 
@@ -23,9 +24,9 @@ class SDLManager{
 
 		thread *video_thread;
 
-		SDL_Window *window;
-		SDL_Texture *texture;
-		SDL_Renderer *renderer;
+		SDL_Window *window 		= nullptr;
+		SDL_Texture *texture 	= nullptr;
+		SDL_Renderer *renderer 	= nullptr;
 
-		pixel_type *video_memory;
+		pixel_type *video_memory = nullptr;
 };

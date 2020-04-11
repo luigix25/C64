@@ -18,6 +18,9 @@ class VIC;
 #define IRQ_REQ_REG 0xD019
 #define IRQ_MASK_REG 0xD01A
 
+#define CHAR_WIDTH 8
+#define CHAR_HEIGHT 8
+
 #define CTRL_REG_1_OFF CTRL_REG_1 - REG_START
 #define CTRL_REG_2_OFF CTRL_REG_2 - REG_START
 
@@ -44,15 +47,19 @@ class VIC {
 
 		void init_host_charset();
 
+		void video_loop();
+		void show_char(uint8_t *, int, int);
 
-		Memory *memory;
-		SDLManager *sdl;
+		Memory *memory = nullptr;
+		SDLManager *sdl = nullptr;
 
 		uint8_t *host_video_memory = nullptr;
 		uint8_t *guest_video_memory = nullptr;
 
 		uint8_t *guest_charset = nullptr;
 		uint8_t *host_charset = nullptr;
+
+		thread *video_loop_thread;
 
 	public:
 		VIC();

@@ -39,12 +39,12 @@ int main(){
 	signal(SIGPIPE,dump_cpu_handler);
 	signal(SIGINT,close);
 
+	VIC *vic = new VIC();
 
 	mem = new Memory();
 	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
 	mem->load_charset(CHARSET_ROM);
 
-	VIC *vic = new VIC();
 	SDLManager *sdl = new SDLManager();
 
 	mem->setVIC(vic);

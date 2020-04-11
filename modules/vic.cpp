@@ -20,14 +20,51 @@ VIC::VIC(){
 
 	rasterline = 0;
 
-//	host_video_memory = nullptr;
-//	guest_video_memory = nullptr;
+	video_loop_thread = new thread(&VIC::video_loop,this);
 
 }
 
 VIC::~VIC(){
 
 	delete[] registers;
+	delete video_loop_thread;
+
+}
+
+
+void VIC::show_char(uint8_t *character, int X, int Y){
+
+	for(int i = 0; i < CHAR_WIDTH; i++){
+		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
+		memcpy(ptr, character + (i*8) ,8);
+	}
+
+}
+
+void VIC::video_loop(){
+
+	while(true){
+		if(sdl == nullptr)
+			continue;
+
+		uint32_t cursorX = 0;
+		uint32_t cursorY = 0;
+
+		for(int i=0;i<1000;i++){
+
+			show_char(host_charset + 64 * guest_video_memory[i] ,cursorX,cursorY);
+
+			cursorY +=8;
+
+			if(cursorY >= SCREEN_WIDTH-7){
+				cursorY = 0;
+				cursorX += 8;
+			}
+		}
+
+		sdl->render_frame();
+		sleep(1);
+	}
 
 }
 
@@ -62,6 +99,9 @@ void VIC::setMemory(Memory *mem){
 void VIC::setSDL(SDLManager *sdl){
 	this->sdl = sdl;
 	this->host_video_memory = sdl->getVideoMemoryPtr();
+
+	memset(host_video_memory,0xE0,64000);
+
 }
 
 uint8_t VIC::read_register(uint16_t addr){

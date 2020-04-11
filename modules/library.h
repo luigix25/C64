@@ -7,6 +7,9 @@
 #include <fstream>
 #include <string.h>
 #include <stdint.h>
+#include <thread>
+#include <unistd.h>
+
 
 #include "debug.h"
 
