@@ -460,8 +460,6 @@ void CPU::CMP_addr(uint16_t addr){
 
 	uint8_t data = memory->read_byte(addr);
 
-	cout<<"letto: "<<hex<<unsigned(data)<<endl;
-
 	uint16_t t;
 	t = regs.reg[regA] - data;
 	regs.carry_flag = (t<0x100);

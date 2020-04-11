@@ -39,6 +39,9 @@ uint8_t Memory::read_byte(uint16_t addr){
 	}*/
 
 	//TODO: implementare cartridge!
+
+	return memory[addr];
+
 	if(addr >= BASIC_START and addr <= BASIC_END){
 		
 		if(LORAM_mode == RAM)
@@ -74,6 +77,9 @@ uint8_t Memory::read_byte(uint16_t addr){
 }
 
 void Memory::write_byte(uint16_t addr, uint8_t data){
+
+	memory[addr] = data;
+
 
   	uint16_t page = (addr & 0xff00) >> 8;
 
