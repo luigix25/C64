@@ -2,6 +2,10 @@
 
 VIC::VIC(){
     
+
+	registers[CTRL_REG_1_OFF] = 0x9B;
+	registers[CTRL_REG_2_OFF] = 0x08;
+
     control_reg_one(0x9B);
     control_reg_two(0x08);
 
@@ -15,6 +19,9 @@ VIC::VIC(){
 
 	rasterline = 0;
 
+//	host_video_memory = nullptr;
+//	guest_video_memory = nullptr;
+
 }
 
 VIC::~VIC(){
@@ -23,10 +30,19 @@ VIC::~VIC(){
 
 void VIC::setMemory(Memory *mem){
 	this->memory = mem;
+	this->guest_video_memory = mem->getVideoMemoryPtr();
+}
+
+void VIC::setSDL(SDLManager *sdl){
+	this->sdl = sdl;
+	this->host_video_memory = sdl->getVideoMemoryPtr();
 }
 
 uint8_t VIC::read_register(uint16_t addr){
     
+	if(addr > 0xD3FF)
+		return 0xFF;
+
     DEBUG_PRINT("read from VIC memory"<<endl);
     DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
 
@@ -38,6 +54,10 @@ uint8_t VIC::read_register(uint16_t addr){
 }
 
 void VIC::write_register(uint16_t addr, uint8_t data){
+
+	//not mapped
+	if(addr > 0xD3FF)
+		return;
 
     DEBUG_PRINT("write to VIC memory"<<endl);
     DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
@@ -69,7 +89,6 @@ void VIC::control_reg_one(uint8_t data){
 
 	//Bitmap Mode
 
-	set_graphic_mode();
 
 	if(GET_I_BIT(data,3)){
 		visible_rows = 24;
@@ -79,18 +98,21 @@ void VIC::control_reg_one(uint8_t data){
 
 	registers[CTRL_REG_1_OFF] = data;
 
+	set_graphic_mode();
 
 }
 
 void VIC::control_reg_two(uint8_t data){
-
-	set_graphic_mode();
 
 	if(GET_I_BIT(data,3)){
 		visible_cols = 40;
 	} else {
 		visible_cols = 38;
 	}
+
+	registers[CTRL_REG_2_OFF] = data;
+
+	set_graphic_mode();
 
 }
 
@@ -119,3 +141,4 @@ void VIC::set_graphic_mode(){
 		graphic_mode_ = kIllegalMode;
 	*/
 }
+

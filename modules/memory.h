@@ -30,6 +30,8 @@ class Memory{
 
 		void setup_memory_mode(uint8_t value);
 
+		uint8_t* getVideoMemoryPtr();
+
 		//Debug
 		uint8_t* getMemPointer();
 		uint8_t* getKerPointer();

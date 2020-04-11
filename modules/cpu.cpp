@@ -460,8 +460,6 @@ void CPU::CMP_addr(uint16_t addr){
 
 	uint8_t data = memory->read_byte(addr);
 
-	cout<<"letto: "<<hex<<unsigned(data)<<endl;
-
 	uint16_t t;
 	t = regs.reg[regA] - data;
 	regs.carry_flag = (t<0x100);
@@ -504,7 +502,7 @@ void CPU::BNE(uint8_t addr){
 	uint16_t new_addr = (int8_t) addr + regs.PC;
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
 
-	if(regs.zero_flag == 0x0){
+	if(regs.zero_flag == 0){
 		DEBUG_PRINT("BNE to "<<hex<<unsigned(new_addr)<<endl);
 		regs.PC = new_addr;
 	}

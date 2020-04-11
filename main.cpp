@@ -2,11 +2,13 @@
 #include "modules/memory.h"
 
 #include "modules/cpu.h"
+#include "modules/SDLManager.h"
 
 #include "modules/debug.h"
 
 #include <signal.h>
 #include <stdlib.h>
+#include <SDL2/SDL.h>
 
 //uint8_t memory[sixtyfourK];
 void test_cpu(CPU*);
@@ -25,25 +27,35 @@ void dump_cpu_handler(int s){
 	cout<<hex<<unsigned(cpu->regs.PC)<<endl;
 }
 
+void close(int s){
+
+	SDL_Quit();
+	exit(s);
+}
+
 int main(){
 	//CTRL-Z
 	signal(SIGTSTP,dump_mem_handler);
 	signal(SIGPIPE,dump_cpu_handler);
+	signal(SIGINT,close);
+
 
 	mem = new Memory();
 	VIC *vic = new VIC();
+	SDLManager *sdl = new SDLManager();
 
 	mem->setVIC(vic);
 
 	vic->setMemory(mem);
+	vic->setSDL(sdl);
 
 	cpu = new CPU(mem);
 //	cpu->dump_reg();
 
-	//mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
-	//mem->load_charset(CHARSET_ROM);
+	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
+	mem->load_charset(CHARSET_ROM);
 
-	mem->load_custom_memory("roms/6502_functional_test.bin",0x400);
+	/*mem->load_custom_memory("roms/6502_functional_test.bin",0x400);
 	mem->setup_memory_mode(0);
 
 	cpu->regs.PC = 0x400;
@@ -52,7 +64,7 @@ int main(){
 	test_cpu(cpu);
 
 	return -1;
-
+*/
 
 
 	/*loadKernalAndBasic(memory,KERNAL_BASIC_ROM);

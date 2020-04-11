@@ -96,10 +96,6 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 	  }
 
 	if(addr >= 0x400 && addr <= 0x400 +1024){
-		if(data != 0x20){
-			cout<<"scrivo mem video"<<endl;
-			cout<<hex<<unsigned(data)<<endl;
-		}
 
 	}
 
@@ -203,4 +199,8 @@ uint8_t* Memory::getMemPointer(){
 
 uint8_t* Memory::getKerPointer(){
 	return kernal;
+}
+
+uint8_t* Memory::getVideoMemoryPtr(){
+	return &memory[0x400];
 }
