@@ -27,7 +27,7 @@ void dump_cpu_handler(int s){
 	cout<<hex<<unsigned(cpu->regs.PC)<<endl;
 }
 
-void close(int s){
+void chiudi(int s){
 
 	SDL_Quit();
 	exit(s);
@@ -37,7 +37,7 @@ int main(){
 	//CTRL-Z
 	signal(SIGTSTP,dump_mem_handler);
 	signal(SIGPIPE,dump_cpu_handler);
-	signal(SIGINT,close);
+	signal(SIGINT,chiudi);
 
 	VIC *vic = new VIC();
 
