@@ -1,12 +1,12 @@
-FLAGS = -Wall -Wextra -pedantic -g -O2 -std=c++11
+FLAGS = -Wall -Wextra -pedantic -g  -std=c++11
 DEPENDENCIES = library.o cpu.o memory.o vic.o
 HEADERS = library.h memory.h vic.h cpu.h
 
 all: main.o $(DEPENDENCIES)
-	g++ main.o $(DEPENDENCIES) -o main $(FLAGS)
+	g++ main.o $(DEPENDENCIES) -o main $(FLAGS) -lpthread -lSDL2
 
 main.o: main.cpp
-	g++ -c main.cpp
+	g++ -c main.cpp $(FLAGS)
 
 library.o: modules/library.cpp modules/library.h
 	g++ -c modules/library.cpp $(FLAGS)
