@@ -41,6 +41,9 @@ int main(){
 
 
 	mem = new Memory();
+	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
+	mem->load_charset(CHARSET_ROM);
+
 	VIC *vic = new VIC();
 	SDLManager *sdl = new SDLManager();
 
@@ -52,8 +55,7 @@ int main(){
 	cpu = new CPU(mem);
 //	cpu->dump_reg();
 
-	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
-	mem->load_charset(CHARSET_ROM);
+
 
 	/*mem->load_custom_memory("roms/6502_functional_test.bin",0x400);
 	mem->setup_memory_mode(0);

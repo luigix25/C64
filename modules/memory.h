@@ -19,6 +19,8 @@ class Memory{
 	public:
 
 		Memory();
+		~Memory();
+
 		uint8_t read_byte(uint16_t);
 		void write_byte(uint16_t,uint8_t);
 
@@ -31,6 +33,7 @@ class Memory{
 		void setup_memory_mode(uint8_t value);
 
 		uint8_t* getVideoMemoryPtr();
+		uint8_t* getCharROMPtr();
 
 		//Debug
 		uint8_t* getMemPointer();
@@ -44,9 +47,9 @@ class Memory{
 
 		uint8_t memory[sixtyfourK];
 
-		uint8_t basic[eightK];
-		uint8_t kernal[eightK];
-		uint8_t charset[fourK];
+		uint8_t *basic;
+		uint8_t *kernal;
+		uint8_t *charset;
 
 		uint8_t* read_bin_file(const char*,streampos&);
 

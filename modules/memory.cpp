@@ -13,8 +13,20 @@ Memory::Memory(){
 
 	vic = nullptr;
 
+	basic = new uint8_t[eightK];
+	kernal = new uint8_t[eightK];
+	charset = new uint8_t[fourK];
+
+
 	setup_memory_mode(LORAM_MASK | HIRAM_MASK | CHAR_MASK);
 
+}
+
+Memory::~Memory(){
+
+	delete[] basic;
+	delete[] kernal;
+	delete[] charset;
 }
 
 void Memory::dump_memory(uint16_t addr,uint16_t bytes){
@@ -202,5 +214,9 @@ uint8_t* Memory::getKerPointer(){
 }
 
 uint8_t* Memory::getVideoMemoryPtr(){
-	return &memory[0x400];
+	return memory+0x400;
+}
+
+uint8_t* Memory::getCharROMPtr(){
+	return charset;
 }

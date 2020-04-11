@@ -25,7 +25,7 @@ enum MODES {CHAR_MODE,MCM_TEXT_MODE,EXT_BACK_MODE,BITMAP_MODE,MCB_BITMAP_MODE};
 
 class VIC {
 	private:
-		uint8_t registers[0x400];
+		uint8_t *registers;
 		MODES graphic_mode;
 
 		uint8_t visible_rows;
@@ -42,11 +42,17 @@ class VIC {
 
 		void set_graphic_mode();
 
+		void init_host_charset();
+
+
 		Memory *memory;
 		SDLManager *sdl;
 
 		uint8_t *host_video_memory = nullptr;
 		uint8_t *guest_video_memory = nullptr;
+
+		uint8_t *guest_charset = nullptr;
+		uint8_t *host_charset = nullptr;
 
 	public:
 		VIC();
