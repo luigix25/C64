@@ -38,7 +38,7 @@ void CPU::reset_flags(){
 	regs.overflow_flag = 0;
 	regs.zero_flag = 0;
 	regs.carry_flag = 0;
-	regs.interrupt_flag = 0;
+	regs.interrupt_flag = 1;
 	regs.decimal_mode_flag = 0;
 	regs.break_flag = 1;
 
@@ -49,6 +49,8 @@ void CPU::handle_irq(bool ignore){
 	//interrupt is masked
 	if(ignore)
 		return;
+
+	cout<<"arrivata IRQ"<<endl;
 
 	uint8_t temp = ((regs.PC >> 8) & 0xFF);
 	PUSH(temp);

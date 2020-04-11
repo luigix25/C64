@@ -45,14 +45,16 @@ int main(){
 	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
 	mem->load_charset(CHARSET_ROM);
 
+	cpu = new CPU(mem);
+
 	SDLManager *sdl = new SDLManager();
 
 	mem->setVIC(vic);
 
 	vic->setMemory(mem);
 	vic->setSDL(sdl);
+	vic->setCPU(cpu);
 
-	cpu = new CPU(mem);
 //	cpu->dump_reg();
 
 
@@ -85,9 +87,9 @@ int main(){
 		opcode = cpu->fetch();
 		loop = cpu->decode(opcode);
 
-		if(cpu->regs.PC == 0xF1CA){
-			cout<<"Routine Stampa carattere: ";
-			cout<<hex<<unsigned(cpu->regs.reg[regA])<<endl;
+		cout<<"jiffy: "<<hex<<unsigned(mem->read_byte(0x0CD))<<endl;
+
+		if(cpu->regs.PC == 0xEA31){
 			debug = true;
 			//cpu->dump_reg();
 

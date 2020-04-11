@@ -1,3 +1,7 @@
+#pragma once
+
+class CPU;
+
 #include "library.h"
 #include "memory.h"
 

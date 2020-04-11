@@ -71,7 +71,8 @@ void VIC::video_loop(){
 		}
 
 		sdl->render_frame();
-		sleep(1);
+		cpu->irq_line = 0;
+		usleep(1000);
 	}
 
 }
@@ -115,9 +116,6 @@ void VIC::setSDL(SDLManager *sdl){
 
 uint8_t VIC::read_register(uint16_t addr){
     
-	if(addr > 0xD3FF)
-		return 0xFF;
-
     DEBUG_PRINT("read from VIC memory"<<endl);
     DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
 
@@ -131,8 +129,6 @@ uint8_t VIC::read_register(uint16_t addr){
 void VIC::write_register(uint16_t addr, uint8_t data){
 
 	//not mapped
-	if(addr > 0xD3FF)
-		return;
 
     DEBUG_PRINT("write to VIC memory"<<endl);
     DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
@@ -148,10 +144,13 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 			//cout<<"BASE ADDR"<<endl;
 			char_memory_base_addr   = (data & 0xE) << 10;
     		screen_memory_base_addr = (data & 0xF0) << 6;
+    		break;
     		//bitmap_memory_base_addr = (data & 0x8) << 10;
-			
-			//cout<<"MEM ADDR"<<hex<<unsigned(screen_memory_base_addr)<<endl;
-			//cout<<"CHAR ADDR"<<hex<<unsigned(char_memory_base_addr)<<endl;
+
+		case 0xD019:							//interrupt register
+			if(GET_I_BIT(data,0) == 0x0){			//answer to interrupt
+				cpu->irq_line = true;
+			}
     }
 
     addr -= IO_START;
@@ -217,3 +216,8 @@ void VIC::set_graphic_mode(){
 	*/
 }
 
+void VIC::setCPU(CPU* cpu){
+
+	this->cpu = cpu;
+
+}

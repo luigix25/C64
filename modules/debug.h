@@ -1,4 +1,4 @@
-#define DEBUG_MODE 0
+#define DEBUG_MODE 1
 
 #if defined DEBUG_MODE && DEBUG_MODE == 1
 	#define DEBUG_PRINT(x) cout<<x;

@@ -7,6 +7,7 @@ class VIC;
 
 #include "memory.h"
 #include "SDLManager.h"
+#include "cpu.h"
 
 #define REG_START 0xD000
 #define REG_END 0xD02E
@@ -54,6 +55,7 @@ class VIC {
 
 		Memory *memory = nullptr;
 		SDLManager *sdl = nullptr;
+		CPU *cpu = nullptr;
 
 		uint8_t *host_video_memory = nullptr;
 		uint8_t *guest_video_memory = nullptr;
@@ -71,6 +73,7 @@ class VIC {
 		
 		void setMemory(Memory*);
 		void setSDL(SDLManager*);
+		void setCPU(CPU*);
 
 		uint8_t read_register(uint16_t);
 		void write_register(uint16_t,uint8_t);
