@@ -33,6 +33,7 @@ class Memory{
 		void setup_memory_mode(uint8_t value);
 
 		uint8_t* getVideoMemoryPtr();
+		uint8_t* getColorMemoryPtr();
 		uint8_t* getCharROMPtr();
 
 		//Debug
@@ -45,7 +46,7 @@ class Memory{
 
 		VIC *vic;
 
-		uint8_t memory[sixtyfourK];
+		uint8_t *memory;
 
 		uint8_t *basic;
 		uint8_t *kernal;

@@ -19,7 +19,7 @@ CPU *cpu;
 
 void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
-	mem->dump_memory(0x400,1000);					//1000 byte not 1024!
+	mem->dump_memory(0xDB00,1000);					//1000 byte not 1024!
 }
 
 void dump_cpu_handler(int s){

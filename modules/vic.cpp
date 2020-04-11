@@ -34,9 +34,17 @@ VIC::~VIC(){
 
 void VIC::show_char(uint8_t *character, int X, int Y){
 
+	uint8_t bg_color = registers[0xD021-0xD000];
+	uint8_t fg_color = *(guest_color_memory + 40 * X/8 + Y/8);
+
 	for(int i = 0; i < CHAR_WIDTH; i++){
 		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
-		memcpy(ptr, character + (i*8) ,8);
+
+		for(int j=0; j < CHAR_WIDTH; j++){
+			ptr[j] = *(character + (i*8) +j) ? fg_color : bg_color;
+		}
+
+		//memcpy(ptr, character + (i*8) ,8);
 	}
 
 }
@@ -91,6 +99,7 @@ void VIC::init_host_charset(){
 void VIC::setMemory(Memory *mem){
 	this->memory = mem;
 	this->guest_video_memory = mem->getVideoMemoryPtr();
+	this->guest_color_memory = mem->getColorMemoryPtr();
 	this->guest_charset = mem->getCharROMPtr();
 
 	init_host_charset();

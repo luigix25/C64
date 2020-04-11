@@ -21,6 +21,8 @@ class VIC;
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 8
 
+#define BACKGROUND_COLOR_ADDR = 0xD021
+
 #define CTRL_REG_1_OFF CTRL_REG_1 - REG_START
 #define CTRL_REG_2_OFF CTRL_REG_2 - REG_START
 
@@ -58,6 +60,8 @@ class VIC {
 
 		uint8_t *guest_charset = nullptr;
 		uint8_t *host_charset = nullptr;
+
+		uint8_t *guest_color_memory = nullptr;
 
 		thread *video_loop_thread;
 

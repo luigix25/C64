@@ -16,7 +16,7 @@ Memory::Memory(){
 	basic = new uint8_t[eightK];
 	kernal = new uint8_t[eightK];
 	charset = new uint8_t[fourK];
-
+	memory = new uint8_t[sixtyfourK];
 
 	setup_memory_mode(LORAM_MASK | HIRAM_MASK | CHAR_MASK);
 
@@ -95,19 +95,15 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
   		if(addr == MEMORY_LAYOUT_ADDR){
   			setup_memory_mode(data);
   			return;
-  		} else if(addr == 0x9A){
-			  cout<<"Device Output Change "<<hex<<unsigned(data)<<endl;
-		  }
+  		} 
 
-  	} else if(addr >= IO_START and addr <= IO_END){
+  	} else if(addr >= VIC_START and addr <= VIC_END){
 		if(CHAR_mode == IO){		//VIC
 			vic->write_register(addr,data);
 			return;
-		}  
-
-	  }
-
-	if(addr >= 0x400 && addr <= 0x400 +1024){
+		} else {
+			memory[addr] = data;
+		}
 
 	}
 
@@ -217,6 +213,11 @@ uint8_t* Memory::getVideoMemoryPtr(){
 	return memory+0x400;
 }
 
+uint8_t* Memory::getColorMemoryPtr(){
+	return memory+0xD800;
+}
+
 uint8_t* Memory::getCharROMPtr(){
 	return charset;
 }
+
