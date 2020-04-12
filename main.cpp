@@ -84,8 +84,6 @@ int main(){
 	bool loop = true;
 	uint8_t opcode;
 
-	char c;
-
 	bool debug = false;
 
 	while(loop){
@@ -115,7 +113,6 @@ int main(){
 void test_cpu(CPU *cpu)
 {
 	uint16_t pc=0;
-	/* unmap C64 ROMs */
 	uint8_t opcode;
 	bool loop = true;
 
@@ -145,8 +142,6 @@ void test_cpu(CPU *cpu)
 
 		cpu->dump_reg();
 
-		char c;
-		//cin>>c;
 	}
 
 }

@@ -58,22 +58,33 @@ uint8_t Memory::read_byte(uint16_t addr){
 		else
 			return basic[addr-BASIC_START];
 	
-	//VIC CHAR or RAM
+	//I/O CHAR or RAM
 	} else if(addr >= IO_START and addr <= IO_END){
 
 		if(CHAR_mode == RAM)
 			return memory[addr];
-		else if(CHAR_mode == ROM)					//Charset
+
+		else if(CHAR_mode == ROM)								//Charset
 			return charset[addr-IO_START];
-		else if(CHAR_mode == IO){					//VIC
-			if(vic != nullptr)
+
+		else if(CHAR_mode == IO){					
+
+			if(addr >= VIC_START && addr <= VIC_END){			//VIC
+
 				return vic->read_register(addr);
-			else
+
+			} else if(addr >= CIA1_START and addr <= CIA1_END){		//CIA1
+
+				return cia1->read_register(addr);
+
+			} else {
+				//Unimplemented
 				return 0xFF;
+			}
+
 		}
-		
-	//TODO: implementare cartridge!
-	}else if(addr >= KERNAL_START /*and addr <= KERNAL_END  inutile */){
+	
+	}  else if(addr >= KERNAL_START /*and addr <= KERNAL_END  inutile */){
 		
 		if(HIRAM_mode == RAM)
 			return memory[addr];
@@ -95,8 +106,8 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
   		if(addr == MEMORY_LAYOUT_ADDR){
   			setup_memory_mode(data);
   		} else if(addr == 0xCC){
-  			cout<<"scrivo blanking "<<hex<<unsigned(data)<<endl;
-  			raise(SIGPIPE);
+  			//cout<<"scrivo blanking "<<hex<<unsigned(data)<<endl;
+  			//raise(SIGPIPE);
   		} 
 
   	} else if(addr >= VIC_START and addr <= VIC_END){
@@ -107,6 +118,9 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 			memory[addr] = data;
 		}
 
+	} else if(addr >= CIA1_START and addr <= CIA1_END){
+		cia1->write_register(addr,data);
+		return;
 	}
 
 	memory[addr] = data;

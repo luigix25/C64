@@ -42,6 +42,9 @@ using namespace std;
 #define VIC_START 0xD000
 #define VIC_END 0xD3FF
 
+#define CIA1_START 0xDC00
+#define CIA1_END 0xDCFF
+
 #define CIA2_START 0xDD00
 #define CIA2_END 0xDDFF
 
