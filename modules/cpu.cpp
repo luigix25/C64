@@ -44,13 +44,31 @@ void CPU::reset_flags(){
 
 }
 
+void CPU::setIRQline(bool status){
+
+	cout<<"SETTING IRQ to "<<endl;
+	if(status)
+		cout<<"true"<<endl;
+	else
+		cout<<"false"<<endl;
+
+	irq_line = status;
+
+}
+
+void CPU::changeIRQ(){
+
+	setIRQline(!irq_line);
+}
+
+
 void CPU::handle_irq(bool ignore){
 
 	//interrupt is masked
 	if(ignore)
 		return;
 
-	cout<<"arrivata IRQ"<<endl;
+	//cout<<"arrivata IRQ"<<endl;
 
 	uint8_t temp = ((regs.PC >> 8) & 0xFF);
 	PUSH(temp);

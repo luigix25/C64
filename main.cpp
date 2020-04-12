@@ -20,7 +20,7 @@ void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
 	mem->dump_memory(0xDB00,1000);					//1000 byte not 1024!
 
-	cpu->irq_line = !cpu->irq_line;
+	cpu->changeIRQ();
 
 
 }
@@ -53,6 +53,7 @@ int main(){
 	cpu = new CPU(mem);
 
 	SDLManager *sdl = new SDLManager();
+	sdl->setCIA1(cia1);
 
 	mem->setVIC(vic);
 	mem->setCIA1(cia1);

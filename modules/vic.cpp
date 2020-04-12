@@ -72,7 +72,8 @@ void VIC::video_loop(){
 
 		sdl->render_frame();
 		//cpu->irq_line = 0;
-		usleep(1000);
+		//usleep(100000);
+		sleep(1);
 	}
 
 }
@@ -155,8 +156,9 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 
 		case 0xD019:							//interrupt register
 			if(GET_I_BIT(data,0) == 0x0){			//answer to interrupt
-				cpu->irq_line = true;
+				cpu->setIRQline(true);
 			}
+
 			break;
 
 		case RASTER_CNT:

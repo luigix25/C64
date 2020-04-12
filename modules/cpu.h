@@ -25,9 +25,12 @@ class CPU
 
 		//DEBUG
 		void dump_reg();
+		void changeIRQ();
 
 		//active low
-		bool irq_line;
+
+		void setIRQline(bool);
+
 		bool nmi_line;
 		registers regs;
 
@@ -35,13 +38,15 @@ class CPU
 
 		Memory *memory;
 
-		//registers
+		
 
 		//utils
 		uint8_t read_byte(uint16_t);
 		uint16_t read_word(uint16_t);
 
 		//IRQs
+		bool irq_line;
+
 		void handle_irq(bool);
 		void handle_nmi();
 
