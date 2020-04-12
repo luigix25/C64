@@ -6,7 +6,6 @@
 
 #include "modules/debug.h"
 
-#include <signal.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 
@@ -20,11 +19,16 @@ CPU *cpu;
 void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
 	mem->dump_memory(0xDB00,1000);					//1000 byte not 1024!
+
+	cpu->irq_line = !cpu->irq_line;
+
+
 }
 
 void dump_cpu_handler(int s){
 	cout<<endl<<"Dump CPU"<<endl;
 	cout<<hex<<unsigned(cpu->regs.PC)<<endl;
+	//exit(-1);
 }
 
 void chiudi(int s){
@@ -87,9 +91,9 @@ int main(){
 		opcode = cpu->fetch();
 		loop = cpu->decode(opcode);
 
-		cout<<"jiffy: "<<hex<<unsigned(mem->read_byte(0x0CD))<<endl;
+		//cout<<"jiffy: "<<hex<<unsigned(mem->read_byte(0x0CD))<<endl;
 
-		if(cpu->regs.PC == 0xEA31){
+		if(cpu->regs.PC == 0xE5CD){
 			debug = true;
 			//cpu->dump_reg();
 

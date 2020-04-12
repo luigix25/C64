@@ -96,6 +96,7 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
   			setup_memory_mode(data);
   		} else if(addr == 0xCC){
   			cout<<"scrivo blanking "<<hex<<unsigned(data)<<endl;
+  			raise(SIGPIPE);
   		} 
 
   	} else if(addr >= VIC_START and addr <= VIC_END){

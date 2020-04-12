@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <thread>
 #include <unistd.h>
+#include <signal.h>
 
 
 #include "debug.h"

@@ -71,7 +71,7 @@ void VIC::video_loop(){
 		}
 
 		sdl->render_frame();
-		cpu->irq_line = 0;
+		//cpu->irq_line = 0;
 		usleep(1000);
 	}
 
@@ -116,11 +116,16 @@ void VIC::setSDL(SDLManager *sdl){
 
 uint8_t VIC::read_register(uint16_t addr){
     
-    DEBUG_PRINT("read from VIC memory"<<endl);
-    DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
+    //DEBUG_PRINT("read from VIC memory"<<endl);
+    //DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
 
-	if(addr == RASTER_CNT)
+	if(addr == RASTER_CNT){
+		cout<<"PC"<<hex<<unsigned(cpu->regs.PC)<<endl;
+		cout<<"reading from RASTER_CNT"<<endl;
+		//cout<<hex<<unsigned(data)<<endl;
+
 		return 0;
+	}
 
     return registers[addr-IO_START];
 
@@ -129,9 +134,10 @@ uint8_t VIC::read_register(uint16_t addr){
 void VIC::write_register(uint16_t addr, uint8_t data){
 
 	//not mapped
+	//cout<<"PC"<<hex<<unsigned(cpu->regs.PC)<<endl;
 
-    DEBUG_PRINT("write to VIC memory"<<endl);
-    DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
+    //DEBUG_PRINT("write to VIC memory"<<endl);
+    //DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
 
     switch(addr){
         case CTRL_REG_1:
@@ -151,6 +157,14 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 			if(GET_I_BIT(data,0) == 0x0){			//answer to interrupt
 				cpu->irq_line = true;
 			}
+			break;
+
+		case RASTER_CNT:
+			cout<<"writing to raster cnt"<<endl;
+			cout<<hex<<unsigned(data)<<endl;
+
+
+
     }
 
     addr -= IO_START;

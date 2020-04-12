@@ -1,4 +1,4 @@
-FLAGS = -Wall -Wextra -pedantic -g  -std=c++11
+FLAGS = -Wall -Wextra -pedantic -g -std=c++11
 DEPENDENCIES = library.o cpu.o memory.o vic.o SDLManager.o
 HEADERS = library.h memory.h vic.h cpu.h
 
@@ -22,6 +22,9 @@ vic.o: modules/vic.cpp modules/vic.h
 
 SDLManager.o: modules/SDLManager.cpp modules/SDLManager.h
 	g++ -c modules/SDLManager.cpp $(FLAGS)
+
+CIA1.o: modules/CIA1.cpp modules/CIA1.h
+	g++ -c modules/CIA1.cpp $(FLAGS)
 
 clean:
 	rm -f *.o
