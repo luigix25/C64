@@ -203,6 +203,10 @@ void Memory::setVIC(VIC* vic){
 	this->vic = vic;
 }
 
+void Memory::setCIA1(CIA1* cia1){
+	this->cia1 = cia1;
+}
+
 uint8_t* Memory::getMemPointer(){
 	return memory;
 }

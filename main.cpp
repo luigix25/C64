@@ -1,8 +1,8 @@
 #include "modules/library.h"
 #include "modules/memory.h"
-
 #include "modules/cpu.h"
 #include "modules/SDLManager.h"
+#include "modules/cia1.h"
 
 #include "modules/debug.h"
 
@@ -44,6 +44,7 @@ int main(){
 	signal(SIGINT,chiudi);
 
 	VIC *vic = new VIC();
+	CIA1 *cia1 = new CIA1();
 
 	mem = new Memory();
 	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
@@ -54,6 +55,7 @@ int main(){
 	SDLManager *sdl = new SDLManager();
 
 	mem->setVIC(vic);
+	mem->setCIA1(cia1);
 
 	vic->setMemory(mem);
 	vic->setSDL(sdl);

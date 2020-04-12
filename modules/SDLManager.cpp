@@ -45,7 +45,6 @@ void SDLManager::initialize_SDL(){
 		return;
 	}
 
-	SDL_RenderSetScale(renderer, 2, 2);
 	texture = SDL_CreateTexture(renderer,SDL_PIXELFORMAT_RGB332,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);
 
 
