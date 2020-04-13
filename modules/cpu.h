@@ -29,7 +29,8 @@ class CPU
 
 		//active low
 
-		void setIRQline(bool);
+		void setIRQline();
+		void resetIRQline();
 
 		bool nmi_line;
 		registers regs;
@@ -38,7 +39,7 @@ class CPU
 
 		Memory *memory;
 
-		
+		uint8_t irq_counter;
 
 		//utils
 		uint8_t read_byte(uint16_t);

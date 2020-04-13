@@ -57,7 +57,6 @@ class Memory{
 
 		uint8_t* read_bin_file(const char*,streampos&);
 
-
 		bank_mode LORAM_mode;
 		bank_mode HIRAM_mode;
 		bank_mode CHAR_mode;

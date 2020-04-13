@@ -14,6 +14,7 @@ CPU::CPU(Memory* memory, uint16_t PC){
 	//ative low
 	nmi_line = true;
 	irq_line = true;
+	irq_counter = 0;
 
 }
 
@@ -29,6 +30,7 @@ CPU::CPU(Memory* memory){
 	//ative low
 	nmi_line = true;
 	irq_line = true;
+	irq_counter = 0;
 
 }
 
@@ -44,21 +46,34 @@ void CPU::reset_flags(){
 
 }
 
-void CPU::setIRQline(bool status){
+void CPU::setIRQline(){
 
-	cout<<"SETTING IRQ to "<<endl;
-	if(status)
-		cout<<"true"<<endl;
-	else
-		cout<<"false"<<endl;
+	cout<<"SETTING IRQ to false"<<endl;
+	irq_counter++;
+	irq_line = false;
 
-	irq_line = status;
+}
+
+void CPU::resetIRQline(){
+
+	irq_counter--;
+	if(irq_counter == 0){
+		cout<<"SETTING IRQ to true"<<endl;
+		irq_line = true;
+	}
 
 }
 
 void CPU::changeIRQ(){
 
-	setIRQline(!irq_line);
+	cout<<"FORCING IRQ TO ";
+
+	irq_line = !irq_line;
+	if(irq_line)
+		cout<<"true"<<endl;
+	else
+		cout<<"false"<<endl;
+
 }
 
 

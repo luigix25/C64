@@ -16,11 +16,15 @@ VIC::VIC(){
 
     registers[BASE_ADDR_REG - REG_START] = 0x14;
 	registers[IRQ_REQ_REG - REG_START] = 0x0F;
-	registers[IRQ_MASK_REG - REG_START] = 0x0;
+	registers[IRQ_EN_REG - REG_START] = 0x0;
 
 	rasterline = 0;
 
 	video_loop_thread = new thread(&VIC::video_loop,this);
+	video_loop_thread->detach();
+
+
+	interrupt_enabled = false;
 
 }
 
@@ -152,11 +156,14 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 			char_memory_base_addr   = (data & 0xE) << 10;
     		screen_memory_base_addr = (data & 0xF0) << 6;
     		break;
-    		//bitmap_memory_base_addr = (data & 0x8) << 10;
+
+    	case IRQ_EN_REG:
+    		interrupt_enabled = data;
+    		break;
 
 		case 0xD019:							//interrupt register
 			if(GET_I_BIT(data,0) == 0x0){			//answer to interrupt
-				cpu->setIRQline(true);
+				cpu->resetIRQline();
 			}
 
 			break;
