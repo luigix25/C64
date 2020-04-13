@@ -39,7 +39,7 @@ void CIA1::timer_loop(){
 		if(timerB_enabled)
 			timerB--;
 
-		if(timerA_irq_enabled && timerA == 0){
+		if(timerA_irq_enabled and timerB_enabled and timerA == 0){
 			timerA_irq_raised = true;
 			/* Timer A reset */
 
@@ -50,7 +50,7 @@ void CIA1::timer_loop(){
 
 		}
 
-		if(timerB_irq_enabled && timerB == 0){
+		if(timerB_irq_enabled and timerB_enabled and timerB == 0){
 			timerB_irq_raised = true;
 			/* Timer B reset */
 
@@ -60,13 +60,13 @@ void CIA1::timer_loop(){
 				timerB_enabled = false;
 		}
 
-		if(timerA_irq_raised || timerB_irq_raised){
+		if(timerA_irq_raised or timerB_irq_raised){
 			cout<<"Sending INT"<<endl;
 			cpu->setIRQline();
 		}
 
 		//10 microseconds
-		usleep(1);
+		usleep(100);
 	}
 
 
