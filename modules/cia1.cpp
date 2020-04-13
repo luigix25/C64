@@ -10,8 +10,8 @@ CIA1::CIA1(){
 	
 	timerA = timerB = 0;
 
-	timer_thread = new thread(&CIA1::timer_loop,this);
-	timer_thread->detach();
+	//timer_thread = new thread(&CIA1::timer_loop,this);
+	//timer_thread->detach();
 
 }
 
@@ -27,48 +27,40 @@ void CIA1::setCPU(CPU* cpu){
 	this->cpu = cpu;
 }
 
-void CIA1::timer_loop(){
+void CIA1::clock(){
 
-	while(true){
-
-		if(timerA_enabled){
-			timerA--;
-			//cout<<unsigned(timerA)<<endl;
-		}
-
-		if(timerB_enabled)
-			timerB--;
-
-		if(timerA_irq_enabled and timerB_enabled and timerA == 0){
-			timerA_irq_raised = true;
-			/* Timer A reset */
-
-			if(timerA_reload)
-				timerA = timerA_latch;
-			else
-				timerA_enabled = false;
-
-		}
-
-		if(timerB_irq_enabled and timerB_enabled and timerB == 0){
-			timerB_irq_raised = true;
-			/* Timer B reset */
-
-			if(timerB_reload)
-				timerB = timerB_latch;
-			else
-				timerB_enabled = false;
-		}
-
-		if(timerA_irq_raised or timerB_irq_raised){
-			cout<<"Sending INT"<<endl;
-			cpu->setIRQline();
-		}
-
-		//10 microseconds
-		usleep(100);
+	if(timerA_enabled){
+		timerA--;
+		//cout<<unsigned(timerA)<<endl;
 	}
 
+	if(timerB_enabled)
+		timerB--;
+
+	if(timerA_irq_enabled and timerA_enabled and timerA == 0){
+		timerA_irq_raised = true;
+		/* Timer A reset */
+
+		if(timerA_reload)
+			timerA = timerA_latch;
+		else
+			timerA_enabled = false;
+
+	}
+
+	if(timerB_irq_enabled and timerB_enabled and timerB == 0){
+		timerB_irq_raised = true;
+		/* Timer B reset */
+
+		if(timerB_reload)
+			timerB = timerB_latch;
+		else
+			timerB_enabled = false;
+	}
+
+	if(timerA_irq_raised or timerB_irq_raised){
+		cpu->setIRQline();
+	}
 
 }
 
@@ -89,8 +81,6 @@ uint8_t CIA1::read_register(uint16_t address){
 		case IRQ_REG:
 
 			if(timerA_irq_raised || timerB_irq_raised){
-				cout<<"reset INT"<<endl;
-
 				return_value |= 0x80;
 				return_value |= timerA_irq_raised << 0;
 				return_value |= timerB_irq_raised << 1;

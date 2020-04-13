@@ -35,7 +35,11 @@ class CPU
 		bool nmi_line;
 		registers regs;
 
+		void clock();
+
 	private:
+
+		uint16_t clock_before_fetch;
 
 		Memory *memory;
 

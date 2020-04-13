@@ -23,7 +23,6 @@ VIC::VIC(){
 	video_loop_thread = new thread(&VIC::video_loop,this);
 	video_loop_thread->detach();
 
-
 	interrupt_enabled = false;
 
 }
@@ -53,10 +52,11 @@ void VIC::show_char(uint8_t *character, int X, int Y){
 
 }
 
+
 void VIC::video_loop(){
 
 	while(true){
-		if(sdl == nullptr)
+		if(sdl == nullptr || cpu == nullptr || cia1 == nullptr)
 			continue;
 
 		uint32_t cursorX = 0;
@@ -75,8 +75,9 @@ void VIC::video_loop(){
 		}
 
 		sdl->render_frame();
-		//cpu->irq_line = 0;
-		usleep(10000);
+
+
+		usleep(100000);
 		//sleep(1);
 	}
 
@@ -118,6 +119,13 @@ void VIC::setSDL(SDLManager *sdl){
 	memset(host_video_memory,0xE0,64000);
 
 }
+
+void VIC::setCIA1(CIA1 *cia1){
+
+	this->cia1 = cia1;
+
+}
+
 
 uint8_t VIC::read_register(uint16_t addr){
     

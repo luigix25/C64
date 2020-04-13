@@ -39,8 +39,8 @@ void chiudi(int s){
 
 int main(){
 	//CTRL-Z
-	signal(SIGTSTP,dump_mem_handler);
-	signal(SIGPIPE,dump_cpu_handler);
+	//signal(SIGTSTP,dump_mem_handler);
+	signal(SIGTSTP,dump_cpu_handler);
 	signal(SIGINT,chiudi);
 
 	VIC *vic = new VIC();
@@ -63,29 +63,16 @@ int main(){
 	vic->setMemory(mem);
 	vic->setSDL(sdl);
 	vic->setCPU(cpu);
+	vic->setCIA1(cia1);
 
-//	cpu->dump_reg();
+	while(true){
 
+		cpu->clock();
+		cia1->clock();
+	}
 
-
-	/*mem->load_custom_memory("roms/6502_functional_test.bin",0x400);
-	mem->setup_memory_mode(0);
-
-	cpu->regs.PC = 0x400;
-	cpu->dump_reg();
-
-	test_cpu(cpu);
-
-	return -1;
-*/
-
-
-	/*loadKernalAndBasic(memory,KERNAL_BASIC_ROM);
-	loadCharset(memory,CHARSET_ROM);
-*/
-
-	bool loop = true;
-	uint8_t opcode;
+	//bool loop = true;
+	/*uint8_t opcode;
 
 	bool debug = false;
 
@@ -93,8 +80,6 @@ int main(){
 
 		opcode = cpu->fetch();
 		loop = cpu->decode(opcode);
-
-		//cout<<"jiffy: "<<hex<<unsigned(mem->read_byte(0x0CD))<<endl;
 
 		if(cpu->regs.PC == 0xE5CD){
 			debug = true;
@@ -109,7 +94,7 @@ int main(){
 
 	}
 
-	cpu->dump_reg();
+	cpu->dump_reg();*/
 
 }
 

@@ -16,6 +16,8 @@ CPU::CPU(Memory* memory, uint16_t PC){
 	irq_line = true;
 	irq_counter = 0;
 
+	clock_before_fetch = 0;
+
 }
 
 CPU::CPU(Memory* memory){
@@ -32,6 +34,8 @@ CPU::CPU(Memory* memory){
 	irq_line = true;
 	irq_counter = 0;
 
+	clock_before_fetch = 0;
+
 }
 
 void CPU::reset_flags(){
@@ -46,9 +50,17 @@ void CPU::reset_flags(){
 
 }
 
+void CPU::clock(){
+
+	uint8_t opcode = fetch();
+
+	decode(opcode);
+
+}
+
 void CPU::setIRQline(){
 
-	cout<<"SETTING IRQ to false"<<endl;
+	//cout<<"SETTING IRQ to false"<<endl;
 	irq_counter++;
 	irq_line = false;
 
@@ -58,7 +70,7 @@ void CPU::resetIRQline(){
 
 	irq_counter--;
 	if(irq_counter == 0){
-		cout<<"SETTING IRQ to true"<<endl;
+		//cout<<"SETTING IRQ to true"<<endl;
 		irq_line = true;
 	}
 

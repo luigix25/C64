@@ -8,6 +8,7 @@ class VIC;
 #include "memory.h"
 #include "SDLManager.h"
 #include "cpu.h"
+#include "cia1.h"
 
 #define REG_START 0xD000
 #define REG_END 0xD02E
@@ -59,6 +60,7 @@ class VIC {
 		Memory *memory = nullptr;
 		SDLManager *sdl = nullptr;
 		CPU *cpu = nullptr;
+		CIA1 *cia1 = nullptr;
 
 		//SDL
 
@@ -70,7 +72,6 @@ class VIC {
 
 		uint8_t *guest_color_memory = nullptr;
 
-		thread *video_loop_thread;
 
 	public:
 		VIC();
@@ -79,8 +80,10 @@ class VIC {
 		void setMemory(Memory*);
 		void setSDL(SDLManager*);
 		void setCPU(CPU*);
+		void setCIA1(CIA1*);
 
 		uint8_t read_register(uint16_t);
 		void write_register(uint16_t,uint8_t);
+		thread *video_loop_thread;
 
 };

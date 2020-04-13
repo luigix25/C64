@@ -26,7 +26,7 @@ class CIA1
 		void write_register(uint16_t,uint8_t);
 
 		void setCPU(CPU*);
-
+		void clock();
 
 	private:
 		uint8_t registers[16];
@@ -52,9 +52,5 @@ class CIA1
 		thread *timer_thread;
 
 		CPU *cpu;
-
-
-		void timer_loop();
-
 
 };

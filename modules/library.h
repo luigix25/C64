@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <signal.h>
 
+#include <semaphore.h>
 
 #include "debug.h"
 
