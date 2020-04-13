@@ -5,6 +5,9 @@ CIA1::CIA1(){
 	timerA_latch = timerB_latch = 0;
 	timerA_enabled = timerB_enabled = false;
 	timerA_reload = timerB_reload = false;
+	timerA_irq_enabled = timerB_irq_enabled = false;
+	timerA_irq_raised = timerB_irq_raised = false;
+	
 	timerA = timerB = 0;
 
 	timer_thread = new thread(&CIA1::timer_loop,this);
@@ -28,18 +31,42 @@ void CIA1::timer_loop(){
 
 	while(true){
 
-		if(timerA_enabled)
+		if(timerA_enabled){
 			timerA--;
+			//cout<<unsigned(timerA)<<endl;
+		}
 
 		if(timerB_enabled)
 			timerB--;
 
-		if( (timerA_enabled && timerA <= 0) || (timerB_enabled && timerB <= 0)){
-			//cpu->setIRQline();
+		if(timerA_irq_enabled && timerA == 0){
+			timerA_irq_raised = true;
+			/* Timer A reset */
+
+			if(timerA_reload)
+				timerA = timerA_latch;
+			else
+				timerA_enabled = false;
+
+		}
+
+		if(timerB_irq_enabled && timerB == 0){
+			timerB_irq_raised = true;
+			/* Timer B reset */
+
+			if(timerB_reload)
+				timerB = timerB_latch;
+			else
+				timerB_enabled = false;
+		}
+
+		if(timerA_irq_raised || timerB_irq_raised){
+			cout<<"Sending INT"<<endl;
+			cpu->setIRQline();
 		}
 
 		//10 microseconds
-		usleep(10);
+		usleep(1);
 	}
 
 
@@ -51,10 +78,30 @@ uint8_t CIA1::read_register(uint16_t address){
 	//cout<<hex<<unsigned(address)<<endl;
 
 	//Masking first byte
-	address &= 0x0F;
+	address &= 0x00FF;
 	//For mirroring
 	address = address % 16;
 
+	uint8_t return_value = 0;
+
+	switch(address){
+
+		case IRQ_REG:
+
+			if(timerA_irq_raised || timerB_irq_raised){
+				cout<<"reset INT"<<endl;
+
+				return_value |= 0x80;
+				return_value |= timerA_irq_raised << 0;
+				return_value |= timerB_irq_raised << 1;
+				cpu->resetIRQline();
+				timerA_irq_raised = timerB_irq_raised = false;
+			}
+
+			return return_value;
+
+
+	}
 
 	return registers[address];
 
@@ -74,7 +121,11 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 
 	switch(address){
 		case IRQ_REG:
-			//cout<<"CIA1 IRQ REG "<<hex<<unsigned(data)<<endl;
+			timerA_irq_enabled = GET_I_BIT(data,0);
+			timerB_irq_enabled = GET_I_BIT(data,1);
+
+			cout<<"IRQ REG"<<endl;
+			cout<<"regA "<<hex<<unsigned(timerA_irq_enabled)<<endl;
 			break;
 
 		case TA_LOW:
@@ -90,7 +141,7 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 		case TA_CTRL:
 			timerA_enabled = GET_I_BIT(data,0);
 			timerA_reload = !(GET_I_BIT(data,3));
-
+			
 			if(GET_I_BIT(data,4))
 				timerA = timerA_latch;
 
@@ -116,11 +167,6 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 			break;
 
 	}
-
-
-	cout<<"VIC TIMERS: "<<endl;
-	cout<<"TIMERA "<<hex<<unsigned(timerA_latch)<<endl;
-	cout<<"TIMERB "<<hex<<unsigned(timerB_latch)<<endl;
 
 	registers[address] = data;
 

@@ -52,6 +52,8 @@ int main(){
 
 	cpu = new CPU(mem);
 
+	cia1->setCPU(cpu);
+
 	SDLManager *sdl = new SDLManager();
 	sdl->setCIA1(cia1);
 

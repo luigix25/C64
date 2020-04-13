@@ -40,6 +40,12 @@ class CIA1
 		bool timerA_enabled;
 		bool timerB_enabled;
 
+		bool timerA_irq_enabled;
+		bool timerB_irq_enabled;
+
+		bool timerA_irq_raised;
+		bool timerB_irq_raised;
+
 		bool timerA_reload;
 		bool timerB_reload;
 

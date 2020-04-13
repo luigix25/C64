@@ -76,8 +76,8 @@ void VIC::video_loop(){
 
 		sdl->render_frame();
 		//cpu->irq_line = 0;
-		//usleep(100000);
-		sleep(1);
+		usleep(10000);
+		//sleep(1);
 	}
 
 }
