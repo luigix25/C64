@@ -76,9 +76,7 @@ void VIC::video_loop(){
 
 		sdl->render_frame();
 
-
-		usleep(100000);
-		//sleep(1);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));		//sleep(1);
 	}
 
 }

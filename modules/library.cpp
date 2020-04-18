@@ -58,12 +58,12 @@ KeyboardMatrix RowColFromScancode(uint16_t code){
 			matrix.row = 4;
 			break;
 
-		case SDL_SCANCODE_C:		//giusta!
+		case SDL_SCANCODE_C:
 			matrix.col = 2;
 			matrix.row = 4;
 			break;
 
-		case SDL_SCANCODE_D:		//giusta!
+		case SDL_SCANCODE_D:	
 			matrix.col = 2;
 			matrix.row = 2;
 			break;
@@ -84,6 +84,39 @@ KeyboardMatrix RowColFromScancode(uint16_t code){
 		case SDL_SCANCODE_H:
 			matrix.col = 3;
 			matrix.row = 5;
+			break;
+		case SDL_SCANCODE_I:
+			matrix.col = 4;
+			matrix.row = 1;
+			break;
+
+		case SDL_SCANCODE_J:
+			matrix.col = 4;
+			matrix.row = 2;
+			break;		
+		case SDL_SCANCODE_K:
+			matrix.col = 4;
+			matrix.row = 5;
+			break;		
+		case SDL_SCANCODE_L:
+			matrix.col = 5;
+			matrix.row = 2;
+			break;		
+		case SDL_SCANCODE_M:
+			matrix.col = 4;
+			matrix.row = 4;
+			break;		
+		case SDL_SCANCODE_N:
+			matrix.col = 4;
+			matrix.row = 7;
+			break;			
+		case SDL_SCANCODE_O:
+			matrix.col = 4;
+			matrix.row = 6;
+			break;		
+		case SDL_SCANCODE_P:
+			matrix.col = 5;
+			matrix.row = 1;
 			break;
 	}
 

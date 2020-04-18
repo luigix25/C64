@@ -16,6 +16,9 @@ char convert(char);
 Memory *mem;
 CPU *cpu;
 
+auto totale = chrono::duration_cast<chrono::nanoseconds>(chrono::nanoseconds(0)).count();
+uint64_t quanti =  0;
+
 void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
 	mem->dump_memory(0xDB00,1000);					//1000 byte not 1024!
@@ -33,8 +36,12 @@ void dump_cpu_handler(int s){
 
 void chiudi(int s){
 
+	cout<<"AVG"<<endl;
+	cout<<dec<<totale/quanti<<endl;
+	cout<<"----------"<<endl;
+
 	SDL_Quit();
-	exit(s);
+	exit(-1);
 }
 
 int main(){
@@ -66,35 +73,17 @@ int main(){
 	vic->setCIA1(cia1);
 
 	while(true){
-
+		auto start = chrono::steady_clock::now();
 		cpu->clock();
 		cia1->clock();
+		auto end = chrono::steady_clock::now();
+		auto c = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+		totale += c;
+		quanti++;
+
+		//cout<<totale/quanti<<endl;
+		//cout << "Elapsed time in nanoseconds : " <<dec<<c<< " ns" << endl;
 	}
-
-	//bool loop = true;
-	/*uint8_t opcode;
-
-	bool debug = false;
-
-	while(loop){
-
-		opcode = cpu->fetch();
-		loop = cpu->decode(opcode);
-
-		if(cpu->regs.PC == 0xE5CD){
-			debug = true;
-			//cpu->dump_reg();
-
-			//return 0;
-		}
-
-		if(debug)
-			cpu->dump_reg();
-
-
-	}
-
-	cpu->dump_reg();*/
 
 }
 

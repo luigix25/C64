@@ -89,14 +89,12 @@ void SDLManager::keyboard_loop(){
 
 				cout<<"Key press detected: ";
 				matrix = RowColFromScancode(event.key.keysym.scancode);
-
 				cia1->setKeyPressed(matrix);
-				//cia1->write_register(KEYBOARD_ROW_ADDR,matrix.row);
-				//cia1->write_register(KEYBOARD_COL_ADDR,matrix.col);
-
 				break;
 
 				case SDL_KEYUP:
+				cia1->resetKeyPressed();
+
 				printf( "Key release detected\n" );
 				break;
 

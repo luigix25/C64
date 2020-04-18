@@ -32,6 +32,7 @@ class CIA1
 		void clock();
 
 		void setKeyPressed(KeyboardMatrix);
+		void resetKeyPressed();
 
 	private:
 		uint8_t registers[16];

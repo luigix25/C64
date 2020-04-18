@@ -96,13 +96,10 @@ uint8_t CIA1::read_register(uint16_t address){
 		case KEYBOARD_ROW:
 					
 			if(key_pressed && registers[KEYBOARD_COL] == 0){
-				//cout<<"return col 0 "<<hex<<unsigned(last_pressed.row)<<endl;
 				return (last_pressed.row);
 			}
 			else if(key_pressed && registers[KEYBOARD_COL] == last_pressed.col){
 				key_pressed = true;
-				//cout<<"return col giusta "<<hex<<unsigned(last_pressed.row)<<endl;
-
 				return last_pressed.row;
 			} else {
 				return 0xFF;
@@ -114,9 +111,6 @@ uint8_t CIA1::read_register(uint16_t address){
 }
 
 void CIA1::write_register(uint16_t address, uint8_t data){
-
-	//cout<<"writing to cia1"<<endl;
-	//cout<<hex<<unsigned(address)<<" : "<<hex<<unsigned(data)<<endl;
 
 	//Masking first byte
 	address &= 0x00FF;
@@ -168,7 +162,6 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 				timerB = timerB_latch;
 			break;
 		case KEYBOARD_COL:				//DRA
-			//cout<<"Writing to DRA "<<hex<<unsigned(data)<<endl;
 			break;
 
 	}
@@ -183,5 +176,11 @@ void CIA1::setKeyPressed(KeyboardMatrix matrix){
 	cout<<"setting Key Pressed"<<endl;
 	key_pressed = true;
 	last_pressed = matrix;
+
+}
+
+void CIA1::resetKeyPressed(){
+
+	key_pressed = false;
 
 }
