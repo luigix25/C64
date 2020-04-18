@@ -28,6 +28,8 @@ class VIC;
 #define CTRL_REG_1_OFF CTRL_REG_1 - REG_START
 #define CTRL_REG_2_OFF CTRL_REG_2 - REG_START
 
+#define CLOCK_NUMBER 20000					//50Hz and clock is 1 MHz
+
 enum MODES {CHAR_MODE,MCM_TEXT_MODE,EXT_BACK_MODE,BITMAP_MODE,MCB_BITMAP_MODE};
 
 class VIC {
@@ -51,7 +53,6 @@ class VIC {
 
 		void init_host_charset();
 
-		void video_loop();
 		void show_char(uint8_t *, int, int);
 
 		bool interrupt_enabled;
@@ -73,10 +74,15 @@ class VIC {
 		uint8_t *guest_color_memory = nullptr;
 
 
+		uint32_t clocks_to_new_render;
+		//chrono::time_point last_time_rendered;
+
 	public:
 		VIC();
 		~VIC();
 		
+		void clock();
+
 		void setMemory(Memory*);
 		void setSDL(SDLManager*);
 		void setCPU(CPU*);

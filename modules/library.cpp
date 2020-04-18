@@ -154,7 +154,25 @@ KeyboardMatrix RowColFromScancode(uint16_t code){
 			matrix.row = 4;
 			break;
 
+		case SDL_SCANCODE_5:
+			matrix.col = 2;
+			matrix.row = 0;
+			break;
 
+		case SDL_SCANCODE_RETURN:
+			matrix.col = 0;
+			matrix.row = 1;
+			break;
+
+		case SDL_SCANCODE_SPACE:
+			matrix.col = 7;
+			matrix.row = 4;
+			break;
+
+		case SDL_SCANCODE_F1:	//Equals
+			matrix.col = 6;
+			matrix.row = 5;
+			break;
 	}
 
 	matrix.col = getMaskForCode(matrix.col);

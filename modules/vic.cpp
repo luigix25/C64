@@ -20,10 +20,8 @@ VIC::VIC(){
 
 	rasterline = 0;
 
-	video_loop_thread = new thread(&VIC::video_loop,this);
-	video_loop_thread->detach();
-
 	interrupt_enabled = false;
+	clocks_to_new_render = 1;
 
 }
 
@@ -53,31 +51,32 @@ void VIC::show_char(uint8_t *character, int X, int Y){
 }
 
 
-void VIC::video_loop(){
+void VIC::clock(){
 
-	while(true){
-		if(sdl == nullptr || cpu == nullptr || cia1 == nullptr)
-			continue;
+	clocks_to_new_render--;
 
-		uint32_t cursorX = 0;
-		uint32_t cursorY = 0;
-
-		for(int i=0;i<1000;i++){
-
-			show_char(host_charset + 64 * guest_video_memory[i] ,cursorX,cursorY);
-
-			cursorY +=8;
-
-			if(cursorY >= SCREEN_WIDTH-7){
-				cursorY = 0;
-				cursorX += 8;
-			}
-		}
-
-		sdl->render_frame();
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));		//sleep(1);
+	if(clocks_to_new_render > 0){
+		return;
 	}
+
+	clocks_to_new_render = 20000;
+
+	uint32_t cursorX = 0;
+	uint32_t cursorY = 0;
+
+	for(int i=0;i<1000;i++){
+
+		show_char(host_charset + 64 * guest_video_memory[i] ,cursorX,cursorY);
+
+		cursorY +=8;
+
+		if(cursorY >= SCREEN_WIDTH-7){
+			cursorY = 0;
+			cursorX += 8;
+		}
+	}
+
+	sdl->render_frame();
 
 }
 
