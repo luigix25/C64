@@ -72,15 +72,31 @@ int main(){
 	vic->setCPU(cpu);
 	vic->setCIA1(cia1);
 
+
+	//auto microsecond = chrono::duration_cast<chrono::duration>(chrono::nanoseconds(1000));
+	//auto microsecond = chrono::duration_cast<chrono::duration>(chrono::nanoseconds(1000));
+
 	while(true){
 		auto start = chrono::steady_clock::now();
 		cpu->clock();
 		cia1->clock();
 		auto end = chrono::steady_clock::now();
-		auto c = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
-		totale += c;
-		quanti++;
+	
+		//auto c = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+		auto c = chrono::duration_cast<chrono::nanoseconds>(end - start);
 
+		c = chrono::nanoseconds(1000) - c;
+		//cout<<"sleeping for "<<c.count()<<endl;
+
+		//usleep(1);
+
+		/*cout<<"dormo"<<endl;
+		this_thread::sleep_for(c);
+		cout<<"sveglia"<<endl;
+*/
+		/*totale += c;
+		quanti++;
+*/
 		//cout<<totale/quanti<<endl;
 		//cout << "Elapsed time in nanoseconds : " <<dec<<c<< " ns" << endl;
 	}
