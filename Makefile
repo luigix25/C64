@@ -26,6 +26,9 @@ SDLManager.o: modules/SDLManager.cpp modules/SDLManager.h
 cia1.o: modules/cia1.cpp modules/cia1.h
 	g++ -c modules/cia1.cpp $(FLAGS)
 
+#keyboard.o: modules/keyboard.cpp modules/keyboard.h
+#	g++ -c modules/keyboard.cpp $(FLAGS)
+
 clean:
 	rm -f *.o
 	rm -f main

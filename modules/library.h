@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <signal.h>
 
+#include <SDL2/SDL.h>
+
 #include <semaphore.h>
 
 #include "debug.h"
@@ -59,16 +61,17 @@ using namespace std;
 
 #define null 0
 
-
-void hexDump(void*, int);
-
-//void loadKernalAndBasic(uint8_t *,const char*);
-//void loadCharset(uint8_t *,const char*);
-
 enum register_name
 {
 	regA,regX,regY
 	
+};
+
+struct KeyboardMatrix{
+
+	uint8_t row;
+	uint8_t col;
+
 };
 
 struct registers{
@@ -88,4 +91,7 @@ struct registers{
 	uint8_t flags;
 };
 
+void hexDump(void*, int);
+KeyboardMatrix RowColFromScancode(uint16_t);
+uint8_t getMaskForCode(uint8_t);
 //#endif

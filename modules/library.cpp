@@ -43,47 +43,77 @@ void hexDump(void *addr, int len)
     printf("  %s\n", buff);
 }
 
-void loadKernalAndBasic(uint8_t *memory,const char* filename){
+KeyboardMatrix RowColFromScancode(uint16_t code){
 
-    ifstream file(filename,ios::in | ios::binary | ios::ate);
-    streampos size;
+	KeyboardMatrix matrix;
 
-    if (file.is_open())
-    {
+	switch(code){
+		case SDL_SCANCODE_A:
+			matrix.col = 1;
+			matrix.row = 2;
+			break;
 
-        uint8_t *rom = new uint8_t[sixteenK];
+		case SDL_SCANCODE_B:
+			matrix.col = 3;
+			matrix.row = 4;
+			break;
 
-        size = file.tellg();
-        file.seekg (0, ios::beg);
-        file.read ((char*)rom, size);
-        file.close();
+		case SDL_SCANCODE_C:		//giusta!
+			matrix.col = 2;
+			matrix.row = 4;
+			break;
 
-        memcpy(memory+BASIC_START,rom,eightK);
-        memcpy(memory+KERNAL_START,rom+eightK,eightK);
+		case SDL_SCANCODE_D:		//giusta!
+			matrix.col = 2;
+			matrix.row = 2;
+			break;
+		case SDL_SCANCODE_E:
+			matrix.col = 1;
+			matrix.row = 6;
+			break;
+		case SDL_SCANCODE_F:
+			matrix.col = 2;
+			matrix.row = 5;
+			break;
 
-        delete[] rom;
+		case SDL_SCANCODE_G:
+			matrix.col = 3;
+			matrix.row = 2;
+			break;
 
-    }
+		case SDL_SCANCODE_H:
+			matrix.col = 3;
+			matrix.row = 5;
+			break;
+	}
+
+	matrix.col = getMaskForCode(matrix.col);
+
+	matrix.row = ~(1 << matrix.row); //operazione inversa di getMaskForCode
+
+	return matrix;
+
 }
 
-void loadCharset(uint8_t *memory,const char* filename){
+uint8_t getMaskForCode(uint8_t code){
 
-    ifstream file(filename,ios::in | ios::binary | ios::ate);
-    streampos size;
+	if(code == 0){
+		return 0xFE;
+	} else  if(code == 1){
+		return 0xFD;
+	} else  if(code == 2){
+		return 0xFB;
+	} else  if(code == 3){
+		return 0xF7;
+	} else  if(code == 4){
+		return 0xEF;
+	} else  if(code == 5){
+		return 0xDF;
+	} else  if(code == 6){
+		return 0xBF;
+	} else  if(code == 7){
+		return 0x7F;
+	} else
+		return 0xFF;
 
-    if (file.is_open())
-    {
-
-        uint8_t *rom = new uint8_t[fourK];
-
-        size = file.tellg();
-        file.seekg (0, ios::beg);
-        file.read ((char*)rom, size);
-        file.close();
-
-        memcpy(memory+0xD000,rom,fourK);
-
-        delete[] rom;
-
-    }
 }

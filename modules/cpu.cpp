@@ -52,8 +52,12 @@ void CPU::reset_flags(){
 
 void CPU::clock(){
 
-	uint8_t opcode = fetch();
+	if(clock_before_fetch > 0){
+		clock_before_fetch--;
+		return;
+	}
 
+	uint8_t opcode = fetch();
 	decode(opcode);
 
 }
@@ -877,20 +881,19 @@ void CPU::dump_reg(){
 
 bool CPU::decode(uint8_t opcode){
 
-	//OR LD ST PH fatte
-
 	uint16_t addr,tmp;
+
+	uint16_t n_clock = 0;
 
 	switch(opcode){
 		case 0x00:        //BRK
 			DEBUG_PRINT("BRK!"<<endl);
 			BRK();
+			n_clock = 7;
 			break;
 
 		case 0x01:        //ORA (ind,X)		
-
 			addr = indirect_X();			
-
 			OR(regA,memory->read_byte(addr));
 			break;
 
@@ -1604,14 +1607,7 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("INY"<<endl);
 			INC(regY);
 			break;
-		
-		//TODO: CHECK!!!!
-		/*case 0xC9:
-			DEBUG_PRINT("CMP"<<endl);		//CMP ZERO_PAGE
-			addr = zero_page();
-			CMP_data(addr);
-			break;*/
-		
+
 		case 0xC9:
 			addr = immediate();
 			DEBUG_PRINT("CMP imm "<<hex<<unsigned(addr)<<endl);
@@ -1806,6 +1802,7 @@ bool CPU::decode(uint8_t opcode){
  	}
 
  	addr = 0;
+ 	clock_before_fetch = n_clock;
 
   return true;
 

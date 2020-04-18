@@ -10,6 +10,9 @@ CIA1::CIA1(){
 	
 	timerA = timerB = 0;
 
+	key_pressed = false;
+
+
 	//timer_thread = new thread(&CIA1::timer_loop,this);
 	//timer_thread->detach();
 
@@ -87,10 +90,23 @@ uint8_t CIA1::read_register(uint16_t address){
 				cpu->resetIRQline();
 				timerA_irq_raised = timerB_irq_raised = false;
 			}
-
 			return return_value;
 
+		//Keyboard column
+		case KEYBOARD_ROW:
+					
+			if(key_pressed && registers[KEYBOARD_COL] == 0){
+				//cout<<"return col 0 "<<hex<<unsigned(last_pressed.row)<<endl;
+				return (last_pressed.row);
+			}
+			else if(key_pressed && registers[KEYBOARD_COL] == last_pressed.col){
+				key_pressed = true;
+				//cout<<"return col giusta "<<hex<<unsigned(last_pressed.row)<<endl;
 
+				return last_pressed.row;
+			} else {
+				return 0xFF;
+			}
 	}
 
 	return registers[address];
@@ -113,9 +129,6 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 		case IRQ_REG:
 			timerA_irq_enabled = GET_I_BIT(data,0);
 			timerB_irq_enabled = GET_I_BIT(data,1);
-
-			cout<<"IRQ REG"<<endl;
-			cout<<"regA "<<hex<<unsigned(timerA_irq_enabled)<<endl;
 			break;
 
 		case TA_LOW:
@@ -153,11 +166,22 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 
 			if(GET_I_BIT(data,4))
 				timerB = timerB_latch;
-			
+			break;
+		case KEYBOARD_COL:				//DRA
+			//cout<<"Writing to DRA "<<hex<<unsigned(data)<<endl;
 			break;
 
 	}
 
 	registers[address] = data;
+
+}
+
+
+void CIA1::setKeyPressed(KeyboardMatrix matrix){
+
+	cout<<"setting Key Pressed"<<endl;
+	key_pressed = true;
+	last_pressed = matrix;
 
 }

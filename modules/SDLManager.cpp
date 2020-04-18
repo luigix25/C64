@@ -81,17 +81,19 @@ void SDLManager::keyboard_loop(){
 		SDL_Event event;
 		while( SDL_WaitEvent( &event ) ){
 
+			KeyboardMatrix matrix;
+
 		// We are only worried about SDL_KEYDOWN and SDL_KEYUP events
 			switch( event.type ){
 				case SDL_KEYDOWN:
 
-				cia1->write_register(KEYBOARD_ROW_ADDR,0xFD);
-				cia1->write_register(KEYBOARD_COL_ADDR,0xFB);
-
 				cout<<"Key press detected: ";
-				cout<<hex<<unsigned(event.key.keysym.scancode)<<endl;
-				if(event.key.keysym.scancode == SDL_SCANCODE_A)
-					cout<<"premuto A"<<endl;
+				matrix = RowColFromScancode(event.key.keysym.scancode);
+
+				cia1->setKeyPressed(matrix);
+				//cia1->write_register(KEYBOARD_ROW_ADDR,matrix.row);
+				//cia1->write_register(KEYBOARD_COL_ADDR,matrix.col);
+
 				break;
 
 				case SDL_KEYUP:

@@ -16,6 +16,9 @@ class CIA1;
 
 #define IRQ_REG 0x0D
 
+#define KEYBOARD_ROW 0x01
+#define KEYBOARD_COL 0x00
+
 class CIA1
 {
 	public:
@@ -27,6 +30,8 @@ class CIA1
 
 		void setCPU(CPU*);
 		void clock();
+
+		void setKeyPressed(KeyboardMatrix);
 
 	private:
 		uint8_t registers[16];
@@ -52,5 +57,8 @@ class CIA1
 		thread *timer_thread;
 
 		CPU *cpu;
+
+		bool key_pressed;
+		KeyboardMatrix last_pressed;
 
 };
