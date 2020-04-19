@@ -42,7 +42,7 @@ void SDLManager::initialize_SDL(){
 	}
 
 
-	window = SDL_CreateWindow("Hello World!", 100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("Hello World!", 100, 100, SCREEN_WIDTH*2, SCREEN_HEIGHT*2, SDL_WINDOW_SHOWN);
 	
 	if (window == nullptr){
 		cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;

@@ -169,6 +169,12 @@ KeyboardMatrix RowColFromScancode(uint16_t code){
 			matrix.row = 4;
 			break;
 
+		case SDL_SCANCODE_0:
+			cout<<"premuto zero"<<endl;
+			matrix.col = 4;
+			matrix.row = 3;
+			break;
+
 		case SDL_SCANCODE_5:
 			matrix.col = 2;
 			matrix.row = 0;
@@ -180,6 +186,12 @@ KeyboardMatrix RowColFromScancode(uint16_t code){
 			break;
 
 		case SDL_SCANCODE_SPACE:
+			matrix.col = 7;
+			matrix.row = 4;
+			break;
+
+		case SDL_SCANCODE_LSHIFT:
+			cout<<"LSHIFT"<<endl;
 			matrix.col = 7;
 			matrix.row = 4;
 			break;
