@@ -52,11 +52,13 @@ class VIC {
 		void set_graphic_mode();
 
 		void init_host_charset();
+		void init_color_palette();
 
 		void show_char(uint8_t *, int, int);
 
 		bool interrupt_enabled;
 
+		uint8_t color_palette[16];
 
 		Memory *memory = nullptr;
 		SDLManager *sdl = nullptr;

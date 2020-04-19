@@ -1,4 +1,4 @@
-#include "vic.h"
+	#include "vic.h"
 
 VIC::VIC(){
 
@@ -24,6 +24,7 @@ VIC::VIC(){
 	clocks_to_new_render = 1;
 	last_time_rendered = chrono::steady_clock::now();
 
+	init_color_palette();
 
 }
 
@@ -33,11 +34,27 @@ VIC::~VIC(){
 
 }
 
+void VIC::init_color_palette(){
+
+
+	color_palette[0] = 0x00;	//black
+
+	color_palette[0x6] = 0x02;	//blue
+
+	color_palette[0xE] = 0x13;	//light blue
+
+}
+
 
 void VIC::show_char(uint8_t *character, int X, int Y){
 
-	uint8_t bg_color = registers[0xD021-0xD000];
-	uint8_t fg_color = *(guest_color_memory + 40 * X/8 + Y/8);
+	uint8_t bg_color_idx = registers[0xD021-0xD000];
+	//cout<<"BG COLOR "<<hex<<unsigned(bg_color_idx)<<endl;
+	uint8_t bg_color = color_palette[bg_color_idx];
+
+	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
+	uint8_t fg_color = color_palette[fg_color_idx];
+	//cout<<"FG COLOR "<<hex<<unsigned(fg_color_idx)<<endl;
 
 	for(int i = 0; i < CHAR_WIDTH; i++){
 		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
