@@ -170,8 +170,27 @@ KeyboardMatrix RowColFromScancode(uint16_t code){
 			break;
 
 		case SDL_SCANCODE_0:
-			cout<<"premuto zero"<<endl;
 			matrix.col = 4;
+			matrix.row = 3;
+			break;
+
+		case SDL_SCANCODE_1:
+			matrix.col = 7;
+			matrix.row = 0;
+			break;
+		
+		case SDL_SCANCODE_2:
+			matrix.col = 7;
+			matrix.row = 3;
+			break;
+
+		case SDL_SCANCODE_3:
+			matrix.col = 1;
+			matrix.row = 0;
+			break;
+		
+		case SDL_SCANCODE_4:
+			matrix.col = 1;
 			matrix.row = 3;
 			break;
 
@@ -180,9 +199,34 @@ KeyboardMatrix RowColFromScancode(uint16_t code){
 			matrix.row = 0;
 			break;
 
+		case SDL_SCANCODE_6:
+			matrix.col = 2;
+			matrix.row = 3;
+			break;
+
+		case SDL_SCANCODE_7:
+			matrix.col = 3;
+			matrix.row = 0;
+			break;
+
+		case SDL_SCANCODE_8:
+			matrix.col = 3;
+			matrix.row = 3;
+			break;
+
+		case SDL_SCANCODE_9:
+			matrix.col = 4;
+			matrix.row = 0;
+			break;
+
 		case SDL_SCANCODE_RETURN:
 			matrix.col = 0;
 			matrix.row = 1;
+			break;
+
+		case SDL_SCANCODE_COMMA:
+			matrix.col = 5;
+			matrix.row = 7;
 			break;
 
 		case SDL_SCANCODE_SPACE:
