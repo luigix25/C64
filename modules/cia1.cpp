@@ -28,8 +28,8 @@ void CIA1::setCPU(CPU* cpu){
 void CIA1::clock(){
 
 	if(timerA_enabled){
+		//cout<<hex<<unsigned(timerA_latch)<<endl;
 		timerA--;
-		//cout<<unsigned(timerA)<<endl;
 	}
 
 	if(timerB_enabled)

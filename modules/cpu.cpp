@@ -99,8 +99,6 @@ void CPU::handle_irq(bool ignore){
 	if(ignore)
 		return;
 
-	//cout<<"arrivata IRQ"<<endl;
-
 	uint8_t temp = ((regs.PC >> 8) & 0xFF);
 	PUSH(temp);
 
@@ -895,29 +893,34 @@ bool CPU::decode(uint8_t opcode){
 		case 0x01:        //ORA (ind,X)		
 			addr = indirect_X();			
 			OR(regA,memory->read_byte(addr));
+			n_clock = 6;
 			break;
 
 		case 0x05:      //ORA zpg
 			addr = zero_page();
 			OR(regA, memory->read_byte(addr));
+			n_clock = 3;
 			break;
 
 		case 0x06:			//ASL
 			addr = zero_page();	
 			left_shift_mem(addr);
+			n_clock = 5;
 			break;
 	    
 		case 0x08:			//PHP
 			DEBUG_PRINT("PHP"<<endl);
 			PUSH(flags());
+			n_clock = 3;
 			break;
 
 		case 0x09:			//ORA imm
 			addr = immediate();
 			DEBUG_PRINT("ORA "<<hex<<unsigned(addr)<<endl);
 			OR(regA,addr);
+			n_clock = 2;
 			break;
-		
+
 		case 0xA:			//ASL
 			DEBUG_PRINT("ASL"<<endl);
 			ASL(regA);
@@ -927,208 +930,244 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("ORA ABS"<<endl);
 			addr = absolute();		//ORA ABS
 			OR(regA,memory->read_byte(addr));
+			n_clock = 4;
 			break;
 			
 		case 0x0E:						//ASL ABS
 			DEBUG_PRINT("ASL"<<endl);
 			addr = absolute();
 			left_shift_mem(addr);
+			n_clock = 6;
 			break;
 
 		case 0x10:						//BPL
 			DEBUG_PRINT("BPL"<<endl);
 			addr = immediate();
 			BPL(addr);
+			n_clock = 2;
 			break;
 		
 		case 0x11:						//ORA (ind),Y
 			DEBUG_PRINT("ORA ind Y"<<endl);
 			addr = indirect_Y();
 			OR(regA,memory->read_byte(addr));
+			n_clock = 5;
 			break;
 
 		case 0x15:						//ORA zpg,X
 			DEBUG_PRINT("ORA ZPG"<<endl);
 			addr = zero_page(regX);
 			OR(regA,memory->read_byte(addr));
+			n_clock = 4;
 			break;
 		
 		case 0x16:						//ASL zpg,X
 			DEBUG_PRINT("ASL"<<endl);
 			addr = zero_page(regX);
 			left_shift_mem(addr);
+			n_clock = 6;
 			break;
 
 		case 0x18:						//CLC
 			DEBUG_PRINT("CLC"<<endl);
 			regs.carry_flag = false;
+			n_clock = 2;
 			break;
 
 		case 0x19:						//ORA ABS Y
 			DEBUG_PRINT("ORA"<<endl);
 			addr = absolute(regY);
 			OR(regA,memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0x1D:						//ORA abs,X
 			addr = absolute(regX);
 			OR(regA,memory->read_byte(addr));
+			n_clock = 4;
 			break;
 		
 		case 0x1E:
 			DEBUG_PRINT("ASL"<<endl);
 			addr = absolute(regX);
 			left_shift_mem(addr);
+			n_clock = 7;
 			break;
 
 		case 0x20:						//JSR 
 			addr = absolute();
 			DEBUG_PRINT("JSR "<<hex<<unsigned(addr)<<endl);
 			JSR(addr);
+			n_clock = 6;
 			break;
 		
 		case 0x21:						//AND (ind X)
 			DEBUG_PRINT("AND"<<endl);
 			addr = indirect_X();
 			AND(memory->read_byte(addr));
+			n_clock = 6;
 			break;
 
 		case 0x24:						//JSR 
 			addr = zero_page();
 			DEBUG_PRINT("BIT "<<hex<<unsigned(addr)<<endl);
 			BIT(addr);
+			n_clock = 3;
 			break;
 		
 		case 0x25:						//AND zpg
 			DEBUG_PRINT("AND"<<endl);
 			addr = zero_page();
 			AND(memory->read_byte(addr));
+			n_clock = 3;
 			break;
 		
 		case 0x26:						//ROL zpg
 			addr = zero_page();
 			DEBUG_PRINT("ROL "<<endl);
 			rotate_left_mem(addr);
+			n_clock = 5;
 			break;
 
 		case 0x28:						//PLP 
 			DEBUG_PRINT("PLP"<<endl);
 			flags(POP());
+			n_clock = 4;
 			break;
 
 		case 0x29:						//AND imm 
 			addr = immediate();
 			DEBUG_PRINT("AND "<<hex<<unsigned(addr)<<endl);
 			AND(addr);
+			n_clock = 2;
 			break;
 
 		case 0x2A:						//ROL A 
 			DEBUG_PRINT("ROL A"<<endl);
 			ROL(regA);
+			n_clock = 2;
 			break;
 
 		case 0x2C:						//BIT ABS
 			DEBUG_PRINT("BIT"<<endl);
 			addr = absolute();
 			BIT(addr);
+			n_clock = 4;
 			break;
 
 		case 0x2D:						//AND abs
 			DEBUG_PRINT("AND"<<endl);
 			addr = absolute();
 			AND(memory->read_byte(addr));
-			break;	
+			n_clock = 4;
+			break;
 
 		case 0x2E:						//ROL ABS
 			DEBUG_PRINT("ROL ABS"<<endl);
 			addr = absolute();
 			rotate_left_mem(addr);
+			n_clock = 6;
 			break;
 
 		case 0x30:						//BMI 
 			addr = immediate();
 			DEBUG_PRINT("BMI "<<hex<<unsigned(addr)<<endl);
 			BMI(addr);
+			n_clock = 2;
 			break;
 
 		case 0x31:						//AND (ind),Y
 			DEBUG_PRINT("AND"<<endl);
 			addr = indirect_Y();
 			AND(memory->read_byte(addr));
+			n_clock = 5;
 			break;
 
 		case 0x35:						//AND zpg,X
 			DEBUG_PRINT("AND"<<endl);
 			addr = zero_page(regX);
 			AND(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0x36:						//ROL 
 			DEBUG_PRINT("ROL"<<endl);
 			addr = zero_page(regX);
 			rotate_left_mem(addr);
+			n_clock = 6;
 			break;
 
 		case 0x38:
 			DEBUG_PRINT("SEC"<<endl);
 			regs.carry_flag = true;
+			n_clock = 2;
 			break;
 
 		case 0x39:						//AND abs Y
 			DEBUG_PRINT("AND"<<endl);
 			addr = absolute(regY);
 			AND(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0x3D:						//AND abs X
 			DEBUG_PRINT("AND"<<endl);
 			addr = absolute(regX);
 			AND(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0x3E:						//ROL
 			DEBUG_PRINT("ROL"<<endl);
 			addr = absolute(regX);
 			rotate_left_mem(addr);
+			n_clock = 7;
+			break;
+
+		case 0x40:
+			DEBUG_PRINT("RTI"<<endl);
+			RTI();
+			n_clock = 7;
 			break;
 
 		case 0x41:						//EOR (ind,X)
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = indirect_X();
 			EOR(memory->read_byte(addr));
+			n_clock = 6;
 			break;
 
 		case 0x45:						//EOR zpg
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = zero_page();
 			EOR(memory->read_byte(addr));
+			n_clock = 3;
 			break;
 		
-		case 0x40:
-			DEBUG_PRINT("RTI"<<endl);
-			RTI();
-			break;
-
 		case 0x46:						//LSR zpg
 			DEBUG_PRINT("LSR"<<endl;)
 			addr = zero_page();
 			right_shift_mem(addr);
+			n_clock = 5;
 			break;
 
 		case 0x48:						//PHA
 			DEBUG_PRINT("PHA"<<endl);
 			PUSH(regA);
+			n_clock = 3;
 			break;
 		
 		case 0x49:						//EOR
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = immediate();
 			EOR(addr);
+			n_clock = 2;
 			break;
 
 		case 0x4A:						//LSR
 			DEBUG_PRINT("LSR"<<endl);
 			LSR(regA);
+			n_clock = 2;
 			break;
 
 		case 0x4C:						//JMP abs
@@ -1136,105 +1175,123 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("JMP to "<<hex<<unsigned(addr)<<endl);
 
 			regs.PC = addr;
+			n_clock = 3;
 			break;
 		
 		case 0x4D:						//EOR abs
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = absolute();
 			EOR(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 		
 		case 0x4E:
 			DEBUG_PRINT("LSR ABS"<<endl);
 			addr = absolute();
 			right_shift_mem(addr);
+			n_clock = 6;
 			break;
 
 		case 0x50:						//JMP abs
 			addr = immediate();
 			DEBUG_PRINT("BVC"<<endl);
 			BVC(addr);
+			n_clock = 2;
 			break;
 
 		case 0x51:						//EOR (ind),Y
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = indirect_Y();
 			EOR(memory->read_byte(addr));
+			n_clock = 5;
 			break;
 
 		case 0x55:						//EOR zpg X
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = zero_page(regX);
 			EOR(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0x56:						//LSR zpg_X
 			DEBUG_PRINT("LSR zpg,X"<<endl);
 			addr = zero_page(regX);
 			right_shift_mem(addr);
+			n_clock = 6;
 			break;
 
 		case 0x58:						//CLI
 			DEBUG_PRINT("CLI"<<endl);
 			regs.interrupt_flag = false;
+			n_clock = 2;
 			break;
 
 		case 0x59:						//EOR abs Y
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = absolute(regY);
 			EOR(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0x5D:						//EOR abs X
 			DEBUG_PRINT("EOR"<<endl;)
 			addr = absolute(regX);
 			EOR(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0x5E:
 			DEBUG_PRINT("LSR"<<endl);
 			addr = absolute(regX);
 			right_shift_mem(addr);
+			n_clock = 7;
 			break;
 
 		case 0x60:						//RTS
 			DEBUG_PRINT("RTS"<<endl);
 			addr = (POP() + (POP() << 8)) + 1;
   			regs.PC = addr;
+			n_clock = 6;
 			break;
 
 		case 0x61:								//ADC (ind X)
 			DEBUG_PRINT("ADC"<<endl);
 			addr = indirect_X();
 			ADC(memory->read_byte(addr));
+			n_clock = 6;
 			break;
 
 		case 0x65:						//ADC imm
 			addr = zero_page();
 			DEBUG_PRINT("ADC "<<hex<<unsigned(addr)<<endl);
 			ADC(memory->read_byte(addr));
+			n_clock = 3;
 			break;
 		
 		case 0x66:						//ROR zpg
 			addr = zero_page();
 			DEBUG_PRINT("ROR "<<endl);
 			rotate_right_mem(addr);
+			n_clock = 5;
 			break;
 
 		case 0x68:						//PLA
 			DEBUG_PRINT("PLA"<<endl);
 			PLA();
+			n_clock = 4;
 			break;
 		
 		case 0x69:						//ADC imm
 			DEBUG_PRINT("ADC"<<endl);
 			addr = immediate();
 			ADC(addr);
+			n_clock = 2;
 			break;
 		
 		case 0x6A:						//ROR 
 			DEBUG_PRINT("ROR"<<endl);
 			ROR();
+			n_clock = 2;
 			break;
 		
 		case 0x6C:						//JMP (ind)
@@ -1247,88 +1304,99 @@ bool CPU::decode(uint8_t opcode){
 			
 			regs.PC = addr;
 
-			//JMP(tmp);
+			n_clock = 3;
 			break;
-		
+			
 		case 0x6D:
 			DEBUG_PRINT("ADC"<<endl);	//ADC ABS
 			addr = absolute();
 
 			ADC(memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0x6E:
 
 			DEBUG_PRINT("ROR"<<endl);
 
 			addr = absolute();
 			rotate_right_mem(addr);
+			n_clock = 6;
 			break;
-
+	
 		case 0x70:
 			DEBUG_PRINT("BVS"<<endl);
 			addr = immediate();
 			BVS(addr);
+			n_clock = 2;
 			break;
-
+	
 		case 0x71:								//ADC (ind) Y
 			DEBUG_PRINT("ADC"<<endl);
 			addr = indirect_Y();
 			ADC(memory->read_byte(addr));
+			n_clock = 5;
 			break;
-
+	
 		case 0x75:								//ADC zpg X
 			DEBUG_PRINT("ADC"<<endl);
 			addr = zero_page(regX);
 			ADC(memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0x76:									//ROR
 			DEBUG_PRINT("ROR ZPG,X"<<endl);
 			addr = zero_page(regX);
 			rotate_right_mem(addr);
-
+			n_clock = 6;
 			break;
-
+	
 		case 0x78:						//SEI
 			DEBUG_PRINT("SEI"<<endl);
 			regs.interrupt_flag = true;
+			n_clock = 2;
 			break;
-
+	
 		case 0x79:								//ADC abs Y
 			DEBUG_PRINT("ADC"<<endl);
 			addr = absolute(regY);
 			ADC(memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0x7D:								//ADC abs X
 			DEBUG_PRINT("ADC"<<endl);
 			addr = absolute(regX);
 			ADC(memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0x7E:						//ROR
 			DEBUG_PRINT("ROR"<<endl);
 			addr = absolute(regX);
 			rotate_right_mem(addr);
+			n_clock = 7;
 			break;
-
+	
 	    case 0x81:						//STA (ind,X)
 	    	DEBUG_PRINT("STA indirect X"<<endl);
 
 	    	addr = indirect_X();
 	    	ST(regA,addr);
 
-	    	break;
-
+			n_clock = 6;
+			break;
+	
 	    case 0x84:						//STY zpg
 	    	addr = zero_page();
 			DEBUG_PRINT("STY "<<hex<<hex<<unsigned(addr)<<endl);
 
 	    	ST(regY,addr);
 
-	    	break;
-
+			n_clock = 3;
+			break;
+	
 	    case 0x85:						//STA zpg
 
 	    	addr = zero_page();
@@ -1336,370 +1404,438 @@ bool CPU::decode(uint8_t opcode){
 
 	    	ST(regA,addr);
 
-	    	break;
-
+			n_clock = 3;
+			break;
+	
 	    case 0x86:						//STX zpg
 	    	addr = zero_page();
 			DEBUG_PRINT("STX "<<hex<<unsigned(addr)<<endl);
 	    	ST(regX,addr);
 
-	    	break;
-
+			n_clock = 3;
+			break;
+	
 		case 0x88:						//DEY
 			DEBUG_PRINT("DEY"<<endl);
 			DE(regY);
+			n_clock = 2;
 			break;
-
+	
 		case 0x8A:						//TXA
 			DEBUG_PRINT("TXA"<<endl);
 			TXA();
+			n_clock = 2;
 			break;
-
+	
 	    case 0x8C:						//STY abs
 	    	DEBUG_PRINT("STY abs"<<endl);
 
 	    	addr = absolute();
 	    	ST(regY,addr);
 
-	    	break;
-
+			n_clock = 4;
+			break;
+	
 	    case 0x8D:						//STA abs
 
 	    	addr = absolute();
 	    	DEBUG_PRINT("STA "<<hex<<unsigned(addr)<<endl);
 
 	    	ST(regA,addr);
-	    	break;
-
+			n_clock = 4;
+			break;
+	
 	    case 0x8E:						//STX abs
 	    	addr = absolute();
 			DEBUG_PRINT("STX "<<hex<<unsigned(addr)<<endl);
 
 	    	ST(regX,addr);
-	    	break;
-
+			n_clock = 4;
+			break;
+	
 		case 0x90:						//BCC
 	    	DEBUG_PRINT("BCC"<<endl);
 
 	    	addr = immediate();
 	    	BCC(addr);
-	    	break;
-
+			n_clock = 2;
+			break;
+	
 		case 0x91:						//STA (ind),Y
 			addr = indirect_Y();
 			DEBUG_PRINT("STA "<<hex<<unsigned(addr)<<endl);
 			ST(regA,addr);
+			n_clock = 6;
 			break;
-
+	
 		case 0x94:						//STY zpg,X
 	    	DEBUG_PRINT("STY zero page x"<<endl);
 
 	    	addr = zero_page(regX);
 	    	ST(regY,addr);
-	    	break;
-
+			n_clock = 4;
+			break;
+	
 		case 0x95:						//STA zpg,X
 	    	DEBUG_PRINT("STA zero page x"<<endl);
 
 	    	addr = zero_page(regX);
 	    	ST(regA,addr);
-	    	break;
-
+			n_clock = 4;
+			break;
+	
 		case 0x96:						//STA zpg,Y
 	    	DEBUG_PRINT("STX zero page x"<<endl);
 
 	    	addr = zero_page(regY);
 	    	ST(regX,addr);
-	    	break;
-		
+			n_clock = 4;
+			break;
+			
 		case 0x98:						//TYA
 	    	DEBUG_PRINT("TYA"<<endl);
 	    	regs.reg[regA] = regs.reg[regY];
 			SET_ZF(regs.reg[regA]);
 			SET_NF(regs.reg[regA]);
-	    	break;
-
+			n_clock = 2;
+			break;
+	
 		case 0x99:						//STA abs,Y
 			addr = absolute(regY);
 			DEBUG_PRINT("STA 0x"<<hex<<unsigned(addr)<<endl);
 			ST(regA,addr);
+			n_clock = 5;
 			break;
-		
+			
 		case 0x9A:						//TXS
 	    	DEBUG_PRINT("TXS"<<endl);
 	    	regs.SP = regs.reg[regX];
-	    	break;
-
+			n_clock = 2;
+			break;
+	
 		case 0x9D:						//STA abs,X
 	    	DEBUG_PRINT("STA abs X"<<endl);
 
 	    	addr = absolute(regX);
 	    	ST(regA,addr);
-	    	break;
-
+			n_clock = 5;
+			break;
+	
 		case 0xA0:						//LDY imm
 			DEBUG_PRINT("LDY IMM"<<endl);
 			addr = immediate();
 			LD(regY,addr);
+			n_clock = 2;
 			break;
-
+	
 		case 0xA1:						//LDA (ind,X)
 			DEBUG_PRINT("LDY IMM"<<endl);
 			addr = indirect_X();
 			LD(regA,memory->read_byte(addr));
+			n_clock = 6;
 			break;
-
+	
 		case 0xA2:						//LDX imm
 			addr = immediate();
 			DEBUG_PRINT("LDX "<<hex<<unsigned(addr)<<endl);
 			LD(regX,addr);
+			n_clock = 2;
 			break;
-
+	
 		case 0xA4:						//LDY zpg
 			addr = zero_page();
 			DEBUG_PRINT("LDY "<<hex<<unsigned(addr)<<endl);
 			LD(regY,memory->read_byte(addr));
+			n_clock = 3;
 			break;
-
+	
 		case 0xA5:						//LDA zpg
 			DEBUG_PRINT("LDA zero"<<endl);
 			addr = zero_page();
 			LD(regA,memory->read_byte(addr));
+			n_clock = 3;
 			break;
-
+	
 		case 0xA6:						//LDX zpg
 			DEBUG_PRINT("LDX zero"<<endl);
 			addr = zero_page();
 			LD(regX,memory->read_byte(addr));
+			n_clock = 3;
 			break;
-		
+			
 		case 0xA8:						//TAY
 			DEBUG_PRINT("TAY"<<endl);
 			TAY();
+			n_clock = 2;
 			break;
-
+	
 		case 0xA9:						//LDA imm
 			addr = immediate();
 			DEBUG_PRINT("LDA "<<hex<<unsigned(addr)<<endl);
 			LD(regA,addr);
+			n_clock = 2;
 			break;
-		
+			
 		case 0xAA:						//TAX
 			DEBUG_PRINT("TAX"<<endl);
 			TAX();
+			n_clock = 2;
 			break;
-
+	
 		case 0xAC:						//LDY abs
 			addr = absolute();
 			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
 			LD(regY,memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0xAD:						//LDA abs
 			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
 			addr = absolute();
 			LD(regA,memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0xAE:						//LDX abs
 			addr = absolute();
 			LD(regX,memory->read_byte(addr));
 			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
+			n_clock = 4;
 			break;
-		
+			
 		case 0xB0:						//BCS
 			DEBUG_PRINT("BCS"<<endl);
 			addr = immediate();
 			BCS(addr);
+			n_clock = 2;
 			break;
-
+	
 		case 0xB1:						//LDA ind y
 			addr = indirect_Y();
 			DEBUG_PRINT("LDA "<<hex<<unsigned(addr)<<endl);
 
 			LD(regA,memory->read_byte(addr));
+			n_clock = 5;
 			break;
-
+	
 		case 0xB4:						//LDY zpg,X
 			DEBUG_PRINT("LDY zpg X"<<endl);
 			addr = zero_page(regX);
 			LD(regY,memory->read_byte(addr));
+			n_clock = 3;
 			break;
-
+	
 		case 0xB5:						//LDA zpg,X
 			DEBUG_PRINT("LDA ind y"<<endl);
 			addr = zero_page(regX);
 			LD(regA,memory->read_byte(addr));
+			n_clock = 3;
 			break;
-				
+					
 		case 0xB6:						//LDX zpg,Y
 			DEBUG_PRINT("LOAD ind y"<<endl);
 			addr = zero_page(regY);
 			LD(regX,memory->read_byte(addr));
+			n_clock = 3;
 			break;
-
+	
 		case 0xB8:
 			DEBUG_PRINT("CLV"<<endl);
 			regs.overflow_flag = false;
+			n_clock = 2;
 			break;
-
+	
 		case 0xB9:						//LDA abs,Y
 			addr = absolute(regY);
 			DEBUG_PRINT("LOAD "<<hex<<unsigned(addr)<<endl);
 
 			LD(regA,memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0xBA:						//TSX
 			DEBUG_PRINT("TSX "<<endl);
 			TSX();
+			n_clock = 2;
 			break;
-
+	
 		case 0xBC:						//LDY abs,X
 			DEBUG_PRINT("LOAD abs X"<<endl);
 			addr = absolute(regX);
 			LD(regY,memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0xBD:						//LDA abs,X
 			DEBUG_PRINT("LOAD abs X"<<endl);
 			addr = absolute(regX);
 			LD(regA,memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0xBE:						//LDX abs,X
 			DEBUG_PRINT("LOAD abs Y"<<endl);
 			addr = absolute(regY);
 			LD(regX,memory->read_byte(addr));
+			n_clock = 4;
 			break;
-		
+			
 		case 0xC0:						//CPY imm
 			DEBUG_PRINT("CPY"<<endl);
 			addr = immediate();
 			CP(regY,addr);
+			n_clock = 2;
 			break;
-
+	
 		case 0xC1:						//CPY ind X
 			DEBUG_PRINT("CMP"<<endl);
 			addr = indirect_X();
 			CP(regA,memory->read_byte(addr));
-			break;	
-
+			n_clock = 6;
+			break;
+	
 		case 0xC4:						//CPY zpg
 			DEBUG_PRINT("CPY"<<endl);
 			addr = zero_page();
 			CP(regY,memory->read_byte(addr));
-			break;		
-		
+			n_clock = 3;
+			break;
+			
 		case 0xC5:						//CPY zpg
 			DEBUG_PRINT("CMP"<<endl);
 			addr = zero_page();
 			CMP_addr(addr);
-			break;		
-		
+			n_clock = 3;
+			break;
+			
 		case 0xC6:						//DEC zpg
 			DEBUG_PRINT("DEC"<<endl);
 			addr = zero_page();
 			DEC(addr);
-			break;	
-		
+			n_clock = 5;
+			break;
+			
 		case 0xC8:						//INY
 			DEBUG_PRINT("INY"<<endl);
 			INC(regY);
+			n_clock = 2;
 			break;
-
+	
 		case 0xC9:
 			addr = immediate();
 			DEBUG_PRINT("CMP imm "<<hex<<unsigned(addr)<<endl);
 			CMP_data(addr);
+			n_clock = 2;
 			break;
-
+	
 		case 0xCA:						//DEX
 			DEBUG_PRINT("DEX"<<endl);
 			DE(regX);
+			n_clock = 2;
 			break;
-
+	
 		case 0xCC:
 			DEBUG_PRINT("CPY"<<endl);
 			addr = absolute();
 			CP(regY,memory->read_byte(addr));
+			n_clock = 4;
 			break;
-
+	
 		case 0xCE:						//DEC ABS
 			DEBUG_PRINT("CMP"<<endl);
 			addr = absolute();
 			DEC(addr);
+			n_clock = 6;
 			break;
-
+	
 		case 0xCD:						//CMP ABS
 			DEBUG_PRINT("CMP"<<endl);
 			addr = absolute();
 			CMP_addr(addr);
+			n_clock = 4;
 			break;
-		
+			
 		case 0xD0:						//BNE
 			DEBUG_PRINT("BNE"<<endl);
 			addr = immediate();
 			BNE(addr);
-			break;	
-		
+			n_clock = 2;
+			break;
+			
 		case 0xD1:						//CMP
 			DEBUG_PRINT("CMP"<<endl);
 			addr = indirect_Y();
 			CMP_addr(addr);
-			break;	
-
+			n_clock = 5;
+			break;
+	
 		case 0xD5:						//CMP zeropage_x
 			DEBUG_PRINT("CMP"<<endl);
 			addr = zero_page(regX);
 			CMP_addr(addr);
-			break;	
-
+			n_clock = 4;
+			break;
+	
 		case 0xD6:						//DEC ZPG X
 			DEBUG_PRINT("DEC"<<endl);
 			addr = zero_page(regX);
 			DEC(addr);
+			n_clock = 6;
 			break;
-
+	
 		case 0xD8:						//CLD
 			DEBUG_PRINT("CLD"<<endl);
 			regs.decimal_mode_flag = false;
+			n_clock = 2;
 			break;
-		
+			
 		case 0xD9:						//CMP ABS,Y
 			DEBUG_PRINT("CMP"<<endl);
 			addr = absolute(regY);
 			CMP_addr(addr);
+			n_clock = 4;
 			break;
-
+	
 		case 0xDD:						//CMP abs,X
 			DEBUG_PRINT("CMP"<<endl);
 			addr = absolute(regX);
 			CMP_addr(addr);
+			n_clock = 4;
 			break;
-
+	
 		case 0xDE:						//DEC ABS,X
 			DEBUG_PRINT("DEC"<<endl);
 			addr = absolute(regX);
 			DEC(addr);
+			n_clock = 7;
 			break;
-		
+			
 		case 0xE0:						//CPX imm
 			DEBUG_PRINT("CPX"<<endl);
 			addr = immediate();
 			CP(regX,addr);
-			break;	
-
+			n_clock = 2;
+			break;
+	
 		case 0xE1:								//SBC (ind X)
 			DEBUG_PRINT("SBC"<<endl);
 			addr = indirect_X();
 			SBC(memory->read_byte(addr));
+			n_clock = 6;
 			break;
-
+	
 		case 0xE4:
 			DEBUG_PRINT("CPX"<<endl);
 			addr = zero_page();
 			CPX(memory->read_byte(addr));
+			n_clock = 3;
+			break;
+	
+		case 0xE5:						//SBC
+			DEBUG_PRINT("SBC"<<endl);
+			addr = zero_page();
+			SBC(memory->read_byte(addr));
+			n_clock = 3;
 			break;
 
 		case 0xE6:						//INC
@@ -1707,92 +1843,101 @@ bool CPU::decode(uint8_t opcode){
 			DEBUG_PRINT("INC zpg "<<hex<<unsigned(addr)<<endl);
 
 			INC(addr);
+			n_clock = 5;
 			break;
-
-		case 0xE5:						//SBC
-			DEBUG_PRINT("SBC"<<endl);
-			addr = zero_page();
-			SBC(memory->read_byte(addr));
-			break;
-
+	
 		case 0xE8:						//INX
 			DEBUG_PRINT("INX"<<endl);
 			INC(regX);
+			n_clock = 2;
 			break;
 		
 		case 0xE9:
 			DEBUG_PRINT("SBC"<<endl);
 			addr = immediate();
 			SBC(addr);
+			n_clock = 2;
 			break;
 
 		case 0xEA:						//NOP
 			DEBUG_PRINT("NOP"<<endl);
+			n_clock = 2;
 			break;
 
 		case 0xEC:
 			DEBUG_PRINT("CPX abs"<<endl);
 			addr = absolute();
 			CPX(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0xED:
 			DEBUG_PRINT("SBC"<<endl); 	//SBC ABS
 			addr = absolute();
 			SBC(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0xEE:
 			DEBUG_PRINT("INC"<<endl);
 			addr = absolute();
 			INC(addr);
+			n_clock = 6;
 			break;
 
 		case 0xF0:						//BEQ rel
 			DEBUG_PRINT("BEQ"<<endl);
 			addr = immediate();
 			BEQ(addr);
+			n_clock = 2;
 			break;
 
 		case 0xF1:								//SBC (ind) Y
 			DEBUG_PRINT("SBC"<<endl);
 			addr = indirect_Y();
 			SBC(memory->read_byte(addr));
+			n_clock = 5;
 			break;
 
 		case 0xF5:								//SBC zpg X
 			DEBUG_PRINT("ADC"<<endl);
 			addr = zero_page(regX);
 			SBC(memory->read_byte(addr));
+			n_clock = 4;
 			break;
 
 		case 0xF6:
 			DEBUG_PRINT("INC"<<endl);
 			addr = zero_page(regX);
 			INC(addr);
+			n_clock = 6;
 			break;
 
 		case 0xF8:						//SED
 			DEBUG_PRINT("SED"<<endl);
 			regs.decimal_mode_flag = true;
+			n_clock = 2;
 			break;
 		
 		case 0xF9:								//SBC abs Y
 			DEBUG_PRINT("SBC"<<endl);
 			addr = absolute(regY);
 			SBC(memory->read_byte(addr));
-			break;		
-		
-		case 0xFE:						//INC ABS,X
-			DEBUG_PRINT("INC"<<endl);
-			addr = absolute(regX);
-			INC(addr);
+			n_clock = 4;
 			break;
 
 		case 0xFD:								//SBC abs X
 			DEBUG_PRINT("SBC"<<endl);
 			addr = absolute(regX);
 			SBC(memory->read_byte(addr));
+			n_clock = 4;
+			break;
+		
+		case 0xFE:						//INC ABS,X
+			DEBUG_PRINT("INC"<<endl);
+			addr = absolute(regX);
+			INC(addr);
+			n_clock = 7;
 			break;
 
 		default:
