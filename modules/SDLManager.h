@@ -23,6 +23,7 @@ class SDLManager{
 
 		void setCIA1(CIA1*);
 		pixel_type* getVideoMemoryPtr();
+		SDL_PixelFormat* getPixelFormat();
 
 		void render_frame();
 
@@ -40,6 +41,7 @@ class SDLManager{
 		SDL_Window *window 		= nullptr;
 		SDL_Texture *texture 	= nullptr;
 		SDL_Renderer *renderer 	= nullptr;
+		SDL_PixelFormat *format = nullptr;
 
 		pixel_type *video_memory = nullptr;
 

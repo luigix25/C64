@@ -11,6 +11,8 @@ SDLManager::SDLManager(){
 	total_redraws = 0;
 	start_time = chrono::steady_clock::now();
 
+	format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB332);
+
 }
 
 SDLManager::~SDLManager(){
@@ -61,7 +63,6 @@ void SDLManager::initialize_SDL(){
 
 	texture = SDL_CreateTexture(renderer,SDL_PIXELFORMAT_RGB332,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);
 
-
 	keyboard_loop();
 
 }
@@ -90,6 +91,11 @@ void SDLManager::setCIA1(CIA1* cia1){
 	this->cia1 = cia1;
 }
 
+SDL_PixelFormat* SDLManager::getPixelFormat(){
+
+	return format;
+
+}
 
 
 void SDLManager::keyboard_loop(){
