@@ -24,7 +24,11 @@ VIC::VIC(){
 	clocks_to_new_render = 1;
 	last_time_rendered = chrono::steady_clock::now();
 
-	memset(color_palette,0,0xF*sizeof(uint8_t));
+	//memset(&color_palette[0],0,0xF*sizeof(uint8_t));
+
+	for(int i=0;i<16;i++){
+		color_palette[i] = 0;
+	}
 
 }
 
@@ -38,8 +42,8 @@ void VIC::init_color_palette(){
 
     SDL_PixelFormat *format = sdl->getPixelFormat();
 
-	color_palette[0] 	= SDL_MapRGB(format, 0x00, 0x00, 0x00);			//black
-	color_palette[1] 	= SDL_MapRGB(format, 0xFF, 0xFF, 0xFF);			//white
+	color_palette[0] 	= SDL_MapRGB(format, 0x00, 0x00, 0x00);		//black
+	color_palette[1] 	= SDL_MapRGB(format, 0xFF, 0xFF, 0xFF);		//white
 	color_palette[2] 	= SDL_MapRGB(format, 0xab, 0x31, 0x26);
 	color_palette[3] 	= SDL_MapRGB(format, 0x66, 0xda, 0xff);
 	color_palette[4] 	= SDL_MapRGB(format, 0xbb, 0x3f, 0xb8);
@@ -67,6 +71,7 @@ void VIC::show_char(uint8_t *character, int X, int Y){
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
 	uint8_t fg_color = color_palette[fg_color_idx];
 	//cout<<"FG COLOR "<<hex<<unsigned(fg_color_idx)<<endl;
+
 
 	for(int i = 0; i < CHAR_WIDTH; i++){
 		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;

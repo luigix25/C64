@@ -42,6 +42,9 @@ using namespace std;
 #define IO_START 0xD000
 #define IO_END 0x0DFFF
 
+#define COLOR_RAM_START 0xD800
+#define COLOR_RAM_END 0xDBE7
+
 #define VIC_START 0xD000
 #define VIC_END 0xD3FF
 

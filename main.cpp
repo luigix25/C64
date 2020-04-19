@@ -18,9 +18,10 @@ SDLManager *sdl;
 
 void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
-	mem->dump_memory(0xDB00,1000);					//1000 byte not 1024!
+	mem->dump_memory(0x400,1000);					//1000 byte not 1024!
+	mem->dump_color_memory(0xD800,1000);					//1000 byte not 1024!
 
-	cpu->changeIRQ();
+	//cpu->changeIRQ();
 
 
 }
@@ -39,8 +40,8 @@ void chiudi(int s){
 
 int main(){
 	//CTRL-Z
-	//signal(SIGTSTP,dump_mem_handler);
-	signal(SIGTSTP,dump_cpu_handler);
+	signal(SIGTSTP,dump_mem_handler);
+	//signal(SIGTSTP,dump_cpu_handler);
 	signal(SIGINT,chiudi);
 
 	VIC *vic = new VIC();

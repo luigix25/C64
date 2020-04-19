@@ -18,6 +18,7 @@ SDLManager::SDLManager(){
 SDLManager::~SDLManager(){
 
 	delete[] video_memory;
+	SDL_FreeFormat(format);
 
 }
 
@@ -98,6 +99,19 @@ SDL_PixelFormat* SDLManager::getPixelFormat(){
 }
 
 
+void SDLManager::terminate(){
+
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyTexture(texture);
+	SDL_DestroyWindow(window);
+
+	SDL_Quit();
+
+	exit(-1);
+
+}
+
+
 void SDLManager::keyboard_loop(){
 
 	while(true){
@@ -110,25 +124,44 @@ void SDLManager::keyboard_loop(){
 		// We are only worried about SDL_KEYDOWN and SDL_KEYUP events
 			switch( event.type ){
 				case SDL_KEYDOWN:
-
-				cout<<"Key press detected: ";
-				matrix = RowColFromScancode(event.key.keysym.scancode);
-				cia1->setKeyPressed(matrix);
-				break;
+					cout<<"Key press detected: ";
+					matrix = RowColFromScancode(event.key.keysym.scancode);
+					cia1->setKeyPressed(matrix);
+					break;
 
 				case SDL_KEYUP:
-				cia1->resetKeyPressed();
+					cia1->resetKeyPressed();
 
-				printf( "Key release detected\n" );
-				break;
+					cout<<"Key release detected\n";
+					break;
 
 				case SDL_QUIT:
-				printf("vorrei terminare");
-				//loop = false;
+					cout<<"Terminating\n";
+					terminate();
+					//loop = false;
+					break;
+
+				/*case SDL_WINDOWEVENT:
+
+					switch (event.window.event) {
+
+					    case SDL_WINDOWEVENT_CLOSE:  		//X of the window
+							//cout<<"premuta X"<<endl;
+							//machine->quit();
+							break;
+
+					    default:
+					        break;
+					}
+
+        			break;*/
 
 				default:
-		    	break;
+		    		break;
 			}
+
+
+
 		}
 
 	}

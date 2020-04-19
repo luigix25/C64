@@ -42,7 +42,7 @@ class Memory{
 		uint8_t* getMemPointer();
 		uint8_t* getKerPointer();
 		void dump_memory(uint16_t,uint16_t);
-
+		void dump_color_memory(uint16_t,uint16_t);
 
 	private:
 
@@ -50,10 +50,12 @@ class Memory{
 		CIA1 	*cia1;
 
 		uint8_t *memory;
+		uint8_t *color_ram;
 
 		uint8_t *basic;
 		uint8_t *kernal;
 		uint8_t *charset;
+
 
 		uint8_t* read_bin_file(const char*,streampos&);
 

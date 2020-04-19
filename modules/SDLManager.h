@@ -33,6 +33,7 @@ class SDLManager{
 		void initialize_SDL();
 		void keyboard_loop();
 
+		void terminate();
 
 		CIA1 *cia1;
 

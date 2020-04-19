@@ -18,6 +18,12 @@ Memory::Memory(){
 	charset = new uint8_t[fourK];
 	memory = new uint8_t[sixtyfourK];
 
+	color_ram = new uint8_t[1000];
+
+	//clearing video mem and color ram
+	memset(memory+0x400,0,1000);
+	memset(color_ram,0,1000);
+
 	setup_memory_mode(LORAM_MASK | HIRAM_MASK | CHAR_MASK);
 
 }
@@ -41,14 +47,22 @@ void Memory::dump_memory(uint16_t addr,uint16_t bytes){
 
 }
 
+
+void Memory::dump_color_memory(uint16_t addr,uint16_t bytes){
+
+	cout<<endl<<"---------------------"<<endl;
+
+	for(uint16_t i=0;i<bytes;i++){
+		cout<<hex<<unsigned(color_ram[addr+i-COLOR_RAM_START])<<" ";
+	}
+
+	cout<<endl<<"---------------------"<<endl;
+
+}
+
 uint8_t Memory::read_byte(uint16_t addr){
 
 	//uint16_t page = addr & 0xff00;
-
-	/*if(addr >= 0xE473 && addr <= 0xE498){
-		cout<<"scritta comm"<<endl;
-		//raise(SIGPIPE);
-	}*/
 
 	//TODO: implementare cartridge!
 	if(addr >= BASIC_START and addr <= BASIC_END){
@@ -76,6 +90,10 @@ uint8_t Memory::read_byte(uint16_t addr){
 			} else if(addr >= CIA1_START and addr <= CIA1_END){		//CIA1
 
 				return cia1->read_register(addr);
+
+			} else if(addr >= COLOR_RAM_START && addr <= COLOR_RAM_END){
+
+				return color_ram[addr - COLOR_RAM_START];
 
 			} else {
 				//Unimplemented
@@ -121,6 +139,12 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 	} else if(addr >= CIA1_START and addr <= CIA1_END){
 		cia1->write_register(addr,data);
 		return;
+	
+	} else if(addr >= COLOR_RAM_START and addr <= COLOR_RAM_END){
+		if(CHAR_mode == IO){
+			color_ram[addr - COLOR_RAM_START] = data;
+			return;
+		}
 	}
 
 	memory[addr] = data;
@@ -234,7 +258,7 @@ uint8_t* Memory::getVideoMemoryPtr(){
 }
 
 uint8_t* Memory::getColorMemoryPtr(){
-	return memory+0xD800;
+	return color_ram;
 }
 
 uint8_t* Memory::getCharROMPtr(){
