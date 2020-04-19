@@ -93,10 +93,10 @@ void CPU::changeIRQ(){
 }
 
 
-void CPU::handle_irq(bool ignore){
+void CPU::handle_irq(){
 
 	//interrupt is masked
-	if(ignore)
+	if(regs.interrupt_flag)
 		return;
 
 	uint8_t temp = ((regs.PC >> 8) & 0xFF);
@@ -459,7 +459,7 @@ uint8_t CPU::fetch(){
 	if(nmi_line == false){
 		handle_nmi();
 	} else if(irq_line == false){
-		handle_irq(regs.interrupt_flag);
+		handle_irq();
 	}
 
 	uint8_t opcode = read_byte(regs.PC);

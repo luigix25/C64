@@ -52,7 +52,7 @@ class CPU
 		//IRQs
 		bool irq_line;
 
-		void handle_irq(bool);
+		void handle_irq();
 		void handle_nmi();
 
 		//Memory Addressing Modes

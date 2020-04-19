@@ -30,6 +30,7 @@ void CIA1::clock(){
 	if(timerA_enabled){
 		//cout<<hex<<unsigned(timerA_latch)<<endl;
 		timerA--;
+
 	}
 
 	if(timerB_enabled)
@@ -58,6 +59,7 @@ void CIA1::clock(){
 
 	if(timerA_irq_raised or timerB_irq_raised){
 		cpu->setIRQline();
+		timerA_irq_raised = timerB_irq_raised = false;
 	}
 
 }
@@ -78,13 +80,13 @@ uint8_t CIA1::read_register(uint16_t address){
 
 		case IRQ_REG:
 
-			if(timerA_irq_raised || timerB_irq_raised){
-				return_value |= 0x80;
-				return_value |= timerA_irq_raised << 0;
-				return_value |= timerB_irq_raised << 1;
-				cpu->resetIRQline();
-				timerA_irq_raised = timerB_irq_raised = false;
-			}
+			//if(timerA_irq_raised || timerB_irq_raised){
+			return_value |= 0x80;
+			return_value |= timerA_irq_raised << 0;
+			return_value |= timerB_irq_raised << 1;
+			cpu->resetIRQline();
+			timerA_irq_raised = timerB_irq_raised = false;
+			//}
 			return return_value;
 
 		//Keyboard column
