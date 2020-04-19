@@ -22,13 +22,14 @@ VIC::VIC(){
 
 	interrupt_enabled = false;
 	clocks_to_new_render = 1;
+	last_time_rendered = chrono::steady_clock::now();
+
 
 }
 
 VIC::~VIC(){
 
 	delete[] registers;
-	delete video_loop_thread;
 
 }
 
@@ -61,6 +62,7 @@ void VIC::clock(){
 
 	clocks_to_new_render = 20000;
 
+
 	uint32_t cursorX = 0;
 	uint32_t cursorY = 0;
 
@@ -77,6 +79,25 @@ void VIC::clock(){
 	}
 
 	sdl->render_frame();
+
+	auto current_time = chrono::steady_clock::now();
+
+	//auto c = chrono::duration_cast<chrono::nanoseconds>(current_time - last_time_rendered);
+
+
+	auto c = current_time - last_time_rendered;
+
+	//auto temp = chrono::duration_cast<chrono::milliseconds>(c);
+
+	//cout<<"Current - Last "<<dec<<temp.count()<<" ms"<<endl;
+
+	c = chrono::milliseconds(20) - c;
+
+	this_thread::sleep_for(c);
+
+
+	last_time_rendered = chrono::steady_clock::now();
+
 
 }
 

@@ -75,7 +75,7 @@ class VIC {
 
 
 		uint32_t clocks_to_new_render;
-		//chrono::time_point last_time_rendered;
+		chrono::time_point<chrono::steady_clock> last_time_rendered;
 
 	public:
 		VIC();
@@ -90,6 +90,5 @@ class VIC {
 
 		uint8_t read_register(uint16_t);
 		void write_register(uint16_t,uint8_t);
-		thread *video_loop_thread;
 
 };

@@ -55,8 +55,6 @@ class CIA1
 		bool timerA_reload;
 		bool timerB_reload;
 
-		thread *timer_thread;
-
 		CPU *cpu;
 
 		bool key_pressed;

@@ -12,15 +12,10 @@ CIA1::CIA1(){
 
 	key_pressed = false;
 
-
-	//timer_thread = new thread(&CIA1::timer_loop,this);
-	//timer_thread->detach();
-
 }
 
 CIA1::~CIA1(){
 
-	delete timer_thread;
 
 }
 

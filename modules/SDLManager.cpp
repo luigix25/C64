@@ -8,7 +8,9 @@ SDLManager::SDLManager(){
 	video_thread = new thread(&SDLManager::initialize_SDL,this);
 	video_thread->detach();
 
-	//funzione();
+	total_redraws = 0;
+	start_time = chrono::steady_clock::now();
+
 }
 
 SDLManager::~SDLManager(){
@@ -17,6 +19,20 @@ SDLManager::~SDLManager(){
 
 }
 
+void SDLManager::checkFPS(){
+	auto end_time = chrono::steady_clock::now();
+
+	auto totale = chrono::duration_cast<chrono::seconds>(end_time - start_time).count();
+
+	double frames = total_redraws;
+
+	cout<<"Redraws "<<dec<<unsigned(total_redraws)<<endl;
+
+	cout<<"Time "<<dec<<unsigned(totale)<<" s"<<endl;
+
+	cout<<"FPS "<<dec<<frames/totale<<endl;
+
+}
 
 void SDLManager::initialize_SDL(){
 
@@ -51,6 +67,8 @@ void SDLManager::initialize_SDL(){
 }
 
 void SDLManager::render_frame(){
+
+	total_redraws++;
 
 	if(texture == nullptr || renderer == nullptr)
 		return;

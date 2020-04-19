@@ -14,7 +14,7 @@ void test_cpu(CPU*);
 char convert(char);
 Memory *mem;
 CPU *cpu;
-VIC *vic;
+SDLManager *sdl;
 
 void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
@@ -28,7 +28,7 @@ void dump_mem_handler(int s){
 void dump_cpu_handler(int s){
 	cout<<endl<<"Dump CPU"<<endl;
 
-	vic->clock();
+	sdl->checkFPS();
 }
 
 void chiudi(int s){
@@ -43,7 +43,7 @@ int main(){
 	signal(SIGTSTP,dump_cpu_handler);
 	signal(SIGINT,chiudi);
 
-	vic = new VIC();
+	VIC *vic = new VIC();
 	CIA1 *cia1 = new CIA1();
 
 	mem = new Memory();
@@ -54,7 +54,7 @@ int main(){
 
 	cia1->setCPU(cpu);
 
-	SDLManager *sdl = new SDLManager();
+	sdl = new SDLManager();
 	sdl->setCIA1(cia1);
 
 	mem->setVIC(vic);
@@ -65,40 +65,10 @@ int main(){
 	vic->setCPU(cpu);
 	vic->setCIA1(cia1);
 
-
-	//auto microsecond = chrono::duration_cast<chrono::duration>(chrono::nanoseconds(1000));
-	//auto microsecond = chrono::duration_cast<chrono::duration>(chrono::nanoseconds(1000));
-
 	while(true){
-		//auto start = chrono::steady_clock::now();
 		cpu->clock();
 		cia1->clock();
 		vic->clock();
-
-		//auto end = chrono::steady_clock::now();
-	
-		//auto c = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
-		
-		//auto c = chrono::duration_cast<chrono::nanoseconds>(end - start);
-
-		//c = chrono::nanoseconds(1000) - c;
-
-		auto start = chrono::steady_clock::now();
-
-		//this_thread::sleep_for(chrono::nanoseconds(1));
-
-		auto end = chrono::steady_clock::now();
-		auto c = chrono::duration_cast<chrono::nanoseconds>(end - start);
-
-		/*cout<<"dormo"<<endl;
-		this_thread::sleep_for(c);
-		cout<<"sveglia"<<endl;
-*/
-		/*totale += c;
-		quanti++;
-*/
-		//cout<<totale/quanti<<endl;
-		//cout << "Elapsed time in nanoseconds : " <<dec<<c<< " ns" << endl;
 	}
 
 }
