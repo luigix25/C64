@@ -95,6 +95,6 @@ struct registers{
 };
 
 void hexDump(void*, int);
-KeyboardMatrix RowColFromScancode(uint16_t);
+KeyboardMatrix RowColFromScancode(uint16_t,bool);
 uint8_t getMaskForCode(uint8_t);
 //#endif

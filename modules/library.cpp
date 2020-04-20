@@ -43,7 +43,7 @@ void hexDump(void *addr, int len)
     printf("  %s\n", buff);
 }
 
-KeyboardMatrix RowColFromScancode(uint16_t code){
+KeyboardMatrix RowColFromScancode(uint16_t code,bool pressed){
 
 	KeyboardMatrix matrix;
 
@@ -235,20 +235,31 @@ KeyboardMatrix RowColFromScancode(uint16_t code){
 			break;
 
 		case SDL_SCANCODE_LSHIFT:
-			cout<<"LSHIFT"<<endl;
-			matrix.col = 7;
-			matrix.row = 4;
+			matrix.col = 1;
+			matrix.row = 7;
 			break;
 
 		case SDL_SCANCODE_F1:	//Equals
 			matrix.col = 6;
 			matrix.row = 5;
 			break;
+
+		case SDL_SCANCODE_F2:	//Shift + 2
+			cout<<"f2"<<endl;
+			matrix.col = 0x7D;
+			matrix.row = 0x77;
+
+			return matrix;
+			break;
 	}
 
-	matrix.col = getMaskForCode(matrix.col);
+	matrix.col =  (1 << matrix.col); 
+	matrix.row = (1 << matrix.row); 
 
-	matrix.row = ~(1 << matrix.row); //operazione inversa di getMaskForCode
+	if(pressed){
+		matrix.col =  ~matrix.col; 
+		matrix.row = ~matrix.row; 
+	}
 
 	return matrix;
 

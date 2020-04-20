@@ -40,8 +40,8 @@ void chiudi(int s){
 
 int main(){
 	//CTRL-Z
-	signal(SIGTSTP,dump_mem_handler);
-	//signal(SIGTSTP,dump_cpu_handler);
+	//signal(SIGTSTP,dump_mem_handler);
+	signal(SIGTSTP,dump_cpu_handler);
 	signal(SIGINT,chiudi);
 
 	VIC *vic = new VIC();

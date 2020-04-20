@@ -32,7 +32,6 @@ class CIA1
 		void clock();
 
 		void setKeyPressed(KeyboardMatrix);
-		void resetKeyPressed();
 
 	private:
 		uint8_t registers[16];
@@ -57,7 +56,6 @@ class CIA1
 
 		CPU *cpu;
 
-		bool key_pressed;
 		KeyboardMatrix last_pressed;
 
 };

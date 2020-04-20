@@ -10,8 +10,6 @@ CIA1::CIA1(){
 	
 	timerA = timerB = 0;
 
-	key_pressed = false;
-
 }
 
 CIA1::~CIA1(){
@@ -92,11 +90,10 @@ uint8_t CIA1::read_register(uint16_t address){
 		//Keyboard column
 		case KEYBOARD_ROW:
 					
-			if(key_pressed && registers[KEYBOARD_COL] == 0){
-				return (last_pressed.row);
+			if(registers[KEYBOARD_COL] == 0){
+				return last_pressed.row;
 			}
-			else if(key_pressed && registers[KEYBOARD_COL] == last_pressed.col){
-				key_pressed = true;
+			else if(registers[KEYBOARD_COL] == last_pressed.col){
 				return last_pressed.row;
 			} else {
 				return 0xFF;
@@ -171,13 +168,6 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 void CIA1::setKeyPressed(KeyboardMatrix matrix){
 
 	cout<<"setting Key Pressed"<<endl;
-	key_pressed = true;
 	last_pressed = matrix;
-
-}
-
-void CIA1::resetKeyPressed(){
-
-	key_pressed = false;
 
 }

@@ -116,21 +116,35 @@ void SDLManager::keyboard_loop(){
 
 	while(true){
 
+		KeyboardMatrix new_pressed_matrix;
+		KeyboardMatrix last_pressed_matrix;
+		last_pressed_matrix.row = 0xFF;
+		last_pressed_matrix.col = 0xFF;
+
+
 		SDL_Event event;
 		while( SDL_WaitEvent( &event ) ){
-
-			KeyboardMatrix matrix;
 
 		// We are only worried about SDL_KEYDOWN and SDL_KEYUP events
 			switch( event.type ){
 				case SDL_KEYDOWN:
-					cout<<"Key press detected: ";
-					matrix = RowColFromScancode(event.key.keysym.scancode);
-					cia1->setKeyPressed(matrix);
+					cout<<"Key press detected: \n";
+					new_pressed_matrix = RowColFromScancode(event.key.keysym.scancode,true);
+
+					last_pressed_matrix.row &= new_pressed_matrix.row;
+					last_pressed_matrix.col &= new_pressed_matrix.col;
+
+					cia1->setKeyPressed(last_pressed_matrix);
+				
 					break;
 
 				case SDL_KEYUP:
-					cia1->resetKeyPressed();
+					new_pressed_matrix = RowColFromScancode(event.key.keysym.scancode,false);
+
+					last_pressed_matrix.row |= new_pressed_matrix.row;
+					last_pressed_matrix.col |= new_pressed_matrix.col;
+
+					cia1->setKeyPressed(last_pressed_matrix);
 
 					cout<<"Key release detected\n";
 					break;
