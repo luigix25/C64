@@ -387,6 +387,25 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.col = 0;
 			matrix.row = 0;
 			break;
+
+		case SDL_SCANCODE_DOWN:
+			matrix.col = 0;
+			matrix.row = 7;
+			break;
+		
+		case SDL_SCANCODE_RIGHT:
+			matrix.col = 0;
+			matrix.row = 2;
+			break;
+
+
+		/*case SDL_SCANCODE_RIGHT:
+
+			break;
+			
+		case SDL_SCANCODE_RIGHT:
+
+			break;*/	
 	}
 
 	/*matrix.col =  (1 << matrix.col); 
