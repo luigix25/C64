@@ -53,10 +53,12 @@ int main(){
 
 	cpu = new CPU(mem);
 
-	cia1->setCPU(cpu);
 
 	sdl = new SDLManager();
-	sdl->setCIA1(cia1);
+
+	cia1->setCPU(cpu);
+	cia1->setSDL(sdl);
+
 
 	mem->setVIC(vic);
 	mem->setCIA1(cia1);

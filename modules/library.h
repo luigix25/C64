@@ -60,7 +60,9 @@ using namespace std;
 #define RESET_vector 0xFFFC
 #define IRQ_vector 0xFFFE
 
-#define GET_I_BIT(x,i) (x>>i) & 1
+#define GET_I_BIT(x,i) 		((x>>i) & 1)
+#define SET_I_BIT(x,i) 		(x |= (1<<i))
+#define RESET_I_BIT(x,i) 	(x &= ~(1<<i))
 
 #define null 0
 
@@ -95,6 +97,5 @@ struct registers{
 };
 
 void hexDump(void*, int);
-KeyboardMatrix RowColFromScancode(uint16_t,bool);
-uint8_t getMaskForCode(uint8_t);
+
 //#endif

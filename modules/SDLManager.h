@@ -20,22 +20,21 @@ class SDLManager{
 		SDLManager();
 		~SDLManager();
 
-
-		void setCIA1(CIA1*);
 		pixel_type* getVideoMemoryPtr();
 		SDL_PixelFormat* getPixelFormat();
 
 		void render_frame();
 
 		void checkFPS();
+		uint8_t getRowForCol(uint8_t);
 
 	private:
 		void initialize_SDL();
 		void keyboard_loop();
 
 		void terminate();
-
-		CIA1 *cia1;
+		
+		KeyboardMatrix RowColFromScancode(uint16_t);
 
 		thread *video_thread;
 
@@ -44,6 +43,7 @@ class SDLManager{
 		SDL_Renderer *renderer 	= nullptr;
 		SDL_PixelFormat *format = nullptr;
 
+		uint8_t keyboard_matrix[8][8];
 		pixel_type *video_memory = nullptr;
 
 		//DEBUG

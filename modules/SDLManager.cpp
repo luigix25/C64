@@ -13,6 +13,10 @@ SDLManager::SDLManager(){
 
 	format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB332);
 
+	memset(&keyboard_matrix[0],0xFF,64);
+
+	getRowForCol(0);
+
 }
 
 SDLManager::~SDLManager(){
@@ -88,10 +92,6 @@ pixel_type* SDLManager::getVideoMemoryPtr(){
 
 }
 
-void SDLManager::setCIA1(CIA1* cia1){
-	this->cia1 = cia1;
-}
-
 SDL_PixelFormat* SDLManager::getPixelFormat(){
 
 	return format;
@@ -116,11 +116,7 @@ void SDLManager::keyboard_loop(){
 
 	while(true){
 
-		KeyboardMatrix new_pressed_matrix;
-		KeyboardMatrix last_pressed_matrix;
-		last_pressed_matrix.row = 0xFF;
-		last_pressed_matrix.col = 0xFF;
-
+		KeyboardMatrix matrix;
 
 		SDL_Event event;
 		while( SDL_WaitEvent( &event ) ){
@@ -129,24 +125,16 @@ void SDLManager::keyboard_loop(){
 			switch( event.type ){
 				case SDL_KEYDOWN:
 					cout<<"Key press detected: \n";
-					new_pressed_matrix = RowColFromScancode(event.key.keysym.scancode,true);
-
-					last_pressed_matrix.row &= new_pressed_matrix.row;
-					last_pressed_matrix.col &= new_pressed_matrix.col;
-
-					cia1->setKeyPressed(last_pressed_matrix);
-				
+					matrix = RowColFromScancode(event.key.keysym.scancode);
+					keyboard_matrix[matrix.row][matrix.col] = 0x00;
+			
 					break;
 
 				case SDL_KEYUP:
-					new_pressed_matrix = RowColFromScancode(event.key.keysym.scancode,false);
-
-					last_pressed_matrix.row |= new_pressed_matrix.row;
-					last_pressed_matrix.col |= new_pressed_matrix.col;
-
-					cia1->setKeyPressed(last_pressed_matrix);
-
 					cout<<"Key release detected\n";
+					matrix = RowColFromScancode(event.key.keysym.scancode);
+					keyboard_matrix[matrix.row][matrix.col] = 0xFF;
+
 					break;
 
 				case SDL_QUIT:
@@ -154,21 +142,6 @@ void SDLManager::keyboard_loop(){
 					terminate();
 					//loop = false;
 					break;
-
-				/*case SDL_WINDOWEVENT:
-
-					switch (event.window.event) {
-
-					    case SDL_WINDOWEVENT_CLOSE:  		//X of the window
-							//cout<<"premuta X"<<endl;
-							//machine->quit();
-							break;
-
-					    default:
-					        break;
-					}
-
-        			break;*/
 
 				default:
 		    		break;
@@ -179,5 +152,251 @@ void SDLManager::keyboard_loop(){
 		}
 
 	}
+
+}
+
+
+uint8_t SDLManager::getRowForCol(uint8_t col){
+
+	uint8_t result = 0xFF;
+
+	for(int i=0;i<8;i++){
+		for(int j=0;j<8;j++){
+			if(GET_I_BIT(col,j) == 1)
+				continue;
+			
+			if(GET_I_BIT(result,i) == 1 and keyboard_matrix[i][j] == 0)
+				RESET_I_BIT(result,i);
+		}
+	}
+
+	return result;
+
+}
+
+KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
+
+	KeyboardMatrix matrix;
+
+	switch(code){
+		case SDL_SCANCODE_A:
+			matrix.col = 1;
+			matrix.row = 2;
+			break;
+
+		case SDL_SCANCODE_B:
+			matrix.col = 3;
+			matrix.row = 4;
+			break;
+
+		case SDL_SCANCODE_C:
+			matrix.col = 2;
+			matrix.row = 4;
+			break;
+
+		case SDL_SCANCODE_D:	
+			matrix.col = 2;
+			matrix.row = 2;
+			break;
+		case SDL_SCANCODE_E:
+			matrix.col = 1;
+			matrix.row = 6;
+			break;
+		case SDL_SCANCODE_F:
+			matrix.col = 2;
+			matrix.row = 5;
+			break;
+
+		case SDL_SCANCODE_G:
+			matrix.col = 3;
+			matrix.row = 2;
+			break;
+
+		case SDL_SCANCODE_H:
+			matrix.col = 3;
+			matrix.row = 5;
+			break;
+		case SDL_SCANCODE_I:
+			matrix.col = 4;
+			matrix.row = 1;
+			break;
+
+		case SDL_SCANCODE_J:
+			matrix.col = 4;
+			matrix.row = 2;
+			break;		
+		case SDL_SCANCODE_K:
+			matrix.col = 4;
+			matrix.row = 5;
+			break;		
+		case SDL_SCANCODE_L:
+			matrix.col = 5;
+			matrix.row = 2;
+			break;		
+		case SDL_SCANCODE_M:
+			matrix.col = 4;
+			matrix.row = 4;
+			break;		
+		case SDL_SCANCODE_N:
+			matrix.col = 4;
+			matrix.row = 7;
+			break;			
+		case SDL_SCANCODE_O:
+			matrix.col = 4;
+			matrix.row = 6;
+			break;		
+		case SDL_SCANCODE_P:
+			matrix.col = 5;
+			matrix.row = 1;
+			break;
+
+		case SDL_SCANCODE_Q:
+			matrix.col = 7;
+			matrix.row = 6;
+			break;
+					
+		case SDL_SCANCODE_R:
+			matrix.col = 2;
+			matrix.row = 1;
+			break;
+		
+		case SDL_SCANCODE_S:
+			matrix.col = 1;
+			matrix.row = 5;
+			break;
+		
+		case SDL_SCANCODE_T:
+			matrix.col = 2;
+			matrix.row = 6;
+			break;		
+
+		case SDL_SCANCODE_U:
+			matrix.col = 3;
+			matrix.row = 6;
+			break;		
+
+		case SDL_SCANCODE_V:
+			matrix.col = 3;
+			matrix.row = 7;
+			break;	
+
+		case SDL_SCANCODE_W:
+			matrix.col = 1;
+			matrix.row = 1;
+			break;
+
+		case SDL_SCANCODE_X:
+			matrix.col = 2;
+			matrix.row = 7;
+			break;	
+
+		case SDL_SCANCODE_Y:
+			matrix.col = 3;
+			matrix.row = 1;
+			break;	
+
+		case SDL_SCANCODE_Z:
+			matrix.col = 1;
+			matrix.row = 4;
+			break;
+
+		case SDL_SCANCODE_0:
+			matrix.col = 4;
+			matrix.row = 3;
+			break;
+
+		case SDL_SCANCODE_1:
+			matrix.col = 7;
+			matrix.row = 0;
+			break;
+		
+		case SDL_SCANCODE_2:
+			matrix.col = 7;
+			matrix.row = 3;
+			break;
+
+		case SDL_SCANCODE_3:
+			matrix.col = 1;
+			matrix.row = 0;
+			break;
+		
+		case SDL_SCANCODE_4:
+			matrix.col = 1;
+			matrix.row = 3;
+			break;
+
+		case SDL_SCANCODE_5:
+			matrix.col = 2;
+			matrix.row = 0;
+			break;
+
+		case SDL_SCANCODE_6:
+			matrix.col = 2;
+			matrix.row = 3;
+			break;
+
+		case SDL_SCANCODE_7:
+			matrix.col = 3;
+			matrix.row = 0;
+			break;
+
+		case SDL_SCANCODE_8:
+			matrix.col = 3;
+			matrix.row = 3;
+			break;
+
+		case SDL_SCANCODE_9:
+			matrix.col = 4;
+			matrix.row = 0;
+			break;
+
+		case SDL_SCANCODE_RETURN:
+			matrix.col = 0;
+			matrix.row = 1;
+			break;
+
+		case SDL_SCANCODE_COMMA:
+			matrix.col = 5;
+			matrix.row = 7;
+			break;
+
+		case SDL_SCANCODE_SPACE:
+			matrix.col = 7;
+			matrix.row = 4;
+			break;
+
+		case SDL_SCANCODE_LSHIFT:
+			matrix.col = 1;
+			matrix.row = 7;
+			break;
+
+		case SDL_SCANCODE_F1:	//Equals
+			matrix.col = 6;
+			matrix.row = 5;
+			break;
+
+		case SDL_SCANCODE_F2:	//Shift + 2
+			cout<<"f2"<<endl;
+			matrix.col = 0xFD;
+			matrix.row = 0x7E;
+
+			return matrix;
+			break;
+
+		case SDL_SCANCODE_BACKSPACE:
+			matrix.col = 0;
+			matrix.row = 0;
+			break;
+	}
+
+	/*matrix.col =  (1 << matrix.col); 
+	matrix.row = (1 << matrix.row); 
+
+	if(pressed){
+		matrix.col =  ~matrix.col; 
+		matrix.row = ~matrix.row; 
+	}*/
+
+	return matrix;
 
 }

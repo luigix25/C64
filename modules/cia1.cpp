@@ -10,6 +10,8 @@ CIA1::CIA1(){
 	
 	timerA = timerB = 0;
 
+	sdl = nullptr;
+
 }
 
 CIA1::~CIA1(){
@@ -22,6 +24,12 @@ void CIA1::setCPU(CPU* cpu){
 
 	this->cpu = cpu;
 }
+
+void CIA1::setSDL(SDLManager* sdl){
+
+	this->sdl = sdl;
+}
+
 
 void CIA1::clock(){
 
@@ -88,16 +96,8 @@ uint8_t CIA1::read_register(uint16_t address){
 			return return_value;
 
 		//Keyboard column
-		case KEYBOARD_ROW:
-					
-			if(registers[KEYBOARD_COL] == 0){
-				return last_pressed.row;
-			}
-			else if(registers[KEYBOARD_COL] == last_pressed.col){
-				return last_pressed.row;
-			} else {
-				return 0xFF;
-			}
+		case KEYBOARD_ROW:		
+			return sdl->getRowForCol(registers[KEYBOARD_COL]);
 	}
 
 	return registers[address];
@@ -161,13 +161,5 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 	}
 
 	registers[address] = data;
-
-}
-
-
-void CIA1::setKeyPressed(KeyboardMatrix matrix){
-
-	cout<<"setting Key Pressed"<<endl;
-	last_pressed = matrix;
 
 }

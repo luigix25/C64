@@ -3,8 +3,9 @@
 class CIA1;
 
 #include "library.h"
-
 #include "cpu.h"
+#include "SDLManager.h"
+
 
 #define TA_LOW 0x04
 #define TA_HI 0x05
@@ -31,7 +32,8 @@ class CIA1
 		void setCPU(CPU*);
 		void clock();
 
-		void setKeyPressed(KeyboardMatrix);
+		void setSDL(SDLManager*);
+
 
 	private:
 		uint8_t registers[16];
@@ -55,6 +57,7 @@ class CIA1
 		bool timerB_reload;
 
 		CPU *cpu;
+		SDLManager *sdl;
 
 		KeyboardMatrix last_pressed;
 
