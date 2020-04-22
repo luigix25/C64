@@ -14,6 +14,15 @@ class SDLManager;
 #define KEYBOARD_COL_ADDR 0xDC00
 #define KEYBOARD_ROW_ADDR 0xDC01
 
+
+struct KeyboardMatrix{
+
+	uint8_t row;
+	uint8_t col;
+	bool shift = false;
+
+};
+
 class SDLManager{
 
 	public:

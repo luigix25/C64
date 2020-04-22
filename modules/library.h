@@ -72,13 +72,6 @@ enum register_name
 	
 };
 
-struct KeyboardMatrix{
-
-	uint8_t row;
-	uint8_t col;
-
-};
-
 struct registers{
 	uint8_t reg[3];
 

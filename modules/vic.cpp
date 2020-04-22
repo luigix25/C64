@@ -48,7 +48,7 @@ void VIC::init_color_palette(){
 	color_palette[3] 	= SDL_MapRGB(format, 0x66, 0xda, 0xff);
 	color_palette[4] 	= SDL_MapRGB(format, 0xbb, 0x3f, 0xb8);
 	color_palette[5]	= SDL_MapRGB(format, 0x55, 0xce, 0x58);
-	color_palette[6]	= SDL_MapRGB(format, 0x1d, 0x0e, 0x97);
+	color_palette[6]	= SDL_MapRGB(format, 0x00, 0x00, 0xAA);
 	color_palette[7]	= SDL_MapRGB(format, 0xea, 0xf5, 0x7c);
 	color_palette[8]	= SDL_MapRGB(format, 0xb9, 0x74, 0x18);
 	color_palette[9]	= SDL_MapRGB(format, 0x78, 0x53, 0x00);
@@ -56,7 +56,7 @@ void VIC::init_color_palette(){
 	color_palette[11]	= SDL_MapRGB(format, 0x5b, 0x5b, 0x5b);
 	color_palette[12]	= SDL_MapRGB(format, 0x8b, 0x8b, 0x8b);
 	color_palette[13]	= SDL_MapRGB(format, 0xb0, 0xf4, 0xac);
-	color_palette[14]	= SDL_MapRGB(format, 0xaa, 0x9d, 0xef);
+	color_palette[14]	= SDL_MapRGB(format, 0x00, 0x88, 0xff);
 	color_palette[15]	= SDL_MapRGB(format, 0xb8, 0xb8, 0xb8);
 
 }

@@ -59,6 +59,4 @@ class CIA1
 		CPU *cpu;
 		SDLManager *sdl;
 
-		KeyboardMatrix last_pressed;
-
 };

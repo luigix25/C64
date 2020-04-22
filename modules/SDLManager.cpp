@@ -127,13 +127,22 @@ void SDLManager::keyboard_loop(){
 					cout<<"Key press detected: \n";
 					matrix = RowColFromScancode(event.key.keysym.scancode);
 					keyboard_matrix[matrix.row][matrix.col] = 0x00;
-			
+					
+					//injecting shift
+					if(matrix.shift){
+						keyboard_matrix[7][1] = 0x00;
+					}
+
 					break;
 
 				case SDL_KEYUP:
 					cout<<"Key release detected\n";
 					matrix = RowColFromScancode(event.key.keysym.scancode);
 					keyboard_matrix[matrix.row][matrix.col] = 0xFF;
+					
+					if(matrix.shift){
+						keyboard_matrix[7][1] = 0xFF;
+					}
 
 					break;
 
@@ -198,10 +207,12 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.col = 2;
 			matrix.row = 2;
 			break;
+
 		case SDL_SCANCODE_E:
 			matrix.col = 1;
 			matrix.row = 6;
 			break;
+
 		case SDL_SCANCODE_F:
 			matrix.col = 2;
 			matrix.row = 5;
@@ -359,6 +370,11 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.col = 5;
 			matrix.row = 7;
 			break;
+	
+		case SDL_SCANCODE_PERIOD:
+			matrix.col = 5;
+			matrix.row = 4;
+			break;
 
 		case SDL_SCANCODE_SPACE:
 			matrix.col = 7;
@@ -373,14 +389,6 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 		case SDL_SCANCODE_F1:	//Equals
 			matrix.col = 6;
 			matrix.row = 5;
-			break;
-
-		case SDL_SCANCODE_F2:	//Shift + 2
-			cout<<"f2"<<endl;
-			matrix.col = 0xFD;
-			matrix.row = 0x7E;
-
-			return matrix;
 			break;
 
 		case SDL_SCANCODE_BACKSPACE:
@@ -398,14 +406,19 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.row = 2;
 			break;
 
-
-		/*case SDL_SCANCODE_RIGHT:
-
+		//same as left but with shift!
+		case SDL_SCANCODE_LEFT:
+			matrix.col = 0;
+			matrix.row = 2;
+			matrix.shift = true;
 			break;
-			
-		case SDL_SCANCODE_RIGHT:
 
-			break;*/	
+		//same as down but with shift!
+		case SDL_SCANCODE_UP:
+			matrix.col = 0;
+			matrix.row = 7;
+			matrix.shift = true;
+			break;
 	}
 
 	/*matrix.col =  (1 << matrix.col); 
