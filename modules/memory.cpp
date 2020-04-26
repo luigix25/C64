@@ -260,6 +260,19 @@ void Memory::load_custom_memory(const string& filename, uint16_t offset) {
 
 }
 
+void Memory::load_prg(const string& filename) {
+
+	streampos size;
+	uint8_t* buffer = read_bin_file(filename,size);
+
+	uint16_t addr = buffer[1] << 8 | buffer[0];
+
+	size -= 2;
+
+	memcpy(memory+addr, buffer+2, size);
+
+}
+
 void Memory::setVIC(VIC* vic){
 	this->vic = vic;
 }

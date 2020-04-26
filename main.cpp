@@ -7,9 +7,6 @@
 #include "modules/cia2.h"
 
 
-#include <stdlib.h>
-#include <SDL2/SDL.h>
-
 void test_cpu(CPU*);
 
 Memory *mem;
@@ -18,7 +15,7 @@ SDLManager *sdl;
 
 void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
-	mem->dump_memory(0x400,1000);					//1000 byte not 1024!
+	mem->dump_memory(0x400,1000);							//1000 byte not 1024!
 	mem->dump_color_memory(0xD800,1000);					//1000 byte not 1024!
 
 }
@@ -32,7 +29,7 @@ void dump_cpu_handler(int s){
 void chiudi(int s){
 
 	SDL_Quit();
-	exit(-1);
+	exit(s);
 }
 
 int main(){
@@ -69,6 +66,8 @@ int main(){
 	vic->setCPU(cpu);
 	vic->setCIA1(cia1);
 	vic->setCIA2(cia2);
+
+	mem->load_prg("roms/snake.prg");
 
 	while(true){
 		cpu->clock();

@@ -32,6 +32,7 @@ class Memory{
 		void load_kernal_and_basic(const string&);
 		void load_charset(const string&);
 		void load_custom_memory(const string&,uint16_t);
+		void load_prg(const string&);
 
 		void setVIC(VIC*);
 		void setCIA1(CIA1*);
