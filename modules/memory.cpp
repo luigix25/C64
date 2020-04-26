@@ -283,10 +283,6 @@ uint8_t* Memory::getKerPointer(){
 	return kernal;
 }
 
-uint8_t* Memory::getVideoMemoryPtr(){
-	return memory+0x400;
-}
-
 uint8_t* Memory::getColorMemoryPtr(){
 	return color_ram;
 }

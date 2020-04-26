@@ -39,7 +39,6 @@ class Memory{
 
 		void setup_memory_mode(uint8_t value);
 
-		uint8_t* getVideoMemoryPtr();
 		uint8_t* getColorMemoryPtr();
 
 		//Debug

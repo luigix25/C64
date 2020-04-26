@@ -70,7 +70,7 @@ class VIC {
 		//SDL
 
 		uint8_t *host_video_memory = nullptr;
-		uint8_t *guest_video_memory = nullptr;
+		//uint8_t *guest_video_memory = nullptr;
 
 		uint8_t *host_charset = nullptr;
 

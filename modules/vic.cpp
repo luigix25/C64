@@ -99,7 +99,8 @@ void VIC::clock(){
 
 	for(int i=0;i<1000;i++){
 
-		show_char(host_charset + 64 * guest_video_memory[i] ,cursorX,cursorY);
+		uint8_t value = memory->VIC_read_byte(screen_memory_base_addr+i);
+		show_char(host_charset + 64 * value ,cursorX,cursorY);
 
 		cursorY +=8;
 
@@ -152,7 +153,6 @@ void VIC::update_host_charset(){
 
 void VIC::setMemory(Memory *mem){
 	this->memory = mem;
-	this->guest_video_memory = mem->getVideoMemoryPtr();
 	this->guest_color_memory = mem->getColorMemoryPtr();
 
 }
