@@ -24,11 +24,7 @@ VIC::VIC(){
 	clocks_to_new_render = 1;
 	last_time_rendered = chrono::steady_clock::now();
 
-	//memset(&color_palette[0],0,0xF*sizeof(uint8_t));
-
-	for(int i=0;i<16;i++){
-		color_palette[i] = 0;
-	}
+	memset(&color_palette[0],0,0xF*sizeof(uint8_t));
 
 }
 
@@ -180,6 +176,11 @@ void VIC::setCIA1(CIA1 *cia1){
 
 }
 
+void VIC::setCIA2(CIA2 *cia2){
+
+	this->cia2 = cia2;
+
+}
 
 uint8_t VIC::read_register(uint16_t addr){
     

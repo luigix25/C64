@@ -1,5 +1,5 @@
 FLAGS = -Wall -Wextra -pedantic -g -std=c++11 -O3
-DEPENDENCIES = library.o cpu.o memory.o vic.o SDLManager.o cia1.o
+DEPENDENCIES = library.o cpu.o memory.o vic.o SDLManager.o cia1.o cia2.o
 HEADERS = library.h memory.h vic.h cpu.h
 
 all: main.o $(DEPENDENCIES)
@@ -25,6 +25,9 @@ SDLManager.o: modules/SDLManager.cpp modules/SDLManager.h
 
 cia1.o: modules/cia1.cpp modules/cia1.h
 	g++ -c modules/cia1.cpp $(FLAGS)
+
+cia2.o: modules/cia2.cpp modules/cia2.h
+	g++ -c modules/cia2.cpp $(FLAGS)
 
 #keyboard.o: modules/keyboard.cpp modules/keyboard.h
 #	g++ -c modules/keyboard.cpp $(FLAGS)

@@ -5,6 +5,7 @@ class Memory;
 #include "library.h"
 #include "vic.h"
 #include "cia1.h"
+#include "cia2.h"
 
 #define MEMORY_LAYOUT_ADDR 0x1
 #define LORAM_MASK 0x1
@@ -25,12 +26,16 @@ class Memory{
 		uint8_t read_byte(uint16_t);
 		void write_byte(uint16_t,uint8_t);
 
+		uint8_t VIC_read_byte(uint16_t);
+		void VIC_write_byte(uint16_t,uint8_t);
+
 		void load_kernal_and_basic(const char*);
 		void load_charset(const char*);
 		void load_custom_memory(const char*,uint16_t);
 
 		void setVIC(VIC*);
 		void setCIA1(CIA1*);
+		void setCIA2(CIA2*);
 
 		void setup_memory_mode(uint8_t value);
 
@@ -46,8 +51,9 @@ class Memory{
 
 	private:
 
-		VIC		*vic;
-		CIA1 	*cia1;
+		VIC		*vic = nullptr;
+		CIA1 	*cia1 = nullptr;
+		CIA2 	*cia2 = nullptr;
 
 		uint8_t *memory;
 		uint8_t *color_ram;

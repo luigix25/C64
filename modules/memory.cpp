@@ -11,8 +11,6 @@ Memory::Memory(){
 	HIRAM_mode = RAM;
 	CHAR_mode = RAM;
 
-	vic = nullptr;
-
 	basic = new uint8_t[eightK];
 	kernal = new uint8_t[eightK];
 	charset = new uint8_t[fourK];
@@ -132,10 +130,7 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 		if(CHAR_mode == IO){		//VIC
 			vic->write_register(addr,data);
 			return;
-		} else {
-			memory[addr] = data;
-		}
-
+		} 
 	} else if(addr >= CIA1_START and addr <= CIA1_END){
 		cia1->write_register(addr,data);
 		return;
@@ -149,7 +144,28 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 
 	memory[addr] = data;
 
+}
 
+uint8_t Memory::VIC_read_byte(uint16_t addr){
+
+	uint8_t VICBank = cia2->getVICBank();
+
+	if(VICBank == 3 and addr >= 0x1000 and addr <= 0x1FFF){
+		//Charset mirroring
+		return charset[addr-IO_START];
+
+	} else if(VICBank == 1 and addr >= 0x9000 and addr <= 0x9FFF){
+
+		return charset[addr-IO_START];
+
+	} else {
+		return memory[addr];
+	}
+
+}
+
+void Memory::VIC_write_byte(uint16_t addr, uint8_t data){
+	
 }
 
 void Memory::setup_memory_mode(uint8_t value){
@@ -225,7 +241,7 @@ uint8_t* Memory::read_bin_file(const char* filename, streampos &size){
         return rom;
     }
 
-    return null;
+    return nullptr;
 
 }
 
@@ -243,6 +259,10 @@ void Memory::setVIC(VIC* vic){
 
 void Memory::setCIA1(CIA1* cia1){
 	this->cia1 = cia1;
+}
+
+void Memory::setCIA2(CIA2* cia2){
+	this->cia2 = cia2;
 }
 
 uint8_t* Memory::getMemPointer(){

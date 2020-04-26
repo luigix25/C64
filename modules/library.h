@@ -1,8 +1,5 @@
 #pragma once
 
-//#ifndef LIBRARY_GUARD
-//#define LIBRARY_GUARD
-
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -12,8 +9,6 @@
 #include <signal.h>
 
 #include <SDL2/SDL.h>
-
-#include <semaphore.h>
 
 #include "debug.h"
 
@@ -64,8 +59,6 @@ using namespace std;
 #define SET_I_BIT(x,i) 		(x |= (1<<i))
 #define RESET_I_BIT(x,i) 	(x &= ~(1<<i))
 
-#define null 0
-
 enum register_name
 {
 	regA,regX,regY
@@ -90,5 +83,3 @@ struct registers{
 };
 
 void hexDump(void*, int);
-
-//#endif

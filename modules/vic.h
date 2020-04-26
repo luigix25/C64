@@ -9,6 +9,7 @@ class VIC;
 #include "SDLManager.h"
 #include "cpu.h"
 #include "cia1.h"
+#include "cia2.h"
 
 #define REG_START 0xD000
 #define REG_END 0xD02E
@@ -64,6 +65,7 @@ class VIC {
 		SDLManager *sdl = nullptr;
 		CPU *cpu = nullptr;
 		CIA1 *cia1 = nullptr;
+		CIA2 *cia2 = nullptr;
 
 		//SDL
 
@@ -89,6 +91,7 @@ class VIC {
 		void setSDL(SDLManager*);
 		void setCPU(CPU*);
 		void setCIA1(CIA1*);
+		void setCIA2(CIA2*);
 
 		uint8_t read_register(uint16_t);
 		void write_register(uint16_t,uint8_t);

@@ -15,8 +15,6 @@ SDLManager::SDLManager(){
 
 	memset(&keyboard_matrix[0],0xFF,64);
 
-	getRowForCol(0);
-
 }
 
 SDLManager::~SDLManager(){

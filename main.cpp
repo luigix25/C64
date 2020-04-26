@@ -3,6 +3,7 @@
 #include "modules/cpu.h"
 #include "modules/SDLManager.h"
 #include "modules/cia1.h"
+#include "modules/cia2.h"
 
 #include "modules/debug.h"
 
@@ -11,7 +12,6 @@
 
 void test_cpu(CPU*);
 
-char convert(char);
 Memory *mem;
 CPU *cpu;
 SDLManager *sdl;
@@ -20,9 +20,6 @@ void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
 	mem->dump_memory(0x400,1000);					//1000 byte not 1024!
 	mem->dump_color_memory(0xD800,1000);					//1000 byte not 1024!
-
-	//cpu->changeIRQ();
-
 
 }
 
@@ -46,6 +43,7 @@ int main(){
 
 	VIC *vic = new VIC();
 	CIA1 *cia1 = new CIA1();
+	CIA2 *cia2 = new CIA2();
 
 	mem = new Memory();
 	mem->load_kernal_and_basic(KERNAL_BASIC_ROM);
@@ -59,14 +57,18 @@ int main(){
 	cia1->setCPU(cpu);
 	cia1->setSDL(sdl);
 
+	cia2->setCPU(cpu);
+	cia2->setSDL(sdl);
 
 	mem->setVIC(vic);
 	mem->setCIA1(cia1);
+	mem->setCIA2(cia2);
 
 	vic->setMemory(mem);
 	vic->setSDL(sdl);
 	vic->setCPU(cpu);
 	vic->setCIA1(cia1);
+	vic->setCIA2(cia2);
 
 	while(true){
 		cpu->clock();
