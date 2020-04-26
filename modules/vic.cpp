@@ -214,7 +214,7 @@ void VIC::write_register(uint16_t addr, uint8_t data){
             control_reg_one(data);
             return;
 		case CTRL_REG_2:
-			control_reg_one(data);
+			control_reg_two(data);
 			return;
 		case BASE_ADDR_REG:
 			char_memory_base_addr   = (data & 0xE) << 10;
