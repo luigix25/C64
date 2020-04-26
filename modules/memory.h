@@ -41,7 +41,6 @@ class Memory{
 
 		uint8_t* getVideoMemoryPtr();
 		uint8_t* getColorMemoryPtr();
-		uint8_t* getCharROMPtr();
 
 		//Debug
 		uint8_t* getMemPointer();

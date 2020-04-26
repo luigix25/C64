@@ -3,6 +3,7 @@
 VIC::VIC(){
 
 	registers = new uint8_t[0x400];    
+	host_charset = new uint8_t[4098 *8];
 
 	registers[CTRL_REG_1_OFF] = 0x9B;
 	registers[CTRL_REG_2_OFF] = 0x08;
@@ -31,6 +32,7 @@ VIC::VIC(){
 VIC::~VIC(){
 
 	delete[] registers;
+	delete[] host_charset;
 
 }
 
@@ -96,6 +98,8 @@ void VIC::clock(){
 	uint32_t cursorX = 0;
 	uint32_t cursorY = 0;
 
+	update_host_charset();
+
 	for(int i=0;i<1000;i++){
 
 		show_char(host_charset + 64 * guest_video_memory[i] ,cursorX,cursorY);
@@ -131,16 +135,17 @@ void VIC::clock(){
 
 }
 
-void VIC::init_host_charset(){
-
-	host_charset = new uint8_t[4098 *8];
+void VIC::update_host_charset(){
 
 	uint8_t byte = 0;
+	
 
 	//ROM SIZE
 	for(int i=0;i<4096;i++){
 
-		byte = guest_charset[i];		
+		//cout<<"addr: "<<hex<<unsigned(char_memory_base_addr+i)<<endl;
+
+		byte = memory->VIC_read_byte(char_memory_base_addr+i);
 
 		for(int m=7;m>=0;m--){
 			host_charset[i*8+7-m] = (GET_I_BIT(byte,m)) ? 0xFF : 0;
@@ -155,9 +160,7 @@ void VIC::setMemory(Memory *mem){
 	this->memory = mem;
 	this->guest_video_memory = mem->getVideoMemoryPtr();
 	this->guest_color_memory = mem->getColorMemoryPtr();
-	this->guest_charset = mem->getCharROMPtr();
 
-	init_host_charset();
 }
 
 void VIC::setSDL(SDLManager *sdl){

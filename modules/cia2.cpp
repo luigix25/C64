@@ -43,6 +43,9 @@ void CIA2::write_register(uint16_t address, uint8_t data){
 
 
     registers[address] = data;
-
-
 }
+
+uint8_t CIA2::getVICBank(){
+    return VICBank;
+}
+

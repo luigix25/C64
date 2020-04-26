@@ -152,11 +152,11 @@ uint8_t Memory::VIC_read_byte(uint16_t addr){
 
 	if(VICBank == 3 and addr >= 0x1000 and addr <= 0x1FFF){
 		//Charset mirroring
-		return charset[addr-IO_START];
+		return charset[addr-0x1000];
 
 	} else if(VICBank == 1 and addr >= 0x9000 and addr <= 0x9FFF){
 
-		return charset[addr-IO_START];
+		return charset[addr-0x9000];
 
 	} else {
 		return memory[addr];
@@ -279,9 +279,5 @@ uint8_t* Memory::getVideoMemoryPtr(){
 
 uint8_t* Memory::getColorMemoryPtr(){
 	return color_ram;
-}
-
-uint8_t* Memory::getCharROMPtr(){
-	return charset;
 }
 

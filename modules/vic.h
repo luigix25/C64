@@ -52,7 +52,7 @@ class VIC {
 
 		void set_graphic_mode();
 
-		void init_host_charset();
+		void update_host_charset();
 		void init_color_palette();
 
 		void show_char(uint8_t *, int, int);
@@ -72,7 +72,6 @@ class VIC {
 		uint8_t *host_video_memory = nullptr;
 		uint8_t *guest_video_memory = nullptr;
 
-		uint8_t *guest_charset = nullptr;
 		uint8_t *host_charset = nullptr;
 
 		uint8_t *guest_color_memory = nullptr;
