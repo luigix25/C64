@@ -89,8 +89,13 @@ void VIC::clock(){
 		return;
 	}
 
+
 	clocks_to_new_render = 20000;
 
+	//TODO: fare con altre raster line
+	if(interrupt_enabled){
+		cpu->setIRQline();
+	}
 
 	uint32_t cursorX = 0;
 	uint32_t cursorY = 0;
@@ -185,7 +190,7 @@ uint8_t VIC::read_register(uint16_t addr){
     //DEBUG_PRINT("read from VIC memory"<<endl);
     //DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
 
-	if(addr == RASTER_CNT){
+	if(addr == RASTER_LINE){
 		//cout<<"PC"<<hex<<unsigned(cpu->regs.PC)<<endl;
 		//cout<<"reading from RASTER_CNT"<<endl;
 
@@ -227,7 +232,7 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 
 			break;
 
-		case RASTER_CNT:
+		case RASTER_LINE:
 			cout<<"writing to raster cnt"<<endl;
 			cout<<hex<<unsigned(data)<<endl;
 

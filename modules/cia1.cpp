@@ -115,8 +115,12 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 
 	switch(address){
 		case IRQ_REG:
-			timerA_irq_enabled = GET_I_BIT(data,0);
-			timerB_irq_enabled = GET_I_BIT(data,1);
+		    if(GET_I_BIT(data,0)) 
+				timerA_irq_enabled = GET_I_BIT(data,7);
+    		
+			if(GET_I_BIT(data,1)) 
+				timerB_irq_enabled = GET_I_BIT(data,7);
+
 			break;
 
 		case TA_LOW:

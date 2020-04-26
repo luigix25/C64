@@ -14,7 +14,7 @@ class VIC;
 #define REG_END 0xD02E
 
 #define CTRL_REG_1 0xD011
-#define RASTER_CNT 0xD012
+#define RASTER_LINE 0xD012
 #define CTRL_REG_2 0xD016
 #define BASE_ADDR_REG 0xD018
 #define IRQ_REQ_REG 0xD019

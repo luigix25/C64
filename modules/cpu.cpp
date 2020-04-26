@@ -63,17 +63,17 @@ void CPU::clock(){
 
 void CPU::setIRQline(){
 
-	irq_counter++;
+	//irq_counter++;
 	irq_line = false;
 
 }
 
 void CPU::resetIRQline(){
 
-	irq_counter--;
-	if(irq_counter == 0){
-		irq_line = true;
-	}
+	//irq_counter--;
+	//if(irq_counter == 0){
+	irq_line = true;
+	//}
 
 }
 
