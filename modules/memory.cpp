@@ -89,6 +89,10 @@ uint8_t Memory::read_byte(uint16_t addr){
 
 				return cia1->read_register(addr);
 
+			} else if(addr >= CIA2_START and addr <= CIA2_END){		//CIA2
+
+				return cia2->read_register(addr);
+
 			} else if(addr >= COLOR_RAM_START && addr <= COLOR_RAM_END){
 
 				return color_ram[addr - COLOR_RAM_START];
@@ -135,6 +139,10 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 		cia1->write_register(addr,data);
 		return;
 	
+	} else if(addr >= CIA2_START and addr <= CIA2_END){
+		cia2->write_register(addr,data);
+		return;
+	
 	} else if(addr >= COLOR_RAM_START and addr <= COLOR_RAM_END){
 		if(CHAR_mode == IO){
 			color_ram[addr - COLOR_RAM_START] = data;
@@ -150,11 +158,13 @@ uint8_t Memory::VIC_read_byte(uint16_t addr){
 
 	uint8_t VICBank = cia2->getVICBank();
 
-	if(VICBank == 3 and addr >= 0x1000 and addr <= 0x1FFF){
+	addr += 0x4000 * VICBank;
+
+	if(VICBank == 0 and addr >= 0x1000 and addr <= 0x1FFF){
 		//Charset mirroring
 		return charset[addr-0x1000];
 
-	} else if(VICBank == 1 and addr >= 0x9000 and addr <= 0x9FFF){
+	} else if(VICBank == 2 and addr >= 0x9000 and addr <= 0x9FFF){
 
 		return charset[addr-0x9000];
 

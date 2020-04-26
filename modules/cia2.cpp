@@ -1,8 +1,8 @@
 #include "cia2.h"
 
 CIA2::CIA2(){
-    //In reverse order!!!
-    VICBank = 3;
+
+    VICBank = 0;
 
 }
 
@@ -38,7 +38,7 @@ void CIA2::write_register(uint16_t address, uint8_t data){
 
     //DD00
     if(address == 0){
-        VICBank = data & 0x03;
+        VICBank = (~data) & 0x03;
     }
 
 

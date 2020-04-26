@@ -63,13 +63,10 @@ void VIC::init_color_palette(){
 void VIC::show_char(uint8_t *character, int X, int Y){
 
 	uint8_t bg_color_idx = registers[0xD021-0xD000];
-	//cout<<"BG COLOR "<<hex<<unsigned(bg_color_idx)<<endl;
 	uint8_t bg_color = color_palette[bg_color_idx];
 
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
 	uint8_t fg_color = color_palette[fg_color_idx];
-	//cout<<"FG COLOR "<<hex<<unsigned(fg_color_idx)<<endl;
-
 
 	for(int i = 0; i < CHAR_WIDTH; i++){
 		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
@@ -139,11 +136,8 @@ void VIC::update_host_charset(){
 
 	uint8_t byte = 0;
 	
-
 	//ROM SIZE
 	for(int i=0;i<4096;i++){
-
-		//cout<<"addr: "<<hex<<unsigned(char_memory_base_addr+i)<<endl;
 
 		byte = memory->VIC_read_byte(char_memory_base_addr+i);
 
