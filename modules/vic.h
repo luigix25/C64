@@ -3,7 +3,6 @@
 class VIC;
 
 #include "library.h"
-#include "debug.h"
 
 #include "memory.h"
 #include "SDLManager.h"

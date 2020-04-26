@@ -1,11 +1,11 @@
 #include "modules/library.h"
+
 #include "modules/memory.h"
 #include "modules/cpu.h"
 #include "modules/SDLManager.h"
 #include "modules/cia1.h"
 #include "modules/cia2.h"
 
-#include "modules/debug.h"
 
 #include <stdlib.h>
 #include <SDL2/SDL.h>
