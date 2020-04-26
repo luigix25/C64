@@ -3,18 +3,19 @@ Very Basic C64 emulator implemented using C++ and SDL.
 
 Things Working:
 
-CPU fully tested
+    CPU fully tested
 
 Things Partially Implemented:
 
-Keyboard
+    Keyboard
 
-VIC II char mode
+    VIC II char mode
+
+    VIC II bank switching
 
 
 TODO List:
 
-Implement position change of the Video Memory in RAM
 Char MultiColorMode 
 CPU code refactoring
 Memory code refactoring
