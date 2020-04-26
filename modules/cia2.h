@@ -19,14 +19,14 @@ class CIA2{
 
 		void setSDL(SDLManager*);
 
-        uint8_t getVICBank();
+		uint8_t getVICBank();
 
-    private:
+	private:
 		uint8_t registers[16];
-        
-        uint8_t VICBank;
 
-        CPU *cpu;
+		uint8_t VICBank;
+
+		CPU *cpu;
 		SDLManager *sdl;
 
 };

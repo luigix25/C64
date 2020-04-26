@@ -1,4 +1,4 @@
-	#include "vic.h"
+#include "vic.h"
 
 VIC::VIC(){
 
@@ -179,15 +179,15 @@ void VIC::setCIA2(CIA2 *cia2){
 
 }
 
+//TODO: 
 uint8_t VIC::read_register(uint16_t addr){
     
     //DEBUG_PRINT("read from VIC memory"<<endl);
     //DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
 
 	if(addr == RASTER_CNT){
-		cout<<"PC"<<hex<<unsigned(cpu->regs.PC)<<endl;
-		cout<<"reading from RASTER_CNT"<<endl;
-		//cout<<hex<<unsigned(data)<<endl;
+		//cout<<"PC"<<hex<<unsigned(cpu->regs.PC)<<endl;
+		//cout<<"reading from RASTER_CNT"<<endl;
 
 		return 0;
 	}
@@ -212,7 +212,6 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 			control_reg_one(data);
 			return;
 		case BASE_ADDR_REG:
-			//cout<<"BASE ADDR"<<endl;
 			char_memory_base_addr   = (data & 0xE) << 10;
     		screen_memory_base_addr = (data & 0xF0) << 6;
     		break;
@@ -221,7 +220,7 @@ void VIC::write_register(uint16_t addr, uint8_t data){
     		interrupt_enabled = data;
     		break;
 
-		case 0xD019:							//interrupt register
+		case 0xD019:								//interrupt register
 			if(GET_I_BIT(data,0) == 0x0){			//answer to interrupt
 				cpu->resetIRQline();
 			}
@@ -279,9 +278,8 @@ void VIC::set_graphic_mode(){
 	bool bmm = GET_I_BIT(registers[CTRL_REG_1_OFF],5); 
 	bool mcm = GET_I_BIT(registers[CTRL_REG_2_OFF],4); 
 
-	if(!ecm && !bmm && !mcm){ 
+	if(!ecm && !bmm && !mcm)
 		graphic_mode = CHAR_MODE;
-	}
 	else if(!ecm && !bmm && mcm)
 		graphic_mode = MCM_TEXT_MODE;
 	else if(!ecm && bmm && !mcm)

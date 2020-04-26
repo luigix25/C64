@@ -5,8 +5,6 @@ class SDLManager;
 #include "vic.h"
 #include "cia1.h"
 
-#include <SDL2/SDL.h>
-
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 200
 #define pixel_type uint8_t

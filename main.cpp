@@ -113,20 +113,3 @@ void test_cpu(CPU *cpu)
 	}
 
 }
-
-
-/*char convert(char c){
-	cout<<"ciao"<<endl;
-
-	if(c >= 65 && c <= 90){					//lower case letters
-		cout<<"lower case";
-		c+= (97-65);
-	} else if(c>=193 && c<= 218){
-		cout<<"upper case";
-		c-= (193-65);
-	}
-
-	return c;
-
-
-}*/

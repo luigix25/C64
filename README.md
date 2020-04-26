@@ -1,12 +1,13 @@
-Very Basic C64 emulator implemented using C++ and SDL.
+# C64 Emulator
+A Very Basic C64 Emulator implemented using C++14 and SDL.
 
 
-Things Working:
+# Things Working
 
 * CPU
 * VIC II bank switching
 
-Things Partially Implemented:
+# Things Partially Implemented
 
 * Keyboard 
 	* Some keys are not mapped
@@ -14,7 +15,7 @@ Things Partially Implemented:
 * VIC II char mode
 
 
-TODO List:
+# TODO List
 
 * Char MultiColorMode 
 * CPU code refactoring

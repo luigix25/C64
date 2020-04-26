@@ -1,7 +1,4 @@
 //memory.cpp
-#include <signal.h>
-#include <stdlib.h>
-
 #include "memory.h"
 
 Memory::Memory(){
@@ -79,7 +76,7 @@ uint8_t Memory::read_byte(uint16_t addr){
 		else if(CHAR_mode == ROM)								//Charset
 			return charset[addr-IO_START];
 
-		else if(CHAR_mode == IO){					
+		else if(CHAR_mode == IO){								//Multiplexing on IO peripherals			
 
 			if(addr >= VIC_START && addr <= VIC_END){			//VIC
 
@@ -209,7 +206,7 @@ void Memory::setup_memory_mode(uint8_t value){
 
 }
 
-void Memory::load_kernal_and_basic(const char* filename){
+void Memory::load_kernal_and_basic(const string& filename){
 
 	streampos size;
 	uint8_t* rom = read_bin_file(filename,size);
@@ -222,7 +219,7 @@ void Memory::load_kernal_and_basic(const char* filename){
 
 }
 
-void Memory::load_charset(const char* filename){
+void Memory::load_charset(const string& filename){
 
 	streampos size;
 
@@ -233,7 +230,7 @@ void Memory::load_charset(const char* filename){
 	delete[] rom;
 }
 
-uint8_t* Memory::read_bin_file(const char* filename, streampos &size){
+uint8_t* Memory::read_bin_file(const string& filename, streampos &size){
 
     ifstream file(filename,ios::in | ios::binary | ios::ate);
     //streampos size;
@@ -255,7 +252,7 @@ uint8_t* Memory::read_bin_file(const char* filename, streampos &size){
 
 }
 
-void Memory::load_custom_memory(const char* filename, uint16_t offset) {
+void Memory::load_custom_memory(const string& filename, uint16_t offset) {
 
 	streampos size;
 	uint8_t* buffer = read_bin_file(filename,size);

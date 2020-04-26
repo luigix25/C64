@@ -2,10 +2,9 @@
 
 #include <iostream>
 #include <fstream>
-#include <string.h>
-#include <stdint.h>
+#include <string>
+#include <cstdint>
 #include <thread>
-#include <unistd.h>
 #include <signal.h>
 
 #include <SDL2/SDL.h>

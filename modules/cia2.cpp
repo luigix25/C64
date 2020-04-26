@@ -2,7 +2,7 @@
 
 CIA2::CIA2(){
 
-    VICBank = 0;
+	VICBank = 0;
 
 }
 
@@ -24,7 +24,7 @@ uint8_t CIA2::read_register(uint16_t address){
 	//For mirroring
 	address = address % 16;
 
-    return registers[address];
+	return registers[address];
 
 }
 
@@ -36,16 +36,16 @@ void CIA2::write_register(uint16_t address, uint8_t data){
 	//For mirroring
 	address = address % 16;
 
-    //DD00
-    if(address == 0){
-        VICBank = (~data) & 0x03;
-    }
+	//DD00
+	if(address == 0){
+		VICBank = (~data) & 0x03;
+	}
 
 
-    registers[address] = data;
+	registers[address] = data;
 }
 
 uint8_t CIA2::getVICBank(){
-    return VICBank;
+	return VICBank;
 }
 

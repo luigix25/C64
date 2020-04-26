@@ -1,7 +1,6 @@
 #include "cpu.h"
 
 #include <signal.h>
-#include <stdlib.h>
 
 CPU::CPU(Memory* memory, uint16_t PC){
 
@@ -64,7 +63,6 @@ void CPU::clock(){
 
 void CPU::setIRQline(){
 
-	//cout<<"SETTING IRQ to false"<<endl;
 	irq_counter++;
 	irq_line = false;
 
@@ -74,7 +72,6 @@ void CPU::resetIRQline(){
 
 	irq_counter--;
 	if(irq_counter == 0){
-		//cout<<"SETTING IRQ to true"<<endl;
 		irq_line = true;
 	}
 
@@ -229,8 +226,6 @@ uint16_t CPU::indirect_Y(){
 	//zero page addr!!
 	uint8_t zero_page_addr = immediate();
 	
-	//uint16_t tmp;
-
 	addr = read_word(zero_page_addr);
 	addr += regs.reg[regY];
 
@@ -729,46 +724,12 @@ void CPU::SBC(uint8_t value){
 
 }
 
-/*
-  uint16_t t;
-  if(dmf())
-  {
-    t = ( a() & 0xf ) - ( v &0xf ) - ( cf() ? 0 : 1);
-    if((t & 0x10) != 0)
-      t = ((t-0x6)&0xf) | ((a()&0xf0) - (v&0xf0) - 0x10);
-    else
-      t = (t&0xf) | ((a()&0xf0) - (v&0xf0));
-    if((t&0x100)!=0)
-      t -= 0x60;
-  }
-  else
-  {
-    t = a() - v - (cf() ? 0 : 1);
-  }
-
-
-  cf ( t<0x100 );
-  t = t & 0xff;
-
-
-  of = (( a() ^ t ) & 0x80) && ( (a() ^ v ) & 0x80) 
-
-
-  a((uint8_t)t);*/
-
-
-
 //Compare
 void CPU::CP(register_name index, uint8_t v){
 	uint16_t t;
 	t = regs.reg[index] - v;
 	
-	/*if(v > regs.reg[index]){
-		cout<<"NEGATIVO"<<endl;
-	}*/
-
 	regs.carry_flag = (t < 0x100);
-	//regs.carry_flag = ((t & 0x8000) != 0);
 
 	t = t & 0xff;
 
@@ -823,8 +784,6 @@ void CPU::BRK(){
 	regs.break_flag = true;
 	//interrupt is masked
 
-	cout<<"BRK RETURN ADDR: "<<hex<<unsigned(regs.PC)<<endl;
-
 	uint8_t temp = (((regs.PC+1) >> 8) & 0xFF);
 	PUSH(temp);
 
@@ -869,7 +828,6 @@ void CPU::dump_reg(){
 
 
 	DEBUG_PRINT("FLAGS: "<<hex<<unsigned(flags())<<endl);
-
 
 	DEBUG_PRINT("------------------------------"<<endl);
 

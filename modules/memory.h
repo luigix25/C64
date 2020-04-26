@@ -29,9 +29,9 @@ class Memory{
 		uint8_t VIC_read_byte(uint16_t);
 		void VIC_write_byte(uint16_t,uint8_t);
 
-		void load_kernal_and_basic(const char*);
-		void load_charset(const char*);
-		void load_custom_memory(const char*,uint16_t);
+		void load_kernal_and_basic(const string&);
+		void load_charset(const string&);
+		void load_custom_memory(const string&,uint16_t);
 
 		void setVIC(VIC*);
 		void setCIA1(CIA1*);
@@ -61,7 +61,7 @@ class Memory{
 		uint8_t *charset;
 
 
-		uint8_t* read_bin_file(const char*,streampos&);
+		uint8_t* read_bin_file(const string&,streampos&);
 
 		bank_mode LORAM_mode;
 		bank_mode HIRAM_mode;
