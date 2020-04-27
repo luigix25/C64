@@ -155,9 +155,13 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
 
 uint8_t Memory::VIC_read_byte(uint16_t addr){
 
+
 	uint8_t VICBank = cia2->getVICBank();
 
 	addr += 0x4000 * VICBank;
+
+	//cout<<"VIC READ "<<hex<<unsigned(addr)<<endl;
+
 
 	if(VICBank == 0 and addr >= 0x1000 and addr <= 0x1FFF){
 		//Charset mirroring

@@ -44,7 +44,7 @@ class VIC {
 
 		uint16_t screen_memory_base_addr;
 		uint16_t char_memory_base_addr;
-		//uint16_t bitmap_memory_base_addr;
+		uint16_t bitmap_memory_base_addr;
 
 		void control_reg_one(uint8_t);
 		void control_reg_two(uint8_t);
@@ -55,6 +55,8 @@ class VIC {
 		void init_color_palette();
 
 		void show_char(uint8_t, int, int);
+		void draw_bitmap(uint8_t, int, int);
+		void draw_bitmap_mcm(uint8_t, int, int);
 
 		bool interrupt_enabled;
 

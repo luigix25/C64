@@ -26,6 +26,12 @@ void dump_cpu_handler(int s){
 	sdl->checkFPS();
 }
 
+void load_roba(int s){
+	mem->load_prg("roms/bitmap.prg");
+	//mem->load_prg("roms/delysid_multicolor_testscreen.prg");
+
+}
+
 void chiudi(int s){
 
 	SDL_Quit();
@@ -34,7 +40,9 @@ void chiudi(int s){
 
 int main(){
 	//CTRL-Z
-	signal(SIGTSTP,dump_mem_handler);
+//	signal(SIGTSTP,dump_mem_handler);
+	signal(SIGTSTP,load_roba);
+
 	//signal(SIGTSTP,dump_cpu_handler);
 	signal(SIGINT,chiudi);
 
@@ -66,8 +74,6 @@ int main(){
 	vic->setCPU(cpu);
 	vic->setCIA1(cia1);
 	vic->setCIA2(cia2);
-
-	mem->load_prg("roms/snake.prg");
 
 	while(true){
 		cpu->clock();

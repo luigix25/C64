@@ -16,7 +16,7 @@ VIC::VIC(){
 
 	screen_memory_base_addr = 0x400;
 	char_memory_base_addr = 0xd000;
-	//bitmap_memory_base_addr = 0x0;
+	bitmap_memory_base_addr = 0x0;
 
     registers[BASE_ADDR_REG - REG_START] = 0x14;
 	registers[IRQ_REQ_REG - REG_START] = 0x0F;
@@ -64,6 +64,72 @@ void VIC::init_color_palette(){
 
 }
 
+void VIC::draw_bitmap(uint8_t offset, int X, int Y){
+
+	uint8_t bg_color_idx = offset & 0x0F;
+	uint8_t fg_color_idx = (offset & 0xF0)>>4;
+
+	uint8_t bg_color = color_palette[bg_color_idx];
+	uint8_t fg_color = color_palette[fg_color_idx];
+
+	for(int i=0;i<8;i++){
+		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + (X+i) * SCREEN_WIDTH/8 + Y/8;
+		uint8_t row_pixel_value = memory->VIC_read_byte(bitmap_matrix_ptr);
+		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
+
+		for(int j=0;j<8;j++){
+
+			uint8_t pixel_value = GET_I_BIT(row_pixel_value,j);
+			ptr[j] = (pixel_value) ? fg_color : bg_color;
+
+		}
+
+	}
+
+}
+
+void VIC::draw_bitmap_mcm(uint8_t screen_ram, int X, int Y){
+
+	uint8_t bg_color_idx = registers[0xD021-0xD000];
+	uint8_t bg_color = color_palette[bg_color_idx];
+
+	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
+	uint8_t fg_color = color_palette[fg_color_idx];
+
+	for(int i=0; i<8; i++){
+
+		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + X * SCREEN_WIDTH/8 + Y + i;
+
+		uint8_t screen_matrix_value = memory->VIC_read_byte(bitmap_matrix_ptr);
+		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
+
+		for (int j=0; j<8; j+=2){
+
+			uint8_t switch_value = GET_TWO_BITS(screen_matrix_value,(6-j));
+
+			if(switch_value == 0x00){
+				ptr[j] = ptr[j+1] = bg_color;
+				
+			} else if(switch_value == 0x01){
+				uint8_t color_idx = (screen_ram & 0xF0)>>4;
+				ptr[j] = ptr[j+1] = color_palette[color_idx];
+
+			}else if(switch_value == 0x02){
+				uint8_t color_idx = (screen_ram & 0x0F);
+				ptr[j] = ptr[j+1] = color_palette[color_idx];
+			
+			} else if(switch_value == 0x03){
+				ptr[j] = ptr[j+1] = fg_color;
+			}
+
+
+		}
+
+	}
+
+
+
+}
 
 void VIC::show_char(uint8_t offset, int X, int Y){
 
@@ -89,7 +155,7 @@ void VIC::show_char(uint8_t offset, int X, int Y){
 
 		for(int j=0; j < CHAR_WIDTH; j++){
 
-			if(graphic_mode == CHAR_MODE or (fg_color_idx < 8))
+			if(graphic_mode == CHAR_MODE or (graphic_mode == MCM_TEXT_MODE and fg_color_idx < 8))
 			
 				ptr[j] = *(font_pointer + (i*8) +j) ? fg_color : bg_color;
 			
@@ -114,9 +180,8 @@ void VIC::show_char(uint8_t offset, int X, int Y){
 					ptr[j] = color_palette[fg_color_idx];
 					ptr[j] = color_palette[1];
 
-				}
-
-			}
+				}		
+			} 
 		
 		
 		
@@ -151,9 +216,15 @@ void VIC::clock(){
 
 	for(int i=0;i<1000;i++){
 
-		uint8_t value = memory->VIC_read_byte(screen_memory_base_addr+i);
-		show_char(value ,cursorX,cursorY);
+		uint8_t char_offset = memory->VIC_read_byte(screen_memory_base_addr+i);
 
+		if(graphic_mode == MCM_TEXT_MODE or graphic_mode == CHAR_MODE)
+			show_char(char_offset ,cursorX,cursorY);
+		else if(graphic_mode == BITMAP_MODE)
+			draw_bitmap(char_offset, cursorX, cursorY);
+		else if(graphic_mode == MCB_BITMAP_MODE)
+			draw_bitmap_mcm(char_offset,cursorX,cursorY);
+			
 		cursorY +=8;
 
 		if(cursorY >= SCREEN_WIDTH-7){
@@ -281,6 +352,9 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 		case BASE_ADDR_REG:
 			char_memory_base_addr   = (data & 0xE) << 10;
     		screen_memory_base_addr = (data & 0xF0) << 6;
+			bitmap_memory_base_addr = (data & 0x8) << 10;
+
+			cout<<"bitmap_memory_base_addr "<<hex<<unsigned(bitmap_memory_base_addr)<<endl;
     		break;
 
     	case IRQ_EN_REG:
@@ -347,13 +421,15 @@ void VIC::set_graphic_mode(){
 
 	if(!ecm && !bmm && !mcm)
 		graphic_mode = CHAR_MODE;
-	else if(!ecm && !bmm && mcm)
+	else if(!ecm && !bmm && mcm){
+		cout<<"MCM CHAR!!!!"<<endl;
 		graphic_mode = MCM_TEXT_MODE;
-	else if(!ecm && bmm && !mcm)
+	} else if(!ecm && bmm && !mcm)
 		graphic_mode = BITMAP_MODE;
-	else if(!ecm && bmm && mcm)
+	else if(!ecm && bmm && mcm){
+		cout<<"MCM BITMAP"<<endl;
 		graphic_mode = MCB_BITMAP_MODE;
-	else
+	} else
 		cout<<"UNIMPL MODE"<<endl;
 
 	//Unimplemented
