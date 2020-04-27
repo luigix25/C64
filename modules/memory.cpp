@@ -47,9 +47,11 @@ void Memory::dump_color_memory(uint16_t addr,uint16_t bytes){
 
 	cout<<endl<<"---------------------"<<endl;
 
-	for(uint16_t i=0;i<bytes;i++){
-		cout<<hex<<unsigned(color_ram[addr+i-COLOR_RAM_START])<<" ";
-	}
+	hexDump(color_ram,1000);
+
+	/*for(uint16_t i=0;i<bytes;i++){
+		cout<<hex<<unsigned(color_ram[addr+i])<<" ";
+	}*/
 
 	cout<<endl<<"---------------------"<<endl;
 

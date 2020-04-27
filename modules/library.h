@@ -55,6 +55,8 @@ using namespace std;
 #define IRQ_vector 0xFFFE
 
 #define GET_I_BIT(x,i) 		((x>>i) & 1)
+#define GET_TWO_BITS(x,i) 	((x>>i) & 0x03)
+
 #define SET_I_BIT(x,i) 		(x |= (1<<i))
 #define RESET_I_BIT(x,i) 	(x &= ~(1<<i))
 

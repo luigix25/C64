@@ -54,7 +54,7 @@ class VIC {
 		void update_host_charset();
 		void init_color_palette();
 
-		void show_char(uint8_t *, int, int);
+		void show_char(uint8_t, int, int);
 
 		bool interrupt_enabled;
 
@@ -71,7 +71,8 @@ class VIC {
 		uint8_t *host_video_memory = nullptr;
 		//uint8_t *guest_video_memory = nullptr;
 
-		uint8_t *host_charset = nullptr;
+		uint8_t *host_charset 		= nullptr;
+		uint8_t *host_charset_MCM 	= nullptr;
 
 		uint8_t *guest_color_memory = nullptr;
 
@@ -91,7 +92,10 @@ class VIC {
 		void setCIA1(CIA1*);
 		void setCIA2(CIA2*);
 
+		MODES getCurrentMode();		
+
 		uint8_t read_register(uint16_t);
 		void write_register(uint16_t,uint8_t);
+
 
 };

@@ -4,6 +4,9 @@ VIC::VIC(){
 
 	registers = new uint8_t[0x400];    
 	host_charset = new uint8_t[4098 *8];
+	host_charset_MCM = new uint8_t[4098 *8];;
+
+	memset(registers,0,0x400);
 
 	registers[CTRL_REG_1_OFF] = 0x9B;
 	registers[CTRL_REG_2_OFF] = 0x08;
@@ -25,7 +28,7 @@ VIC::VIC(){
 	clocks_to_new_render = 1;
 	last_time_rendered = chrono::steady_clock::now();
 
-	memset(&color_palette[0],0,0xF*sizeof(uint8_t));
+	memset(&color_palette[0],0,16*sizeof(uint8_t));
 
 }
 
@@ -33,7 +36,7 @@ VIC::~VIC(){
 
 	delete[] registers;
 	delete[] host_charset;
-
+	delete[] host_charset_MCM;
 }
 
 void VIC::init_color_palette(){
@@ -45,7 +48,7 @@ void VIC::init_color_palette(){
 	color_palette[2] 	= SDL_MapRGB(format, 0xab, 0x31, 0x26);
 	color_palette[3] 	= SDL_MapRGB(format, 0x66, 0xda, 0xff);
 	color_palette[4] 	= SDL_MapRGB(format, 0xbb, 0x3f, 0xb8);
-	color_palette[5]	= SDL_MapRGB(format, 0x55, 0xce, 0x58);
+	color_palette[5]	= SDL_MapRGB(format, 0x00, 0xcc, 0x55);
 	color_palette[6]	= SDL_MapRGB(format, 0x00, 0x00, 0xAA);
 	color_palette[7]	= SDL_MapRGB(format, 0xea, 0xf5, 0x7c);
 	color_palette[8]	= SDL_MapRGB(format, 0xb9, 0x74, 0x18);
@@ -53,26 +56,70 @@ void VIC::init_color_palette(){
 	color_palette[10]	= SDL_MapRGB(format, 0xdd, 0x93, 0x87);
 	color_palette[11]	= SDL_MapRGB(format, 0x5b, 0x5b, 0x5b);
 	color_palette[12]	= SDL_MapRGB(format, 0x8b, 0x8b, 0x8b);
-	color_palette[13]	= SDL_MapRGB(format, 0xb0, 0xf4, 0xac);
+	color_palette[13]	= SDL_MapRGB(format, 0xaa, 0xff, 0x66);
+	color_palette[13]	= color_palette[2];
+
 	color_palette[14]	= SDL_MapRGB(format, 0x00, 0x88, 0xff);
 	color_palette[15]	= SDL_MapRGB(format, 0xb8, 0xb8, 0xb8);
 
 }
 
 
-void VIC::show_char(uint8_t *character, int X, int Y){
+void VIC::show_char(uint8_t offset, int X, int Y){
 
 	uint8_t bg_color_idx = registers[0xD021-0xD000];
 	uint8_t bg_color = color_palette[bg_color_idx];
 
+	uint8_t mcm_color_two_idx = registers[0xD022-0xD000];
+	uint8_t mcm_color_two = color_palette[mcm_color_two_idx];
+
+
+	uint8_t mcm_color_three_idx = registers[0xD023-0xD000];
+	uint8_t mcm_color_three = color_palette[mcm_color_three_idx];
+
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
 	uint8_t fg_color = color_palette[fg_color_idx];
+
+	uint8_t* font_pointer = host_charset + 64 * offset;
+	uint8_t* font_pointer_MCM = host_charset_MCM + 64 * offset;
+
 
 	for(int i = 0; i < CHAR_WIDTH; i++){
 		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
 
 		for(int j=0; j < CHAR_WIDTH; j++){
-			ptr[j] = *(character + (i*8) +j) ? fg_color : bg_color;
+
+			if(graphic_mode == CHAR_MODE or (fg_color_idx < 8))
+			
+				ptr[j] = *(font_pointer + (i*8) +j) ? fg_color : bg_color;
+			
+			else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
+
+				uint8_t value = *(font_pointer_MCM + (i*8) +j);
+
+				//cout<<hex<<unsigned(value)<<endl;
+				if(value == 0x00)
+					ptr[j] = bg_color;
+				else if(value == 0x01)
+					ptr[j] = mcm_color_two;
+				else if(value == 0x02){
+					ptr[j] = mcm_color_three;
+				}
+				else if(value == 0x03){
+					
+					/*cout<<"MCM 0 "<<hex<<unsigned(bg_color_idx)<<endl;
+					cout<<"MCM 1 "<<hex<<unsigned(mcm_color_two_idx)<<endl;
+					cout<<"MCM 2 "<<hex<<unsigned(mcm_color_three_idx)<<endl;
+					cout<<"MCM 3 "<<hex<<unsigned(fg_color_idx)<<endl;*/
+					ptr[j] = color_palette[fg_color_idx];
+					ptr[j] = color_palette[1];
+
+				}
+
+			}
+		
+		
+		
 		}
 
 		//memcpy(ptr, character + (i*8) ,8);
@@ -105,7 +152,7 @@ void VIC::clock(){
 	for(int i=0;i<1000;i++){
 
 		uint8_t value = memory->VIC_read_byte(screen_memory_base_addr+i);
-		show_char(host_charset + 64 * value ,cursorX,cursorY);
+		show_char(value ,cursorX,cursorY);
 
 		cursorY +=8;
 
@@ -147,12 +194,27 @@ void VIC::update_host_charset(){
 
 		byte = memory->VIC_read_byte(char_memory_base_addr+i);
 
-		for(int m=7;m>=0;m--){
+		for(int m=0;m<8;m++){
 			host_charset[i*8+7-m] = (GET_I_BIT(byte,m)) ? 0xFF : 0;
+		}
+		
+		for(int m=0;m<8;m+=2){
+			host_charset_MCM[i*8+m] 		= (GET_TWO_BITS(byte,(6-m)));
+			host_charset_MCM[i*8+m+1] 		= (GET_TWO_BITS(byte,(6-m)));
+
 		}
 
 	}
+/*
+	cout<<"-------HOST---------"<<endl;
+	hexDump(host_charset,2048);
+	cout<<"-------------------------"<<endl;
 
+
+	cout<<"-------MCM HOST---------"<<endl;
+	hexDump(host_charset_MCM,2048*8);
+	cout<<"-------------------------"<<endl;
+*/
 }
 
 
@@ -305,5 +367,11 @@ void VIC::set_graphic_mode(){
 void VIC::setCPU(CPU* cpu){
 
 	this->cpu = cpu;
+
+}
+
+MODES VIC::getCurrentMode(){
+
+	return graphic_mode;
 
 }
