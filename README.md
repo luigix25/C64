@@ -12,11 +12,14 @@ A Very Basic C64 Emulator implemented using C++14 and SDL.
 * Keyboard 
 	* Some keys are not mapped
 
-* VIC II char mode
-
+* VIC II
+	* Char mode
+	* Char MCM
+	* Bitmap Mode
+	* Bitmap MCM
 
 # TODO List
 
-* Char MultiColorMode 
+* VIC II Raster Interrupt
 * CPU code refactoring
 * Memory code refactoring

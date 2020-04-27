@@ -27,8 +27,8 @@ void dump_cpu_handler(int s){
 }
 
 void load_roba(int s){
-	mem->load_prg("roms/bitmap.prg");
-	//mem->load_prg("roms/delysid_multicolor_testscreen.prg");
+	//mem->load_prg("roms/bitmap.prg");
+	mem->load_prg("roms/delysid_multicolor_testscreen.prg");
 
 }
 

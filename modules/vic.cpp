@@ -57,8 +57,6 @@ void VIC::init_color_palette(){
 	color_palette[11]	= SDL_MapRGB(format, 0x5b, 0x5b, 0x5b);
 	color_palette[12]	= SDL_MapRGB(format, 0x8b, 0x8b, 0x8b);
 	color_palette[13]	= SDL_MapRGB(format, 0xaa, 0xff, 0x66);
-	color_palette[13]	= color_palette[2];
-
 	color_palette[14]	= SDL_MapRGB(format, 0x00, 0x88, 0xff);
 	color_palette[15]	= SDL_MapRGB(format, 0xb8, 0xb8, 0xb8);
 
@@ -73,7 +71,7 @@ void VIC::draw_bitmap(uint8_t offset, int X, int Y){
 	uint8_t fg_color = color_palette[fg_color_idx];
 
 	for(int i=0;i<8;i++){
-		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + (X+i) * SCREEN_WIDTH/8 + Y/8;
+		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + (X+i) * SCREEN_WIDTH/8 + Y + i;
 		uint8_t row_pixel_value = memory->VIC_read_byte(bitmap_matrix_ptr);
 		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
 
@@ -126,8 +124,6 @@ void VIC::draw_bitmap_mcm(uint8_t screen_ram, int X, int Y){
 		}
 
 	}
-
-
 
 }
 
