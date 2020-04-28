@@ -27,7 +27,6 @@ class Memory{
 		void write_byte(uint16_t,uint8_t);
 
 		uint8_t VIC_read_byte(uint16_t);
-		void VIC_write_byte(uint16_t,uint8_t);
 
 		void load_kernal_and_basic(const string&);
 		void load_charset(const string&);

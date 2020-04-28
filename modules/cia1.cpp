@@ -14,11 +14,6 @@ CIA1::CIA1(){
 
 }
 
-CIA1::~CIA1(){
-
-
-}
-
 
 void CIA1::setCPU(CPU* cpu){
 

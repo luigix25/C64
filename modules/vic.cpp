@@ -151,10 +151,10 @@ void VIC::show_char(uint8_t offset, int X, int Y){
 
 		for(int j=0; j < CHAR_WIDTH; j++){
 
-			if(graphic_mode == CHAR_MODE or (graphic_mode == MCM_TEXT_MODE and fg_color_idx < 8))
+			if(graphic_mode == CHAR_MODE or (fg_color_idx < 8))
 			
 				ptr[j] = *(font_pointer + (i*8) +j) ? fg_color : bg_color;
-			
+
 			else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
 
 				uint8_t value = *(font_pointer_MCM + (i*8) +j);
@@ -166,24 +166,20 @@ void VIC::show_char(uint8_t offset, int X, int Y){
 					ptr[j] = mcm_color_two;
 				else if(value == 0x02){
 					ptr[j] = mcm_color_three;
-				}
-				else if(value == 0x03){
+				} else if(value == 0x03){
 					
 					/*cout<<"MCM 0 "<<hex<<unsigned(bg_color_idx)<<endl;
 					cout<<"MCM 1 "<<hex<<unsigned(mcm_color_two_idx)<<endl;
 					cout<<"MCM 2 "<<hex<<unsigned(mcm_color_three_idx)<<endl;
 					cout<<"MCM 3 "<<hex<<unsigned(fg_color_idx)<<endl;*/
 					ptr[j] = color_palette[fg_color_idx];
-					ptr[j] = color_palette[1];
+					//ptr[j] = color_palette[1];
 
 				}		
 			} 
-		
-		
-		
+
 		}
 
-		//memcpy(ptr, character + (i*8) ,8);
 	}
 
 }
@@ -350,7 +346,6 @@ void VIC::write_register(uint16_t addr, uint8_t data){
     		screen_memory_base_addr = (data & 0xF0) << 6;
 			bitmap_memory_base_addr = (data & 0x8) << 10;
 
-			cout<<"bitmap_memory_base_addr "<<hex<<unsigned(bitmap_memory_base_addr)<<endl;
     		break;
 
     	case IRQ_EN_REG:
@@ -380,9 +375,7 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 
 void VIC::control_reg_one(uint8_t data){
 
-	//Bitmap Mode
-
-
+	
 	if(GET_I_BIT(data,3)){
 		visible_rows = 24;
 	} else {
@@ -415,14 +408,18 @@ void VIC::set_graphic_mode(){
 	bool bmm = GET_I_BIT(registers[CTRL_REG_1_OFF],5); 
 	bool mcm = GET_I_BIT(registers[CTRL_REG_2_OFF],4); 
 
-	if(!ecm && !bmm && !mcm)
+	if(!ecm && !bmm && !mcm){
+		cout<<"CHAR"<<endl;
+
 		graphic_mode = CHAR_MODE;
-	else if(!ecm && !bmm && mcm){
-		cout<<"MCM CHAR!!!!"<<endl;
+	}else if(!ecm && !bmm && mcm){
+		cout<<"MCM CHAR"<<endl;
+
 		graphic_mode = MCM_TEXT_MODE;
-	} else if(!ecm && bmm && !mcm)
+	} else if(!ecm && bmm && !mcm){
+		cout<<"BITMAP"<<endl;
 		graphic_mode = BITMAP_MODE;
-	else if(!ecm && bmm && mcm){
+	} else if(!ecm && bmm && mcm){
 		cout<<"MCM BITMAP"<<endl;
 		graphic_mode = MCB_BITMAP_MODE;
 	} else
@@ -439,11 +436,5 @@ void VIC::set_graphic_mode(){
 void VIC::setCPU(CPU* cpu){
 
 	this->cpu = cpu;
-
-}
-
-MODES VIC::getCurrentMode(){
-
-	return graphic_mode;
 
 }

@@ -177,10 +177,6 @@ uint8_t Memory::VIC_read_byte(uint16_t addr){
 
 }
 
-void Memory::VIC_write_byte(uint16_t addr, uint8_t data){
-	
-}
-
 void Memory::setup_memory_mode(uint8_t value){
   
 	bool loram_en  = ((value & HIRAM_MASK) != 0);

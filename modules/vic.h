@@ -94,7 +94,6 @@ class VIC {
 		void setCIA1(CIA1*);
 		void setCIA2(CIA2*);
 
-		MODES getCurrentMode();		
 
 		uint8_t read_register(uint16_t);
 		void write_register(uint16_t,uint8_t);
