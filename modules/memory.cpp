@@ -271,6 +271,8 @@ void Memory::load_prg(const string& filename) {
 
 	size -= 2;
 
+	delete[] buffer;
+
 	memcpy(memory+addr, buffer+2, size);
 
 }
