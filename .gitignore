@@ -2,7 +2,6 @@ main
 *.o
 .*
 
-emudore-master/*
 old/*
 
 output*
