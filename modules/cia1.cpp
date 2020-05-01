@@ -7,7 +7,7 @@ CIA1::CIA1(){
 	timerA_reload = timerB_reload = false;
 	timerA_irq_enabled = timerB_irq_enabled = false;
 	timerA_irq_raised = timerB_irq_raised = false;
-	
+	timerA_sysclock = timerB_sysclock = false;
 	timerA = timerB = 0;
 
 	sdl = nullptr;
@@ -28,13 +28,12 @@ void CIA1::setSDL(SDLManager* sdl){
 
 void CIA1::clock(){
 
-	if(timerA_enabled){
+	if(timerA_enabled and timerA_sysclock){
 		//cout<<hex<<unsigned(timerA_latch)<<endl;
 		timerA--;
-
 	}
 
-	if(timerB_enabled)
+	if(timerB_enabled and timerB_sysclock)
 		timerB--;
 
 	if(timerA_irq_enabled and timerA_enabled and timerA == 0){
@@ -58,7 +57,7 @@ void CIA1::clock(){
 			timerB_enabled = false;
 	}
 
-	if(timerA_irq_raised or timerB_irq_raised){
+	if((timerA_irq_raised and timerA_irq_enabled) or (timerB_irq_raised and timerB_irq_enabled)){
 		cpu->setIRQline();
 		timerA_irq_raised = timerB_irq_raised = false;
 	}
@@ -85,6 +84,7 @@ uint8_t CIA1::read_register(uint16_t address){
 			return_value |= 0x80;
 			return_value |= timerA_irq_raised << 0;
 			return_value |= timerB_irq_raised << 1;
+			//cout<<"IRQ LINE RESET"<<endl;
 			cpu->resetIRQline();
 			timerA_irq_raised = timerB_irq_raised = false;
 			//}
@@ -101,18 +101,19 @@ uint8_t CIA1::read_register(uint16_t address){
 
 void CIA1::write_register(uint16_t address, uint8_t data){
 
-	//Masking first byte
-	address &= 0x00FF;
+	//Masking first byte for mirroring
+	address &= 0x000F;
 	//For mirroring
-	address = address % 16;
+	//address = address % 16;
 
 	uint16_t data_expanded = data;
 
 	switch(address){
 		case IRQ_REG:
-		    if(GET_I_BIT(data,0)) 
+
+		    if(GET_I_BIT(data,0))
 				timerA_irq_enabled = GET_I_BIT(data,7);
-    		
+			
 			if(GET_I_BIT(data,1)) 
 				timerB_irq_enabled = GET_I_BIT(data,7);
 
@@ -129,9 +130,11 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 			break;
 
 		case TA_CTRL:
+
 			timerA_enabled = GET_I_BIT(data,0);
 			timerA_reload = !(GET_I_BIT(data,3));
-			
+			timerA_sysclock = !(GET_I_BIT(data,5));
+
 			if(GET_I_BIT(data,4))
 				timerA = timerA_latch;
 
@@ -150,6 +153,7 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 		case TB_CTRL:
 			timerB_enabled = GET_I_BIT(data,0);
 			timerB_reload = !(GET_I_BIT(data,3));
+			timerB_sysclock = !(GET_I_BIT(data,5));
 
 			if(GET_I_BIT(data,4))
 				timerB = timerB_latch;

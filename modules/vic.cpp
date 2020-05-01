@@ -198,6 +198,7 @@ void VIC::clock(){
 
 	//TODO: fare con altre raster line
 	if(interrupt_enabled){
+		cout<<"VIC IRQ"<<endl;
 		cpu->setIRQline();
 	}
 
@@ -210,9 +211,9 @@ void VIC::clock(){
 
 		uint8_t char_offset = memory->VIC_read_byte(screen_memory_base_addr+i);
 
-		if(graphic_mode == MCM_TEXT_MODE or graphic_mode == CHAR_MODE)
+		if(graphic_mode == MCM_TEXT_MODE or graphic_mode == CHAR_MODE){
 			show_char(char_offset ,cursorX,cursorY);
-		else if(graphic_mode == BITMAP_MODE)
+		} else if(graphic_mode == BITMAP_MODE)
 			draw_bitmap(char_offset, cursorX, cursorY);
 		else if(graphic_mode == MCB_BITMAP_MODE)
 			draw_bitmap_mcm(char_offset,cursorX,cursorY);

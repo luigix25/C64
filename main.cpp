@@ -5,6 +5,7 @@
 #include "modules/SDLManager.h"
 #include "modules/cia1.h"
 #include "modules/cia2.h"
+#include "modules/loader.h"
 
 
 void test_cpu(CPU*);
@@ -26,23 +27,15 @@ void dump_cpu_handler(int s){
 	sdl->checkFPS();
 }
 
-void load_roba(int s){
-	mem->load_prg("roms/highentropy.prg");
-	//mem->load_prg("roms/delysid_multicolor_testscreen.prg");
-	//mem->load_prg("roms/snake.prg");
-
-}
-
 void chiudi(int s){
 
 	SDL_Quit();
 	exit(s);
 }
 
-int main(){
+int main(int argc, const char **argv){
 	//CTRL-Z
 //	signal(SIGTSTP,dump_mem_handler);
-	signal(SIGTSTP,load_roba);
 
 	//signal(SIGTSTP,dump_cpu_handler);
 	signal(SIGINT,chiudi);
@@ -76,10 +69,23 @@ int main(){
 	vic->setCIA1(cia1);
 	vic->setCIA2(cia2);
 
+	Loader *loader;
+
+	string s = "";
+
+	if(argc > 1){
+		s = argv[1];
+		loader = new Loader(cpu,mem,s);
+	} else {
+		loader = new Loader(cpu,mem,s);
+	}
+
 	while(true){
 		cpu->clock();
 		cia1->clock();
 		vic->clock();
+		loader->clock();
+
 	}
 
 }
@@ -93,18 +99,18 @@ void test_cpu(CPU *cpu)
 	while(loop)
 	{
 		
-		if(pc == cpu->regs.PC)
+		if(pc == cpu->PC)
 		{
 			cout<<"infinite loop at "<<hex<<unsigned(pc)<<endl;
 			break;
 
-		} else if(cpu->regs.PC == 0x3463)
+		} else if(cpu->PC == 0x3463)
 		{
 			cout<<"test passed!"<<endl;
 			break;
 		}
 		
-		pc = cpu->regs.PC;
+		pc = cpu->PC;
 		
 		opcode = cpu->fetch();
 		cout<<"OPCODE: "<<hex<<unsigned(opcode)<<endl;

@@ -34,8 +34,18 @@ void Memory::dump_memory(uint16_t addr,uint16_t bytes){
 
 	cout<<endl<<"---------------------"<<endl;
 
+	int conta = 0;
 	for(uint16_t i=0;i<bytes;i++){
 		cout<<hex<<unsigned(read_byte(addr+i))<<" ";
+
+		conta++;
+		if(conta == 16){
+			cout<<endl;
+			conta = 0;
+		}
+
+
+
 	}
 
 	cout<<endl<<"---------------------"<<endl;
@@ -179,8 +189,8 @@ uint8_t Memory::VIC_read_byte(uint16_t addr){
 
 void Memory::setup_memory_mode(uint8_t value){
   
-	bool loram_en  = ((value & HIRAM_MASK) != 0);
-	bool hiram_en = ((value & LORAM_MASK) != 0);
+	bool loram_en  = ((value & LORAM_MASK) != 0);
+	bool hiram_en = ((value & HIRAM_MASK) != 0);
 	bool char_en = ((value & CHAR_MASK) != 0);
 
 	//Set everything to RAM as default
@@ -188,11 +198,12 @@ void Memory::setup_memory_mode(uint8_t value){
 	LORAM_mode = RAM;
 	CHAR_mode = RAM;
 
-	//Basic
-	if(hiram_en)
-		HIRAM_mode = ROM;
-
 	//Kernal
+	if(hiram_en){
+		HIRAM_mode = ROM;
+	}
+
+	//Basic
 	if(loram_en && hiram_en)
 		LORAM_mode = ROM;
 
@@ -271,9 +282,13 @@ void Memory::load_prg(const string& filename) {
 
 	size -= 2;
 
-	delete[] buffer;
+	cout<<hex<<"addr start: "<<addr<<endl;
+	cout<<hex<<"addr end: "<<addr+size<<endl;
 
 	memcpy(memory+addr, buffer+2, size);
+
+
+	delete[] buffer;
 
 }
 

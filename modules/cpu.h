@@ -18,8 +18,6 @@ class CPU
 		CPU(Memory *);
 		CPU(Memory *,uint16_t);
 
-		//~CPU();
-
 		uint8_t fetch();
 		bool decode(uint8_t);
 
@@ -36,6 +34,9 @@ class CPU
 		registers regs;
 
 		void clock();
+
+		uint16_t PC;
+		uint16_t SP;
 
 	private:
 

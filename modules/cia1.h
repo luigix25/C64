@@ -55,6 +55,9 @@ class CIA1
 		bool timerA_reload;
 		bool timerB_reload;
 
+		bool timerA_sysclock;
+		bool timerB_sysclock;
+
 		CPU *cpu;
 		SDLManager *sdl;
 
