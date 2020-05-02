@@ -206,6 +206,8 @@ void VIC::clock(){
 		rasterline = 0;
 
 	if(rasterline == 0){
+		update_host_charset();
+
 		sdl->render_frame();
 		clocks_to_new_render = 0;
 
@@ -228,8 +230,6 @@ void VIC::clock(){
 	if(interrupt_enabled){
 		cpu->setIRQline();
 	}
-
-	update_host_charset();
 
 	//50 is the first visible rasterline;
 	int crt_row = rasterline - 50;
