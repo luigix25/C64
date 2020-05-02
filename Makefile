@@ -1,4 +1,4 @@
-FLAGS = -Wall -Wextra -pedantic -g3 -std=c++11 -O0
+FLAGS = -Wall -Wextra -pedantic -g3 -std=c++11 -O3
 DEPENDENCIES = library.o cpu.o memory.o vic.o SDLManager.o cia1.o cia2.o loader.o
 HEADERS = library.h memory.h vic.h cpu.h
 

@@ -40,7 +40,7 @@ class VIC {
 		uint8_t visible_rows;
 		uint8_t visible_cols;
 
-		uint8_t rasterline;
+		uint16_t rasterline;
 
 		uint16_t screen_memory_base_addr;
 		uint16_t char_memory_base_addr;
@@ -80,6 +80,8 @@ class VIC {
 
 
 		uint32_t clocks_to_new_render;
+		uint32_t clocks_to_new_line;
+
 		chrono::time_point<chrono::steady_clock> last_time_rendered;
 
 	public:

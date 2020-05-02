@@ -26,6 +26,8 @@ VIC::VIC(){
 
 	interrupt_enabled = false;
 	clocks_to_new_render = 1;
+	clocks_to_new_line = 63;
+
 	last_time_rendered = chrono::steady_clock::now();
 
 	memset(&color_palette[0],0,16*sizeof(uint8_t));
@@ -131,7 +133,7 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 
 //	cout<<"LINE OFFSET "<<dec<<line_offset<<"\n";
 
-	//cout<<"X: "<<X<<" Y "<<Y<<" OF: "<<line_offset<<"\n";
+//	cout<<dec<<"X: "<<X<<" Y "<<Y<<" OF: "<<line_offset<<"\n";
 
 	uint8_t bg_color_idx = registers[0xD021-0xD000];
 	uint8_t bg_color = color_palette[bg_color_idx];
@@ -143,19 +145,21 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 	uint8_t mcm_color_three_idx = registers[0xD023-0xD000];
 	uint8_t mcm_color_three = color_palette[mcm_color_three_idx];
 
+	//non gli piace va oltre di 1
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
 	uint8_t fg_color = color_palette[fg_color_idx];
 
 	uint8_t* font_pointer = host_charset + 64 * offset;
 	uint8_t* font_pointer_MCM = host_charset_MCM + 64 * offset;
 
-
+	//non gli piace
 	uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset + X) + Y;
 
 	for(int j=0; j < CHAR_WIDTH; j++){
 
 		if(graphic_mode == CHAR_MODE or (fg_color_idx < 8))
-		
+
+			//non gli piace
 			ptr[j] = *(font_pointer + (line_offset * 8) +j) ? fg_color : bg_color;
 
 		else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
@@ -188,10 +192,22 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 
 void VIC::clock(){
 
+	clocks_to_new_line--;
+	clocks_to_new_render++;
+
+	if(clocks_to_new_line != 0)
+		return;
+
 	rasterline++;
+	clocks_to_new_line = 63;
+
+
+	if(rasterline == 312)
+		rasterline = 0;
 
 	if(rasterline == 0){
 		sdl->render_frame();
+		clocks_to_new_render = 0;
 
 		auto current_time = chrono::steady_clock::now();
 
@@ -205,10 +221,9 @@ void VIC::clock(){
 		return;
 	}
 
-	if(!(rasterline >= 50 and rasterline <= 250))
+	if(!(rasterline >= 50 and rasterline <= 249))
 		return;
 	
-
 	//TODO: fare con altre raster line
 	if(interrupt_enabled){
 		cpu->setIRQline();
