@@ -54,7 +54,7 @@ class VIC {
 		void update_host_charset();
 		void init_color_palette();
 
-		void show_char(uint8_t, int, int);
+		void show_char_line(uint8_t, int, int,int);
 		void draw_bitmap(uint8_t, int, int);
 		void draw_bitmap_mcm(uint8_t, int, int);
 

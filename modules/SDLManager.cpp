@@ -5,8 +5,8 @@ SDLManager::SDLManager(){
 
 	video_memory = new pixel_type[SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(pixel_type)];
 
-	video_thread = new thread(&SDLManager::initialize_SDL,this);
-	video_thread->detach();
+//	video_thread = new thread(&SDLManager::initialize_SDL,this);
+//	video_thread->detach();
 
 	total_redraws = 0;
 	start_time = chrono::steady_clock::now();

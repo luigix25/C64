@@ -127,7 +127,11 @@ void VIC::draw_bitmap_mcm(uint8_t screen_ram, int X, int Y){
 
 }
 
-void VIC::show_char(uint8_t offset, int X, int Y){
+void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
+
+//	cout<<"LINE OFFSET "<<dec<<line_offset<<"\n";
+
+	//cout<<"X: "<<X<<" Y "<<Y<<" OF: "<<line_offset<<"\n";
 
 	uint8_t bg_color_idx = registers[0xD021-0xD000];
 	uint8_t bg_color = color_palette[bg_color_idx];
@@ -146,39 +150,36 @@ void VIC::show_char(uint8_t offset, int X, int Y){
 	uint8_t* font_pointer_MCM = host_charset_MCM + 64 * offset;
 
 
-	for(int i = 0; i < CHAR_WIDTH; i++){
-		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
+	uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset + X) + Y;
 
-		for(int j=0; j < CHAR_WIDTH; j++){
+	for(int j=0; j < CHAR_WIDTH; j++){
 
-			if(graphic_mode == CHAR_MODE or (fg_color_idx < 8))
-			
-				ptr[j] = *(font_pointer + (i*8) +j) ? fg_color : bg_color;
+		if(graphic_mode == CHAR_MODE or (fg_color_idx < 8))
+		
+			ptr[j] = *(font_pointer + (line_offset * 8) +j) ? fg_color : bg_color;
 
-			else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
+		else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
 
-				uint8_t value = *(font_pointer_MCM + (i*8) +j);
+			uint8_t value = *(font_pointer_MCM + (line_offset * 8) +j);
 
-				//cout<<hex<<unsigned(value)<<endl;
-				if(value == 0x00)
-					ptr[j] = bg_color;
-				else if(value == 0x01)
-					ptr[j] = mcm_color_two;
-				else if(value == 0x02){
-					ptr[j] = mcm_color_three;
-				} else if(value == 0x03){
-					
-					/*cout<<"MCM 0 "<<hex<<unsigned(bg_color_idx)<<endl;
-					cout<<"MCM 1 "<<hex<<unsigned(mcm_color_two_idx)<<endl;
-					cout<<"MCM 2 "<<hex<<unsigned(mcm_color_three_idx)<<endl;
-					cout<<"MCM 3 "<<hex<<unsigned(fg_color_idx)<<endl;*/
-					ptr[j] = color_palette[fg_color_idx];
-					//ptr[j] = color_palette[1];
+			//cout<<hex<<unsigned(value)<<endl;
+			if(value == 0x00)
+				ptr[j] = bg_color;
+			else if(value == 0x01)
+				ptr[j] = mcm_color_two;
+			else if(value == 0x02){
+				ptr[j] = mcm_color_three;
+			} else if(value == 0x03){
+				
+				cout<<"MCM 0 "<<hex<<unsigned(bg_color_idx)<<endl;
+				cout<<"MCM 1 "<<hex<<unsigned(mcm_color_two_idx)<<endl;
+				cout<<"MCM 2 "<<hex<<unsigned(mcm_color_three_idx)<<endl;
+				cout<<"MCM 3 "<<hex<<unsigned(fg_color_idx)<<endl;
+				//ptr[j] = color_palette[fg_color_idx];
+				ptr[j] = color_palette[1];
 
-				}		
-			} 
-
-		}
+			}		
+		} 
 
 	}
 
@@ -187,65 +188,67 @@ void VIC::show_char(uint8_t offset, int X, int Y){
 
 void VIC::clock(){
 
-	clocks_to_new_render--;
+	rasterline++;
 
-	if(clocks_to_new_render > 0){
+	if(rasterline == 0){
+		sdl->render_frame();
+
+		auto current_time = chrono::steady_clock::now();
+
+		auto c = current_time - last_time_rendered;
+
+		c = chrono::milliseconds(20) - c;
+
+		this_thread::sleep_for(c);
+
+		last_time_rendered = chrono::steady_clock::now();
 		return;
 	}
 
-
-	clocks_to_new_render = 20000;
+	if(!(rasterline >= 50 and rasterline <= 250))
+		return;
+	
 
 	//TODO: fare con altre raster line
 	if(interrupt_enabled){
-		cout<<"VIC IRQ"<<endl;
 		cpu->setIRQline();
 	}
 
-	uint32_t cursorX = 0;
-	uint32_t cursorY = 0;
-
 	update_host_charset();
 
-	for(int i=0;i<1000;i++){
+	//50 is the first visible rasterline;
+	int crt_row = rasterline - 50;
 
-		uint8_t char_offset = memory->VIC_read_byte(screen_memory_base_addr+i);
+	uint32_t cursorX = crt_row/8;
+	uint32_t cursorY = 0;
+
+	//cout<<"---------------------------------\n";
+	//cout<<"cursorX "<<cursorX<<"\n";
+
+	for(int i=0;i < 40; i++){
+		
+		//cout<<"offset: "<<dec<<cursorX * 40 + i<<endl;
+		//cout<<"Y: "<<dec<<cursorY<<endl;
+
+		//Dovrebbe essere OK!
+		uint8_t char_offset = memory->VIC_read_byte(screen_memory_base_addr + cursorX * 40 + i);
 
 		if(graphic_mode == MCM_TEXT_MODE or graphic_mode == CHAR_MODE){
-			show_char(char_offset ,cursorX,cursorY);
+			show_char_line(char_offset ,cursorX*8 ,cursorY, crt_row % 8);
 		} else if(graphic_mode == BITMAP_MODE)
-			draw_bitmap(char_offset, cursorX, cursorY);
+			draw_bitmap(char_offset, crt_row, cursorY);
 		else if(graphic_mode == MCB_BITMAP_MODE)
-			draw_bitmap_mcm(char_offset,cursorX,cursorY);
-			
+			draw_bitmap_mcm(char_offset,crt_row,cursorY);
+
 		cursorY +=8;
 
 		if(cursorY >= SCREEN_WIDTH-7){
 			cursorY = 0;
-			cursorX += 8;
+			//cursorX += 8;
 		}
 	}
 
-	sdl->render_frame();
-
-	auto current_time = chrono::steady_clock::now();
-
-	//auto c = chrono::duration_cast<chrono::nanoseconds>(current_time - last_time_rendered);
-
-
-	auto c = current_time - last_time_rendered;
-
-	//auto temp = chrono::duration_cast<chrono::milliseconds>(c);
-
-	//cout<<"Current - Last "<<dec<<temp.count()<<" ms"<<endl;
-
-	c = chrono::milliseconds(20) - c;
-
-	this_thread::sleep_for(c);
-
-
-	last_time_rendered = chrono::steady_clock::now();
-
+	//cout<<"---------------------------------\n";
 
 }
 
