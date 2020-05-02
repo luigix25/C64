@@ -64,7 +64,7 @@ void VIC::init_color_palette(){
 
 }
 
-void VIC::draw_bitmap(uint8_t offset, int X, int Y){
+void VIC::draw_bitmap_line(uint8_t offset, int X, int Y, int line_offset){
 
 	uint8_t bg_color_idx = offset & 0x0F;
 	uint8_t fg_color_idx = (offset & 0xF0)>>4;
@@ -72,10 +72,10 @@ void VIC::draw_bitmap(uint8_t offset, int X, int Y){
 	uint8_t bg_color = color_palette[bg_color_idx];
 	uint8_t fg_color = color_palette[fg_color_idx];
 
-	for(int i=0;i<8;i++){
-		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + (X+i) * SCREEN_WIDTH/8 + Y + i;
+	//for(int i=0;i<8;i++){
+		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + (X+line_offset) * SCREEN_WIDTH/8 + Y + line_offset;
 		uint8_t row_pixel_value = memory->VIC_read_byte(bitmap_matrix_ptr);
-		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
+		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
 
 		for(int j=0;j<8;j++){
 
@@ -84,11 +84,11 @@ void VIC::draw_bitmap(uint8_t offset, int X, int Y){
 
 		}
 
-	}
+	//}
 
 }
 
-void VIC::draw_bitmap_mcm(uint8_t screen_ram, int X, int Y){
+void VIC::draw_bitmap_mcm_line(uint8_t screen_ram, int X, int Y, int line_offset){
 
 	uint8_t bg_color_idx = registers[0xD021-0xD000];
 	uint8_t bg_color = color_palette[bg_color_idx];
@@ -96,12 +96,12 @@ void VIC::draw_bitmap_mcm(uint8_t screen_ram, int X, int Y){
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
 	uint8_t fg_color = color_palette[fg_color_idx];
 
-	for(int i=0; i<8; i++){
+//	for(int i=0; i<8; i++){
 
-		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + X * SCREEN_WIDTH/8 + Y + i;
+		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + X * SCREEN_WIDTH/8 + Y + line_offset;
 
 		uint8_t screen_matrix_value = memory->VIC_read_byte(bitmap_matrix_ptr);
-		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (i+X) + Y;
+		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
 
 		for (int j=0; j<8; j+=2){
 
@@ -122,10 +122,9 @@ void VIC::draw_bitmap_mcm(uint8_t screen_ram, int X, int Y){
 				ptr[j] = ptr[j+1] = fg_color;
 			}
 
-
 		}
 
-	}
+//	}
 
 }
 
@@ -145,28 +144,24 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 	uint8_t mcm_color_three_idx = registers[0xD023-0xD000];
 	uint8_t mcm_color_three = color_palette[mcm_color_three_idx];
 
-	//non gli piace va oltre di 1
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
 	uint8_t fg_color = color_palette[fg_color_idx];
 
 	uint8_t* font_pointer = host_charset + 64 * offset;
 	uint8_t* font_pointer_MCM = host_charset_MCM + 64 * offset;
 
-	//non gli piace
 	uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset + X) + Y;
 
 	for(int j=0; j < CHAR_WIDTH; j++){
 
 		if(graphic_mode == CHAR_MODE or (fg_color_idx < 8))
 
-			//non gli piace
 			ptr[j] = *(font_pointer + (line_offset * 8) +j) ? fg_color : bg_color;
 
 		else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
 
 			uint8_t value = *(font_pointer_MCM + (line_offset * 8) +j);
 
-			//cout<<hex<<unsigned(value)<<endl;
 			if(value == 0x00)
 				ptr[j] = bg_color;
 			else if(value == 0x01)
@@ -174,17 +169,7 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 			else if(value == 0x02){
 				ptr[j] = mcm_color_three;
 			} else if(value == 0x03){
-				
-				if(mcm_color_three_idx != fg_color_idx){
-					cout<<"DIVERSI!"<<endl;
-				}
-
-				/*cout<<"MCM 0 "<<hex<<unsigned(bg_color_idx)<<endl;
-				cout<<"MCM 1 "<<hex<<unsigned(mcm_color_two_idx)<<endl;
-				cout<<"MCM 2 "<<hex<<unsigned(mcm_color_three_idx)<<endl;
-				cout<<"MCM 3 "<<hex<<unsigned(fg_color_idx)<<endl;*/
-				ptr[j] = color_palette[fg_color_idx];
-				//ptr[j] = color_palette[1];
+				ptr[j] = color_palette[fg_color_idx & 0x7];
 
 			}		
 		} 
@@ -242,9 +227,6 @@ void VIC::clock(){
 	uint32_t cursorX = crt_row/8;
 	uint32_t cursorY = 0;
 
-	//cout<<"---------------------------------\n";
-	//cout<<"cursorX "<<cursorX<<"\n";
-
 	for(int i=0;i < 40; i++){
 		
 		//cout<<"offset: "<<dec<<cursorX * 40 + i<<endl;
@@ -256,16 +238,12 @@ void VIC::clock(){
 		if(graphic_mode == MCM_TEXT_MODE or graphic_mode == CHAR_MODE){
 			show_char_line(char_offset ,cursorX*8 ,cursorY, crt_row % 8);
 		} else if(graphic_mode == BITMAP_MODE)
-			draw_bitmap(char_offset, crt_row, cursorY);
+			draw_bitmap_line(char_offset, cursorX*8, cursorY, crt_row % 8);
 		else if(graphic_mode == MCB_BITMAP_MODE)
-			draw_bitmap_mcm(char_offset,crt_row,cursorY);
+			draw_bitmap_mcm_line(char_offset,cursorX*8,cursorY, crt_row % 8);
 
 		cursorY +=8;
 
-		if(cursorY >= SCREEN_WIDTH-7){
-			cursorY = 0;
-			//cursorX += 8;
-		}
 	}
 
 	//cout<<"---------------------------------\n";

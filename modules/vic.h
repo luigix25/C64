@@ -55,8 +55,8 @@ class VIC {
 		void init_color_palette();
 
 		void show_char_line(uint8_t, int, int,int);
-		void draw_bitmap(uint8_t, int, int);
-		void draw_bitmap_mcm(uint8_t, int, int);
+		void draw_bitmap_line(uint8_t, int, int, int);
+		void draw_bitmap_mcm_line(uint8_t, int, int, int);
 
 		bool interrupt_enabled;
 
