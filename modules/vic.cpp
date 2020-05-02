@@ -175,12 +175,16 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 				ptr[j] = mcm_color_three;
 			} else if(value == 0x03){
 				
-				cout<<"MCM 0 "<<hex<<unsigned(bg_color_idx)<<endl;
+				if(mcm_color_three_idx != fg_color_idx){
+					cout<<"DIVERSI!"<<endl;
+				}
+
+				/*cout<<"MCM 0 "<<hex<<unsigned(bg_color_idx)<<endl;
 				cout<<"MCM 1 "<<hex<<unsigned(mcm_color_two_idx)<<endl;
 				cout<<"MCM 2 "<<hex<<unsigned(mcm_color_three_idx)<<endl;
-				cout<<"MCM 3 "<<hex<<unsigned(fg_color_idx)<<endl;
-				//ptr[j] = color_palette[fg_color_idx];
-				ptr[j] = color_palette[1];
+				cout<<"MCM 3 "<<hex<<unsigned(fg_color_idx)<<endl;*/
+				ptr[j] = color_palette[fg_color_idx];
+				//ptr[j] = color_palette[1];
 
 			}		
 		} 
@@ -191,6 +195,10 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 
 
 void VIC::clock(){
+
+	if(interrupt_enabled and rasterline == 0){
+		cpu->setIRQline();
+	}
 
 	clocks_to_new_line--;
 	clocks_to_new_render++;
@@ -227,9 +235,6 @@ void VIC::clock(){
 		return;
 	
 	//TODO: fare con altre raster line
-	if(interrupt_enabled){
-		cpu->setIRQline();
-	}
 
 	//50 is the first visible rasterline;
 	int crt_row = rasterline - 50;
