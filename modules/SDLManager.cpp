@@ -1,9 +1,10 @@
 #include "SDLManager.h"
 
+#define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
 SDLManager::SDLManager(){
 
-	video_memory = new host_pixel_t[SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(host_pixel_t)];
+	video_memory = new host_pixel_t[SCREEN_WIDTH * SCREEN_HEIGHT];
 
 	video_thread = new thread(&SDLManager::initialize_SDL,this);
 	video_thread->detach();
@@ -11,7 +12,7 @@ SDLManager::SDLManager(){
 	total_redraws = 0;
 	start_time = chrono::steady_clock::now();
 
-	format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB332);
+	format = SDL_AllocFormat(PIXEL_FORMAT);
 
 	memset(&keyboard_matrix[0],0xFF,64);
 
@@ -64,7 +65,7 @@ void SDLManager::initialize_SDL(){
 		return;
 	}
 
-	texture = SDL_CreateTexture(renderer,SDL_PIXELFORMAT_RGB332,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);
+	texture = SDL_CreateTexture(renderer,PIXEL_FORMAT,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);
 
 	keyboard_loop();
 

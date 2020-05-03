@@ -46,20 +46,20 @@ void VIC::init_color_palette(){
 
 	color_palette[0] 	= SDL_MapRGB(format, 0x00, 0x00, 0x00);		//black
 	color_palette[1] 	= SDL_MapRGB(format, 0xFF, 0xFF, 0xFF);		//white
-	color_palette[2] 	= SDL_MapRGB(format, 0xab, 0x31, 0x26);
-	color_palette[3] 	= SDL_MapRGB(format, 0x66, 0xda, 0xff);
-	color_palette[4] 	= SDL_MapRGB(format, 0xbb, 0x3f, 0xb8);
+	color_palette[2] 	= SDL_MapRGB(format, 0x88, 0x00, 0x00);
+	color_palette[3] 	= SDL_MapRGB(format, 0xAA, 0xFF, 0xEE);
+	color_palette[4] 	= SDL_MapRGB(format, 0xCC, 0x44, 0xCC);
 	color_palette[5]	= SDL_MapRGB(format, 0x00, 0xcc, 0x55);
 	color_palette[6]	= SDL_MapRGB(format, 0x00, 0x00, 0xAA);
-	color_palette[7]	= SDL_MapRGB(format, 0xea, 0xf5, 0x7c);
-	color_palette[8]	= SDL_MapRGB(format, 0xb9, 0x74, 0x18);
-	color_palette[9]	= SDL_MapRGB(format, 0x78, 0x53, 0x00);
-	color_palette[10]	= SDL_MapRGB(format, 0xdd, 0x93, 0x87);
-	color_palette[11]	= SDL_MapRGB(format, 0x5b, 0x5b, 0x5b);
-	color_palette[12]	= SDL_MapRGB(format, 0x8b, 0x8b, 0x8b);
-	color_palette[13]	= SDL_MapRGB(format, 0xaa, 0xff, 0x66);
-	color_palette[14]	= SDL_MapRGB(format, 0x00, 0x88, 0xff);
-	color_palette[15]	= SDL_MapRGB(format, 0xb8, 0xb8, 0xb8);
+	color_palette[7]	= SDL_MapRGB(format, 0xEE, 0xEE, 0x77);
+	color_palette[8]	= SDL_MapRGB(format, 0xDD, 0x88, 0x55);
+	color_palette[9]	= SDL_MapRGB(format, 0x66, 0x44, 0x00);
+	color_palette[10]	= SDL_MapRGB(format, 0xFF, 0x77, 0x77);
+	color_palette[11]	= SDL_MapRGB(format, 0x33, 0x33, 0x33);
+	color_palette[12]	= SDL_MapRGB(format, 0x77, 0x77, 0x77);
+	color_palette[13]	= SDL_MapRGB(format, 0xAA, 0xFF, 0x66);
+	color_palette[14]	= SDL_MapRGB(format, 0x00, 0x88, 0xFF);
+	color_palette[15]	= SDL_MapRGB(format, 0xBB, 0xBB, 0xBB);
 
 }
 
@@ -68,14 +68,14 @@ void VIC::draw_bitmap_line(uint8_t offset, int X, int Y, int line_offset){
 	uint8_t bg_color_idx = offset & 0x0F;
 	uint8_t fg_color_idx = (offset & 0xF0)>>4;
 
-	uint8_t bg_color = color_palette[bg_color_idx];
-	uint8_t fg_color = color_palette[fg_color_idx];
+	host_pixel_t bg_color = color_palette[bg_color_idx];
+	host_pixel_t fg_color = color_palette[fg_color_idx];
 
 	//Screen_width/8 =  n° di colonne
 
 	uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + (X+line_offset) * SCREEN_WIDTH/8 + Y + line_offset;
 	uint8_t row_pixel_value = memory->VIC_read_byte(bitmap_matrix_ptr);
-	uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
+	host_pixel_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
 
 	for(int j=0;j<8;j++){
 
@@ -90,15 +90,15 @@ void VIC::draw_bitmap_line(uint8_t offset, int X, int Y, int line_offset){
 void VIC::draw_bitmap_mcm_line(uint8_t screen_ram, int X, int Y, int line_offset){
 
 	uint8_t bg_color_idx = registers[0xD021-0xD000];
-	uint8_t bg_color = color_palette[bg_color_idx];
+	host_pixel_t bg_color = color_palette[bg_color_idx];
 
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
-	uint8_t fg_color = color_palette[fg_color_idx];
+	host_pixel_t fg_color = color_palette[fg_color_idx];
 
 	uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + X * SCREEN_WIDTH/8 + Y + line_offset;
 
 	uint8_t screen_matrix_value = memory->VIC_read_byte(bitmap_matrix_ptr);
-	uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
+	host_pixel_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
 
 	for (int j=0; j<8; j+=2){
 
@@ -125,27 +125,22 @@ void VIC::draw_bitmap_mcm_line(uint8_t screen_ram, int X, int Y, int line_offset
 
 void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 
-//	cout<<"LINE OFFSET "<<dec<<line_offset<<"\n";
-
-//	cout<<dec<<"X: "<<X<<" Y "<<Y<<" OF: "<<line_offset<<"\n";
-
 	uint8_t bg_color_idx = registers[0xD021-0xD000];
-	uint8_t bg_color = color_palette[bg_color_idx];
+	host_pixel_t bg_color = color_palette[bg_color_idx];
 
 	uint8_t mcm_color_two_idx = registers[0xD022-0xD000];
-	uint8_t mcm_color_two = color_palette[mcm_color_two_idx];
-
+	host_pixel_t mcm_color_two = color_palette[mcm_color_two_idx];
 
 	uint8_t mcm_color_three_idx = registers[0xD023-0xD000];
-	uint8_t mcm_color_three = color_palette[mcm_color_three_idx];
+	host_pixel_t mcm_color_three = color_palette[mcm_color_three_idx];
 
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
-	uint8_t fg_color = color_palette[fg_color_idx];
+	host_pixel_t fg_color = color_palette[fg_color_idx];
 
 	uint8_t* font_pointer = host_charset + 64 * offset;
 	uint8_t* font_pointer_MCM = host_charset_MCM + 64 * offset;
 
-	uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset + X) + Y;
+	host_pixel_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset + X) + Y;
 
 	for(int j=0; j < CHAR_WIDTH; j++){
 

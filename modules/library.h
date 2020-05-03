@@ -60,7 +60,8 @@ using namespace std;
 #define SET_I_BIT(x,i) 		(x |= (1<<i))
 #define RESET_I_BIT(x,i) 	(x &= ~(1<<i))
 
-#define host_pixel_t uint8_t
+#define host_pixel_t uint32_t
+#define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
 enum register_name
 {
