@@ -25,8 +25,7 @@ VIC::VIC(){
 	rasterline = 0;
 
 	interrupt_enabled = false;
-	clocks_to_new_render = 1;
-	clocks_to_new_line = 63;
+	clocks_to_new_line = RASTER_LINE_CLKS;
 
 	last_time_rendered = chrono::steady_clock::now();
 
@@ -72,19 +71,19 @@ void VIC::draw_bitmap_line(uint8_t offset, int X, int Y, int line_offset){
 	uint8_t bg_color = color_palette[bg_color_idx];
 	uint8_t fg_color = color_palette[fg_color_idx];
 
-	//for(int i=0;i<8;i++){
-		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + (X+line_offset) * SCREEN_WIDTH/8 + Y + line_offset;
-		uint8_t row_pixel_value = memory->VIC_read_byte(bitmap_matrix_ptr);
-		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
+	//Screen_width/8 =  n° di colonne
 
-		for(int j=0;j<8;j++){
+	uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + (X+line_offset) * SCREEN_WIDTH/8 + Y + line_offset;
+	uint8_t row_pixel_value = memory->VIC_read_byte(bitmap_matrix_ptr);
+	uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
 
-			uint8_t pixel_value = GET_I_BIT(row_pixel_value,j);
-			ptr[j] = (pixel_value) ? fg_color : bg_color;
+	for(int j=0;j<8;j++){
 
-		}
+		uint8_t pixel_value = GET_I_BIT(row_pixel_value,j);
+		ptr[j] = (pixel_value) ? fg_color : bg_color;
 
-	//}
+	}
+
 
 }
 
@@ -96,35 +95,31 @@ void VIC::draw_bitmap_mcm_line(uint8_t screen_ram, int X, int Y, int line_offset
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
 	uint8_t fg_color = color_palette[fg_color_idx];
 
-//	for(int i=0; i<8; i++){
+	uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + X * SCREEN_WIDTH/8 + Y + line_offset;
 
-		uint16_t bitmap_matrix_ptr = bitmap_memory_base_addr + X * SCREEN_WIDTH/8 + Y + line_offset;
+	uint8_t screen_matrix_value = memory->VIC_read_byte(bitmap_matrix_ptr);
+	uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
 
-		uint8_t screen_matrix_value = memory->VIC_read_byte(bitmap_matrix_ptr);
-		uint8_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset+X) + Y;
+	for (int j=0; j<8; j+=2){
 
-		for (int j=0; j<8; j+=2){
+		uint8_t switch_value = GET_TWO_BITS(screen_matrix_value,(6-j));
 
-			uint8_t switch_value = GET_TWO_BITS(screen_matrix_value,(6-j));
-
-			if(switch_value == 0x00){
-				ptr[j] = ptr[j+1] = bg_color;
-				
-			} else if(switch_value == 0x01){
-				uint8_t color_idx = (screen_ram & 0xF0)>>4;
-				ptr[j] = ptr[j+1] = color_palette[color_idx];
-
-			}else if(switch_value == 0x02){
-				uint8_t color_idx = (screen_ram & 0x0F);
-				ptr[j] = ptr[j+1] = color_palette[color_idx];
+		if(switch_value == 0x00){
+			ptr[j] = ptr[j+1] = bg_color;
 			
-			} else if(switch_value == 0x03){
-				ptr[j] = ptr[j+1] = fg_color;
-			}
+		} else if(switch_value == 0x01){
+			uint8_t color_idx = (screen_ram & 0xF0)>>4;
+			ptr[j] = ptr[j+1] = color_palette[color_idx];
 
+		}else if(switch_value == 0x02){
+			uint8_t color_idx = (screen_ram & 0x0F);
+			ptr[j] = ptr[j+1] = color_palette[color_idx];
+		
+		} else if(switch_value == 0x03){
+			ptr[j] = ptr[j+1] = fg_color;
 		}
 
-//	}
+	}
 
 }
 
@@ -186,23 +181,22 @@ void VIC::clock(){
 	}
 
 	clocks_to_new_line--;
-	clocks_to_new_render++;
 
 	if(clocks_to_new_line != 0)
 		return;
 
 	rasterline++;
-	clocks_to_new_line = 63;
 
+	//Resetting raster time
+	clocks_to_new_line = RASTER_LINE_CLKS;
 
-	if(rasterline == 312)
+	if(rasterline == LAST_RASTER_LINE)
 		rasterline = 0;
 
 	if(rasterline == 0){
 		update_host_charset();
 
 		sdl->render_frame();
-		clocks_to_new_render = 0;
 
 		auto current_time = chrono::steady_clock::now();
 
@@ -216,37 +210,38 @@ void VIC::clock(){
 		return;
 	}
 
-	if(!(rasterline >= 50 and rasterline <= 249))
+	//< not <= because are 200 not 201!
+	if(!(rasterline >= FIRST_SCREEN_LINE and rasterline < LAST_SCREEN_LINE))
 		return;
 	
-	//TODO: fare con altre raster line
-
 	//50 is the first visible rasterline;
-	int crt_row = rasterline - 50;
+	uint16_t crt_row = rasterline - FIRST_SCREEN_LINE;
+	//Offset inside a character, eg: 2° pixel row of a letter ( each char is 8x8 pixels )
+	uint8_t row_offset = crt_row % 8;
 
 	uint32_t cursorX = crt_row/8;
-	uint32_t cursorY = 0;
 
 	for(int i=0;i < 40; i++){
 		
-		//cout<<"offset: "<<dec<<cursorX * 40 + i<<endl;
-		//cout<<"Y: "<<dec<<cursorY<<endl;
+		uint32_t cursorY = i * 8;
 
-		//Dovrebbe essere OK!
+		//video memory, 40x25 byte matrix
 		uint8_t char_offset = memory->VIC_read_byte(screen_memory_base_addr + cursorX * 40 + i);
 
 		if(graphic_mode == MCM_TEXT_MODE or graphic_mode == CHAR_MODE){
-			show_char_line(char_offset ,cursorX*8 ,cursorY, crt_row % 8);
+		
+			show_char_line(char_offset ,cursorX*8 , cursorY, row_offset);
+		
 		} else if(graphic_mode == BITMAP_MODE)
-			draw_bitmap_line(char_offset, cursorX*8, cursorY, crt_row % 8);
+		
+			draw_bitmap_line(char_offset, cursorX*8, cursorY, row_offset);
+		
 		else if(graphic_mode == MCB_BITMAP_MODE)
-			draw_bitmap_mcm_line(char_offset,cursorX*8,cursorY, crt_row % 8);
 
-		cursorY +=8;
+			draw_bitmap_mcm_line(char_offset, cursorX*8, cursorY, row_offset);
 
 	}
 
-	//cout<<"---------------------------------\n";
 
 }
 
@@ -270,16 +265,7 @@ void VIC::update_host_charset(){
 		}
 
 	}
-/*
-	cout<<"-------HOST---------"<<endl;
-	hexDump(host_charset,2048);
-	cout<<"-------------------------"<<endl;
 
-
-	cout<<"-------MCM HOST---------"<<endl;
-	hexDump(host_charset_MCM,2048*8);
-	cout<<"-------------------------"<<endl;
-*/
 }
 
 

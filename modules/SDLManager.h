@@ -7,7 +7,6 @@ class SDLManager;
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 200
-#define pixel_type uint8_t
 
 #define KEYBOARD_COL_ADDR 0xDC00
 #define KEYBOARD_ROW_ADDR 0xDC01
@@ -27,7 +26,7 @@ class SDLManager{
 		SDLManager();
 		~SDLManager();
 
-		pixel_type* getVideoMemoryPtr();
+		host_pixel_t* getVideoMemoryPtr();
 		SDL_PixelFormat* getPixelFormat();
 
 		void render_frame();
@@ -51,7 +50,7 @@ class SDLManager{
 		SDL_PixelFormat *format = nullptr;
 
 		uint8_t keyboard_matrix[8][8];
-		pixel_type *video_memory = nullptr;
+		host_pixel_t *video_memory = nullptr;
 
 		//DEBUG
 

@@ -3,7 +3,7 @@
 
 SDLManager::SDLManager(){
 
-	video_memory = new pixel_type[SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(pixel_type)];
+	video_memory = new host_pixel_t[SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(host_pixel_t)];
 
 	video_thread = new thread(&SDLManager::initialize_SDL,this);
 	video_thread->detach();
@@ -77,14 +77,14 @@ void SDLManager::render_frame(){
 	if(texture == nullptr || renderer == nullptr)
 		return;
 
-	SDL_UpdateTexture(texture,NULL,video_memory,SCREEN_WIDTH * sizeof(pixel_type));
+	SDL_UpdateTexture(texture,NULL,video_memory,SCREEN_WIDTH * sizeof(host_pixel_t));
 	SDL_RenderCopy( renderer, texture, NULL, NULL );
 	SDL_RenderPresent( renderer );
 
 }
 
 
-pixel_type* SDLManager::getVideoMemoryPtr(){
+host_pixel_t* SDLManager::getVideoMemoryPtr(){
 
 	return video_memory;
 

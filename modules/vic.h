@@ -25,6 +25,12 @@ class VIC;
 
 #define BACKGROUND_COLOR_ADDR = 0xD021
 
+#define RASTER_LINE_CLKS 63
+#define LAST_RASTER_LINE 312
+
+#define FIRST_SCREEN_LINE 50
+#define LAST_SCREEN_LINE 250
+
 #define CTRL_REG_1_OFF CTRL_REG_1 - REG_START
 #define CTRL_REG_2_OFF CTRL_REG_2 - REG_START
 
@@ -60,7 +66,7 @@ class VIC {
 
 		bool interrupt_enabled;
 
-		uint8_t color_palette[16];
+		host_pixel_t color_palette[16];
 
 		Memory *memory = nullptr;
 		SDLManager *sdl = nullptr;
@@ -70,16 +76,13 @@ class VIC {
 
 		//SDL
 
-		uint8_t *host_video_memory = nullptr;
-		//uint8_t *guest_video_memory = nullptr;
+		host_pixel_t *host_video_memory = nullptr;
 
 		uint8_t *host_charset 		= nullptr;
 		uint8_t *host_charset_MCM 	= nullptr;
 
 		uint8_t *guest_color_memory = nullptr;
 
-
-		uint32_t clocks_to_new_render;
 		uint32_t clocks_to_new_line;
 
 		chrono::time_point<chrono::steady_clock> last_time_rendered;

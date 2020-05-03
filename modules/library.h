@@ -60,6 +60,8 @@ using namespace std;
 #define SET_I_BIT(x,i) 		(x |= (1<<i))
 #define RESET_I_BIT(x,i) 	(x &= ~(1<<i))
 
+#define host_pixel_t uint8_t
+
 enum register_name
 {
 	regA,regX,regY
