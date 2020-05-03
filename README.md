@@ -22,3 +22,4 @@ A Very Basic C64 Emulator implemented using C++14 and SDL.
 
 * CPU code refactoring
 * Memory code refactoring
+* Cartridge Loading

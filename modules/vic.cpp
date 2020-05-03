@@ -29,7 +29,7 @@ VIC::VIC(){
 
 	last_time_rendered = chrono::steady_clock::now();
 
-	memset(&color_palette[0],0,16*sizeof(uint8_t));
+	memset(&color_palette[0],0,16*sizeof(host_pixel_t));
 
 }
 

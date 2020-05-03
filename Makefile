@@ -32,9 +32,6 @@ cia2.o: modules/cia2.cpp modules/cia2.h
 loader.o: modules/loader.cpp modules/loader.h
 	g++ -c modules/loader.cpp $(FLAGS)
 
-#keyboard.o: modules/keyboard.cpp modules/keyboard.h
-#	g++ -c modules/keyboard.cpp $(FLAGS)
-
 clean:
 	rm -f *.o
 	rm -f main
