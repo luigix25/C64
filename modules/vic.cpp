@@ -299,10 +299,7 @@ uint8_t VIC::read_register(uint16_t addr){
     //DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
 
 	if(addr == RASTER_LINE){
-		//cout<<"PC"<<hex<<unsigned(cpu->regs.PC)<<endl;
-		//cout<<"reading from RASTER_CNT"<<endl;
-
-		return 0;
+		return rasterline;
 	}
 
     return registers[addr-IO_START];
