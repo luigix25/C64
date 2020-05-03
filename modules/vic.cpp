@@ -181,7 +181,7 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 
 void VIC::clock(){
 
-	if(interrupt_enabled and rasterline == 0){
+	if(interrupt_enabled and rasterline == registers[RASTER_LINE - IO_START]){
 		cpu->setIRQline();
 	}
 
