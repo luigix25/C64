@@ -14,6 +14,9 @@ Memory *mem;
 CPU *cpu;
 SDLManager *sdl;
 
+bool iterate = true;
+
+
 void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
 	//mem->dump_memory(0x400,1000);							//1000 byte not 1024!
@@ -31,8 +34,9 @@ void dump_cpu_handler(int s){
 
 void chiudi(int s){
 
-	SDL_Quit();
-	exit(s);
+	iterate = false;
+	//SDL_Quit();
+	//exit(s);
 }
 
 int main(int argc, const char **argv){
@@ -78,7 +82,7 @@ int main(int argc, const char **argv){
 		loader = new Loader(cpu,mem,s);
 	} 
 
-	while(true){
+	while(iterate){
 		cpu->clock();
 		cia1->clock();
 		vic->clock();

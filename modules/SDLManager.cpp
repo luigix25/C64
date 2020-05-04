@@ -22,6 +22,11 @@ SDLManager::~SDLManager(){
 	delete[] video_memory;
 	SDL_FreeFormat(format);
 
+	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyTexture(texture);
+	SDL_Quit();
+
 }
 
 void SDLManager::checkFPS(){
