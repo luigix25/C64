@@ -16,7 +16,7 @@ void Loader::clock(){
 		return;
 
 	if(!loaded && cpu->PC == BASIC_READY){
-		mem->load_prg(filename);
+		mem->loadPrg(filename);
 		loaded = true;
 		cout<<"Loaded!"<<endl;
 	}
