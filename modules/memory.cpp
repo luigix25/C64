@@ -257,28 +257,6 @@ void Memory::load_charset(const string& filename){
 	delete[] rom;
 }
 
-uint8_t* Memory::readBinFile(const string& filename, streampos &size){
-
-    ifstream file(filename,ios::in | ios::binary | ios::ate);
-    //streampos size;
-
-    if (file.is_open())
-    {
-
-        size = file.tellg();
-
-        uint8_t *rom = new uint8_t[size];
-
-        file.seekg (0, ios::beg);
-        file.read ((char*)rom, size);
-        file.close();
-        return rom;
-    }
-
-    return nullptr;
-
-}
-
 void Memory::load_custom_memory(const string& filename, uint16_t offset) {
 
 	streampos size;

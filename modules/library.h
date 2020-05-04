@@ -87,3 +87,4 @@ struct registers{
 };
 
 void hexDump(void*, int);
+uint8_t* readBinFile(const string&, streampos &);

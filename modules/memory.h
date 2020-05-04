@@ -62,9 +62,6 @@ class Memory{
 		uint8_t *kernal;
 		uint8_t *charset;
 
-
-		uint8_t* readBinFile(const string&,streampos&);
-
 		bankMode LORAM_mode;
 		bankMode HIRAM_mode;
 		bankMode CHAR_mode;
