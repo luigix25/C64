@@ -272,6 +272,7 @@ void Memory::load_custom_memory(const string& filename, uint16_t offset) {
 	streampos size;
 	uint8_t* buffer = readBinFile(filename,size);
 	memcpy(memory+offset, buffer, size);
+	delete[] buffer;
 
 }
 
