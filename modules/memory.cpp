@@ -53,7 +53,7 @@ void Memory::dump_memory(uint16_t addr,uint16_t bytes){
 }
 
 
-void Memory::dump_color_memory(uint16_t addr,uint16_t bytes){
+void Memory::dump_color_memory(){
 
 	cout<<endl<<"---------------------"<<endl;
 

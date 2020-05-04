@@ -57,7 +57,6 @@ class VIC {
 
 		void set_graphic_mode();
 
-		void update_host_charset();
 		void init_color_palette();
 
 		void show_char_line(uint8_t, int, int,int);
@@ -77,9 +76,6 @@ class VIC {
 		//SDL
 
 		host_pixel_t *host_video_memory = nullptr;
-
-		uint8_t *host_charset 		= nullptr;
-		uint8_t *host_charset_MCM 	= nullptr;
 
 		uint8_t *guest_color_memory = nullptr;
 

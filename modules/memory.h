@@ -45,7 +45,7 @@ class Memory{
 		uint8_t* getMemPointer();
 		uint8_t* getKerPointer();
 		void dump_memory(uint16_t,uint16_t);
-		void dump_color_memory(uint16_t,uint16_t);
+		void dump_color_memory();
 
 	private:
 

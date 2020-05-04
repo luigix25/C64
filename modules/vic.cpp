@@ -3,8 +3,6 @@
 VIC::VIC(){
 
 	registers = new uint8_t[0x400];    
-	host_charset = new uint8_t[4098 *8];
-	host_charset_MCM = new uint8_t[4098 *8];;
 
 	memset(registers,0,0x400);
 
@@ -36,8 +34,6 @@ VIC::VIC(){
 VIC::~VIC(){
 
 	delete[] registers;
-	delete[] host_charset;
-	delete[] host_charset_MCM;
 }
 
 void VIC::init_color_palette(){
@@ -137,20 +133,21 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 	uint8_t fg_color_idx = *(guest_color_memory + 40 * X/8 + Y/8);
 	host_pixel_t fg_color = color_palette[fg_color_idx];
 
-	uint8_t* font_pointer = host_charset + 64 * offset;
-	uint8_t* font_pointer_MCM = host_charset_MCM + 64 * offset;
-
 	host_pixel_t *ptr = host_video_memory + SCREEN_WIDTH * (line_offset + X) + Y;
 
 	for(int j=0; j < CHAR_WIDTH; j++){
 
-		if(graphic_mode == CHAR_MODE or (fg_color_idx < 8))
+		if(graphic_mode == CHAR_MODE or (fg_color_idx < 8)){
 
-			ptr[j] = *(font_pointer + (line_offset * 8) +j) ? fg_color : bg_color;
+			uint8_t row_value = memory->VIC_read_byte(char_memory_base_addr + CHAR_WIDTH * offset + line_offset);
 
-		else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
+			uint8_t pixel_value = GET_I_BIT(row_value, 7-j);
+			ptr[j] = (pixel_value) ? fg_color : bg_color;
 
-			uint8_t value = *(font_pointer_MCM + (line_offset * 8) +j);
+		} else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
+
+			uint8_t row_value = memory->VIC_read_byte(char_memory_base_addr + CHAR_WIDTH * offset + line_offset);
+			uint8_t value = GET_TWO_BITS(row_value,(7-j) & 0xFE);
 
 			if(value == 0x00)
 				ptr[j] = bg_color;
@@ -189,7 +186,6 @@ void VIC::clock(){
 		rasterline = 0;
 
 	if(rasterline == 0){
-		update_host_charset();
 
 		sdl->render_frame();
 
@@ -239,30 +235,6 @@ void VIC::clock(){
 
 
 }
-
-void VIC::update_host_charset(){
-
-	uint8_t byte = 0;
-	
-	//ROM SIZE
-	for(int i=0;i<4096;i++){
-
-		byte = memory->VIC_read_byte(char_memory_base_addr+i);
-
-		for(int m=0;m<8;m++){
-			host_charset[i*8+7-m] = (GET_I_BIT(byte,m)) ? 0xFF : 0;
-		}
-		
-		for(int m=0;m<8;m+=2){
-			host_charset_MCM[i*8+m] 		= (GET_TWO_BITS(byte,(6-m)));
-			host_charset_MCM[i*8+m+1] 		= (GET_TWO_BITS(byte,(6-m)));
-
-		}
-
-	}
-
-}
-
 
 void VIC::setMemory(Memory *mem){
 	this->memory = mem;
