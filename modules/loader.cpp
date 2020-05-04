@@ -1,6 +1,6 @@
 #include "loader.h"
 
-Loader::Loader(CPU* cpu, Memory* memory, string& filename){
+Loader::Loader(CPU* cpu, Memory* memory, const string& filename){
 
 	this->filename = filename;
 	this->cpu = cpu;

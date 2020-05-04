@@ -71,22 +71,20 @@ int main(int argc, const char **argv){
 	vic->setCIA1(cia1);
 	vic->setCIA2(cia2);
 
-	Loader *loader;
-
-	string s = "";
+	Loader *loader = nullptr;
 
 	if(argc > 1){
-		s = argv[1];
+		const string s = argv[1];
 		loader = new Loader(cpu,mem,s);
-	} else {
-		loader = new Loader(cpu,mem,s);
-	}
+	} 
 
 	while(true){
 		cpu->clock();
 		cia1->clock();
 		vic->clock();
-		loader->clock();
+
+		if(loader)
+			loader->clock();
 
 	}
 

@@ -282,11 +282,7 @@ void Memory::load_prg(const string& filename) {
 
 	size -= 2;
 
-	cout<<hex<<"addr start: "<<addr<<endl;
-	cout<<hex<<"addr end: "<<addr+size<<endl;
-
 	memcpy(memory+addr, buffer+2, size);
-
 
 	delete[] buffer;
 

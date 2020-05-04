@@ -12,7 +12,7 @@ class Loader;
 class Loader{
 
 	public:
-		Loader(CPU*,Memory*,string&);
+		Loader(CPU*,Memory*,const string&);
 
 		void clock();
 		bool loaded = false;

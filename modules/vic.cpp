@@ -147,6 +147,8 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 		} else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
 
 			uint8_t row_value = memory->VIC_read_byte(char_memory_base_addr + CHAR_WIDTH * offset + line_offset);
+			
+			//FE mask is to get only even numbers
 			uint8_t value = GET_TWO_BITS(row_value,(7-j) & 0xFE);
 
 			if(value == 0x00)
