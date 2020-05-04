@@ -24,7 +24,9 @@ void dump_mem_handler(int s){
 void dump_cpu_handler(int s){
 	cout<<endl<<"Dump CPU"<<endl;
 
-	sdl->checkFPS();
+	cout<<hex<<"PC: "<<unsigned(cpu->PC)<<endl;
+
+	//sdl->checkFPS();
 }
 
 void chiudi(int s){

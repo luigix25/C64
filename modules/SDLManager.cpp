@@ -1,6 +1,5 @@
 #include "SDLManager.h"
 
-#define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
 SDLManager::SDLManager(){
 

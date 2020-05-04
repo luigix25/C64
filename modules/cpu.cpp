@@ -548,6 +548,7 @@ void CPU::BNE(uint8_t addr){
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
 
 	if(regs.zero_flag == 0){
+
 		DEBUG_PRINT("BNE to "<<hex<<unsigned(new_addr)<<endl);
 		PC = new_addr;
 	}
