@@ -127,6 +127,18 @@ uint8_t Memory::read_byte(uint16_t addr){
 	return memory[addr];
 }
 
+uint16_t Memory::read_word(uint16_t addr){
+
+	uint16_t data = read_byte(addr);
+	uint16_t tmp = read_byte(addr+1);
+
+	tmp = tmp <<8;
+	data |= tmp;
+
+	return data;
+
+}
+
 void Memory::write_byte(uint16_t addr, uint8_t data){
 
   	uint16_t page = (addr & 0xff00) >> 8;
