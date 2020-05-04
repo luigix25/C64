@@ -86,5 +86,5 @@ struct registers{
 	uint8_t flags;
 };
 
-void hexDump(void*, int);
+void hexDump(void*, uint16_t);
 uint8_t* readBinFile(const string&, streampos &);

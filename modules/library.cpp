@@ -1,7 +1,7 @@
 //library.cpp
 #include "library.h"
 
-void hexDump(void *addr, int len) 
+void hexDump(void *addr, uint16_t len) 
 {
     int i;
     unsigned char buff[17];

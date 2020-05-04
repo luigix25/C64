@@ -40,7 +40,7 @@ class CPU
 
 	private:
 
-		uint16_t clock_before_fetch;
+		uint16_t clocks_before_fetch;
 
 		Memory *memory;
 

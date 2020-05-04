@@ -5,7 +5,7 @@
 CPU::CPU(Memory* memory, uint16_t PC){
 
 	this->memory = memory;
-	PC = PC;
+	this->PC = PC;
 	SP = 0;
 	
 	reset_flags();
@@ -15,27 +15,11 @@ CPU::CPU(Memory* memory, uint16_t PC){
 	irq_line = true;
 	irq_counter = 0;
 
-	clock_before_fetch = 0;
+	clocks_before_fetch = 0;
 
 }
 
-CPU::CPU(Memory* memory){
-
-	this->memory = memory;
-
-	SP = 0;
-	PC = RESET_routine;
-
-	reset_flags();
-
-	//ative low
-	nmi_line = true;
-	irq_line = true;
-	irq_counter = 0;
-
-	clock_before_fetch = 0;
-
-}
+CPU::CPU(Memory *memory) : CPU::CPU(memory,RESET_routine){}
 
 void CPU::reset_flags(){
 
@@ -51,8 +35,8 @@ void CPU::reset_flags(){
 
 void CPU::clock(){
 
-	if(clock_before_fetch > 0){
-		clock_before_fetch--;
+	if(clocks_before_fetch > 0){
+		clocks_before_fetch--;
 		return;
 	}
 
@@ -1890,7 +1874,7 @@ bool CPU::decode(uint8_t opcode){
  	}
 
  	addr = 0;
- 	clock_before_fetch = n_clock;
+ 	clocks_before_fetch = n_clock;
 
   return true;
 
