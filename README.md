@@ -1,7 +1,6 @@
 # C64 Emulator
 A Very Basic C64 Emulator implemented using C++14 and SDL.
 
-
 # Things Working
 
 * CPU
@@ -13,6 +12,7 @@ A Very Basic C64 Emulator implemented using C++14 and SDL.
 	* Some keys are not mapped
 
 * VIC II
+	* Raster Interrupt
 	* Char mode
 	* Char MCM
 	* Bitmap Mode
@@ -20,6 +20,6 @@ A Very Basic C64 Emulator implemented using C++14 and SDL.
 
 # TODO List
 
-* VIC II Raster Interrupt
 * CPU code refactoring
 * Memory code refactoring
+* Cartridge Loading

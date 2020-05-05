@@ -40,15 +40,11 @@ class CPU
 
 	private:
 
-		uint16_t clock_before_fetch;
+		uint16_t clocks_before_fetch;
 
 		Memory *memory;
 
 		uint8_t irq_counter;
-
-		//utils
-		uint8_t read_byte(uint16_t);
-		uint16_t read_word(uint16_t);
 
 		//IRQs
 		bool irq_line;
@@ -128,9 +124,6 @@ class CPU
 		void rotate_left_mem(uint16_t);
 		void rotate_right_mem(uint16_t);
 
-
-
-		//void ASL(uint16_t);
 		void EOR(uint8_t);
 		void BIT(uint16_t);
 

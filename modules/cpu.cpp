@@ -5,7 +5,7 @@
 CPU::CPU(Memory* memory, uint16_t PC){
 
 	this->memory = memory;
-	PC = PC;
+	this->PC = PC;
 	SP = 0;
 	
 	reset_flags();
@@ -15,27 +15,11 @@ CPU::CPU(Memory* memory, uint16_t PC){
 	irq_line = true;
 	irq_counter = 0;
 
-	clock_before_fetch = 0;
+	clocks_before_fetch = 0;
 
 }
 
-CPU::CPU(Memory* memory){
-
-	this->memory = memory;
-
-	SP = 0;
-	PC = RESET_routine;
-
-	reset_flags();
-
-	//ative low
-	nmi_line = true;
-	irq_line = true;
-	irq_counter = 0;
-
-	clock_before_fetch = 0;
-
-}
+CPU::CPU(Memory *memory) : CPU::CPU(memory,RESET_routine){}
 
 void CPU::reset_flags(){
 
@@ -51,8 +35,8 @@ void CPU::reset_flags(){
 
 void CPU::clock(){
 
-	if(clock_before_fetch > 0){
-		clock_before_fetch--;
+	if(clocks_before_fetch > 0){
+		clocks_before_fetch--;
 		return;
 	}
 
@@ -108,7 +92,7 @@ void CPU::handle_irq(){
 
 	regs.interrupt_flag = true;
 
-	uint16_t addr = read_word(IRQ_vector);
+	uint16_t addr = memory->read_word(IRQ_vector);
 
 	PC = addr;
 
@@ -125,7 +109,7 @@ void CPU::handle_nmi(){
 	//BCD flag is cleared
 	PUSH(flags() & 0xEF);
 
-	uint16_t addr = read_word(NMI_vector);
+	uint16_t addr = memory->read_word(NMI_vector);
 
 	PC = addr;
 
@@ -159,36 +143,16 @@ uint16_t CPU::zero_page(){
 uint8_t CPU::immediate(){
 
 	uint8_t addr;
-	addr = read_byte(PC);
+	addr = memory->read_byte(PC);
 
 	PC++;
 
 	return addr;
 }
 
-uint8_t CPU::read_byte(uint16_t addr){
-
-	uint8_t data = memory->read_byte(addr);
-
-	return data;
-
-}
-
-uint16_t CPU::read_word(uint16_t addr){
-
-	uint16_t data = memory->read_byte(addr);
-	uint16_t tmp = memory->read_byte(addr+1);
-
-	tmp = tmp <<8;
-	data |= tmp;
-
-	return data;
-
-}
-
 uint16_t CPU::absolute(){
 
-	uint16_t addr = read_word(PC);
+	uint16_t addr = memory->read_word(PC);
 
 	PC += 2;
 
@@ -213,7 +177,7 @@ uint16_t CPU::indirect_X(){
 	uint8_t zero_page_addr = immediate();
 
 	zero_page_addr += regs.reg[regX];
-	addr = read_word(zero_page_addr);
+	addr = memory->read_word(zero_page_addr);
 
 	return addr; 
 
@@ -227,7 +191,7 @@ uint16_t CPU::indirect_Y(){
 	//zero page addr!!
 	uint8_t zero_page_addr = immediate();
 	
-	addr = read_word(zero_page_addr);
+	addr = memory->read_word(zero_page_addr);
 	addr += regs.reg[regY];
 
 	return addr;
@@ -458,7 +422,7 @@ uint8_t CPU::fetch(){
 		handle_irq();
 	}
 
-	uint8_t opcode = read_byte(PC);
+	uint8_t opcode = memory->read_byte(PC);
 	//DEBUG_PRINT(hex<<unsigned(opcode)<<endl);
 
 	PC++;
@@ -548,6 +512,7 @@ void CPU::BNE(uint8_t addr){
 	//cout<<"addr: "<<hex<<unsigned(new_addr)<<endl;
 
 	if(regs.zero_flag == 0){
+
 		DEBUG_PRINT("BNE to "<<hex<<unsigned(new_addr)<<endl);
 		PC = new_addr;
 	}
@@ -795,7 +760,7 @@ void CPU::BRK(){
 
 	regs.interrupt_flag = true;
 
-	uint16_t addr = read_word(IRQ_vector);
+	uint16_t addr = memory->read_word(IRQ_vector);
 
 	PC = addr;
 
@@ -1258,7 +1223,7 @@ bool CPU::decode(uint8_t opcode){
 			tmp = absolute();
 			DEBUG_PRINT("JMP "<<hex<<unsigned(tmp)<<endl);
 
-			addr = read_word(tmp);
+			addr = memory->read_word(tmp);
 			DEBUG_PRINT("JUMPING TO: "<<hex<<unsigned(addr)<<endl);
 			
 			PC = addr;
@@ -1909,7 +1874,7 @@ bool CPU::decode(uint8_t opcode){
  	}
 
  	addr = 0;
- 	clock_before_fetch = n_clock;
+ 	clocks_before_fetch = n_clock;
 
   return true;
 

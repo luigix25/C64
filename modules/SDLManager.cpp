@@ -3,7 +3,7 @@
 
 SDLManager::SDLManager(){
 
-	video_memory = new pixel_type[SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(pixel_type)];
+	video_memory = new host_pixel_t[SCREEN_WIDTH * SCREEN_HEIGHT];
 
 	video_thread = new thread(&SDLManager::initialize_SDL,this);
 	video_thread->detach();
@@ -11,7 +11,7 @@ SDLManager::SDLManager(){
 	total_redraws = 0;
 	start_time = chrono::steady_clock::now();
 
-	format = SDL_AllocFormat(SDL_PIXELFORMAT_RGB332);
+	format = SDL_AllocFormat(PIXEL_FORMAT);
 
 	memset(&keyboard_matrix[0],0xFF,64);
 
@@ -21,6 +21,11 @@ SDLManager::~SDLManager(){
 
 	delete[] video_memory;
 	SDL_FreeFormat(format);
+
+	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyTexture(texture);
+	SDL_Quit();
 
 }
 
@@ -64,7 +69,7 @@ void SDLManager::initialize_SDL(){
 		return;
 	}
 
-	texture = SDL_CreateTexture(renderer,SDL_PIXELFORMAT_RGB332,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);
+	texture = SDL_CreateTexture(renderer,PIXEL_FORMAT,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);
 
 	keyboard_loop();
 
@@ -77,14 +82,14 @@ void SDLManager::render_frame(){
 	if(texture == nullptr || renderer == nullptr)
 		return;
 
-	SDL_UpdateTexture(texture,NULL,video_memory,SCREEN_WIDTH * sizeof(pixel_type));
+	SDL_UpdateTexture(texture,NULL,video_memory,SCREEN_WIDTH * sizeof(host_pixel_t));
 	SDL_RenderCopy( renderer, texture, NULL, NULL );
 	SDL_RenderPresent( renderer );
 
 }
 
 
-pixel_type* SDLManager::getVideoMemoryPtr(){
+host_pixel_t* SDLManager::getVideoMemoryPtr(){
 
 	return video_memory;
 

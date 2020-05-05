@@ -19,7 +19,7 @@ Memory::Memory(){
 	memset(memory+0x400,0,1000);
 	memset(color_ram,0,1000);
 
-	setup_memory_mode(LORAM_MASK | HIRAM_MASK | CHAR_MASK);
+	bankSwitch(LORAM_MASK | HIRAM_MASK | CHAREN_MASK);
 
 }
 
@@ -28,6 +28,8 @@ Memory::~Memory(){
 	delete[] basic;
 	delete[] kernal;
 	delete[] charset;
+	delete[] memory;
+	delete[] color_ram;
 }
 
 void Memory::dump_memory(uint16_t addr,uint16_t bytes){
@@ -53,7 +55,7 @@ void Memory::dump_memory(uint16_t addr,uint16_t bytes){
 }
 
 
-void Memory::dump_color_memory(uint16_t addr,uint16_t bytes){
+void Memory::dump_color_memory(){
 
 	cout<<endl<<"---------------------"<<endl;
 
@@ -125,6 +127,18 @@ uint8_t Memory::read_byte(uint16_t addr){
 	return memory[addr];
 }
 
+uint16_t Memory::read_word(uint16_t addr){
+
+	uint16_t data = read_byte(addr);
+	uint16_t tmp = read_byte(addr+1);
+
+	tmp = tmp <<8;
+	data |= tmp;
+
+	return data;
+
+}
+
 void Memory::write_byte(uint16_t addr, uint8_t data){
 
   	uint16_t page = (addr & 0xff00) >> 8;
@@ -133,7 +147,7 @@ void Memory::write_byte(uint16_t addr, uint8_t data){
   	if(page == 0){
 
   		if(addr == MEMORY_LAYOUT_ADDR){
-  			setup_memory_mode(data);
+  			bankSwitch(data);
   		} else if(addr == 0xCC){
   			//cout<<"scrivo blanking "<<hex<<unsigned(data)<<endl;
   			//raise(SIGPIPE);
@@ -187,11 +201,11 @@ uint8_t Memory::VIC_read_byte(uint16_t addr){
 
 }
 
-void Memory::setup_memory_mode(uint8_t value){
+void Memory::bankSwitch(uint8_t value){
   
 	bool loram_en  = ((value & LORAM_MASK) != 0);
 	bool hiram_en = ((value & HIRAM_MASK) != 0);
-	bool char_en = ((value & CHAR_MASK) != 0);
+	bool char_en = ((value & CHAREN_MASK) != 0);
 
 	//Set everything to RAM as default
 	HIRAM_mode = RAM;
@@ -222,7 +236,7 @@ void Memory::setup_memory_mode(uint8_t value){
 void Memory::load_kernal_and_basic(const string& filename){
 
 	streampos size;
-	uint8_t* rom = read_bin_file(filename,size);
+	uint8_t* rom = readBinFile(filename,size);
 
 	//FIRST 8K are basic
 	memcpy(basic, rom, eightK);
@@ -236,57 +250,32 @@ void Memory::load_charset(const string& filename){
 
 	streampos size;
 
-	uint8_t* rom = read_bin_file(filename,size);
+	uint8_t* rom = readBinFile(filename,size);
 
 	memcpy(charset, rom, fourK);
 	
 	delete[] rom;
 }
 
-uint8_t* Memory::read_bin_file(const string& filename, streampos &size){
-
-    ifstream file(filename,ios::in | ios::binary | ios::ate);
-    //streampos size;
-
-    if (file.is_open())
-    {
-
-        size = file.tellg();
-
-        uint8_t *rom = new uint8_t[size];
-
-        file.seekg (0, ios::beg);
-        file.read ((char*)rom, size);
-        file.close();
-        return rom;
-    }
-
-    return nullptr;
-
-}
-
 void Memory::load_custom_memory(const string& filename, uint16_t offset) {
 
 	streampos size;
-	uint8_t* buffer = read_bin_file(filename,size);
+	uint8_t* buffer = readBinFile(filename,size);
 	memcpy(memory+offset, buffer, size);
+	delete[] buffer;
 
 }
 
-void Memory::load_prg(const string& filename) {
+void Memory::loadPrg(const string& filename) {
 
 	streampos size;
-	uint8_t* buffer = read_bin_file(filename,size);
+	uint8_t* buffer = readBinFile(filename,size);
 
 	uint16_t addr = buffer[1] << 8 | buffer[0];
 
 	size -= 2;
 
-	cout<<hex<<"addr start: "<<addr<<endl;
-	cout<<hex<<"addr end: "<<addr+size<<endl;
-
 	memcpy(memory+addr, buffer+2, size);
-
 
 	delete[] buffer;
 

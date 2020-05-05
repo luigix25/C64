@@ -14,30 +14,36 @@ Memory *mem;
 CPU *cpu;
 SDLManager *sdl;
 
+bool iterate = true;
+
+
 void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
 	//mem->dump_memory(0x400,1000);							//1000 byte not 1024!
-	mem->dump_color_memory(0,1000);							//1000 byte not 1024!
+	mem->dump_color_memory();							//1000 byte not 1024!
 
 }
 
 void dump_cpu_handler(int s){
 	cout<<endl<<"Dump CPU"<<endl;
 
-	sdl->checkFPS();
+	cout<<hex<<"PC: "<<unsigned(cpu->PC)<<endl;
+
+	//sdl->checkFPS();
 }
 
 void chiudi(int s){
 
-	SDL_Quit();
-	exit(s);
+	iterate = false;
+	//SDL_Quit();
+	//exit(s);
 }
 
 int main(int argc, const char **argv){
 	//CTRL-Z
 //	signal(SIGTSTP,dump_mem_handler);
 
-	//signal(SIGTSTP,dump_cpu_handler);
+	signal(SIGTSTP,dump_cpu_handler);
 	signal(SIGINT,chiudi);
 
 	VIC *vic = new VIC();
@@ -69,22 +75,20 @@ int main(int argc, const char **argv){
 	vic->setCIA1(cia1);
 	vic->setCIA2(cia2);
 
-	Loader *loader;
-
-	string s = "";
+	Loader *loader = nullptr;
 
 	if(argc > 1){
-		s = argv[1];
+		const string s = argv[1];
 		loader = new Loader(cpu,mem,s);
-	} else {
-		loader = new Loader(cpu,mem,s);
-	}
+	} 
 
-	while(true){
+	while(iterate){
 		cpu->clock();
 		cia1->clock();
 		vic->clock();
-		loader->clock();
+
+		if(loader)
+			loader->clock();
 
 	}
 

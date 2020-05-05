@@ -54,11 +54,14 @@ using namespace std;
 #define RESET_vector 0xFFFC
 #define IRQ_vector 0xFFFE
 
-#define GET_I_BIT(x,i) 		((x>>i) & 1)
-#define GET_TWO_BITS(x,i) 	((x>>i) & 0x03)
+#define GET_I_BIT(x,i) 		((x>>(i)) & 1)
+#define GET_TWO_BITS(x,i) 	((x>>(i)) & 0x03)
 
 #define SET_I_BIT(x,i) 		(x |= (1<<i))
 #define RESET_I_BIT(x,i) 	(x &= ~(1<<i))
+
+#define host_pixel_t uint32_t
+#define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
 enum register_name
 {
@@ -83,4 +86,5 @@ struct registers{
 	uint8_t flags;
 };
 
-void hexDump(void*, int);
+void hexDump(void*, uint16_t);
+uint8_t* readBinFile(const string&, streampos &);

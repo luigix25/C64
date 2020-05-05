@@ -1,7 +1,7 @@
 //library.cpp
 #include "library.h"
 
-void hexDump(void *addr, int len) 
+void hexDump(void *addr, uint16_t len) 
 {
     int i;
     unsigned char buff[17];
@@ -41,4 +41,27 @@ void hexDump(void *addr, int len)
 
     // And print the final ASCII bit.
     printf("  %s\n", buff);
+}
+
+
+uint8_t* readBinFile(const string& filename, streampos &size){
+
+    ifstream file(filename,ios::in | ios::binary | ios::ate);
+    //streampos size;
+
+    if (file.is_open())
+    {
+
+        size = file.tellg();
+
+        uint8_t *rom = new uint8_t[size];
+
+        file.seekg (0, ios::beg);
+        file.read ((char*)rom, size);
+        file.close();
+        return rom;
+    }
+
+    return nullptr;
+
 }

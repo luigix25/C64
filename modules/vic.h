@@ -25,6 +25,12 @@ class VIC;
 
 #define BACKGROUND_COLOR_ADDR = 0xD021
 
+#define RASTER_LINE_CLKS 63
+#define LAST_RASTER_LINE 312
+
+#define FIRST_SCREEN_LINE 50
+#define LAST_SCREEN_LINE 250
+
 #define CTRL_REG_1_OFF CTRL_REG_1 - REG_START
 #define CTRL_REG_2_OFF CTRL_REG_2 - REG_START
 
@@ -40,7 +46,7 @@ class VIC {
 		uint8_t visible_rows;
 		uint8_t visible_cols;
 
-		uint8_t rasterline;
+		uint16_t rasterline;
 
 		uint16_t screen_memory_base_addr;
 		uint16_t char_memory_base_addr;
@@ -51,16 +57,15 @@ class VIC {
 
 		void set_graphic_mode();
 
-		void update_host_charset();
 		void init_color_palette();
 
-		void show_char(uint8_t, int, int);
-		void draw_bitmap(uint8_t, int, int);
-		void draw_bitmap_mcm(uint8_t, int, int);
+		void show_char_line(uint8_t, int, int,int);
+		void draw_bitmap_line(uint8_t, int, int, int);
+		void draw_bitmap_mcm_line(uint8_t, int, int, int);
 
 		bool interrupt_enabled;
 
-		uint8_t color_palette[16];
+		host_pixel_t color_palette[16];
 
 		Memory *memory = nullptr;
 		SDLManager *sdl = nullptr;
@@ -70,16 +75,12 @@ class VIC {
 
 		//SDL
 
-		uint8_t *host_video_memory = nullptr;
-		//uint8_t *guest_video_memory = nullptr;
-
-		uint8_t *host_charset 		= nullptr;
-		uint8_t *host_charset_MCM 	= nullptr;
+		host_pixel_t *host_video_memory = nullptr;
 
 		uint8_t *guest_color_memory = nullptr;
 
+		uint32_t clocks_to_new_line;
 
-		uint32_t clocks_to_new_render;
 		chrono::time_point<chrono::steady_clock> last_time_rendered;
 
 	public:
