@@ -1,10 +1,32 @@
 # C64 Emulator
 A Very Basic C64 Emulator implemented using C++14 and SDL.
 
+# Compiling
+
+SDL library must be already installed 
+
+```
+make
+```
+
+# Usage
+
+Launch
+
+```
+./main
+```
+Load PRG file
+
+```
+./main path/to/file.prg
+```
+
 # Things Working
 
-* CPU
+* CPU Opcodes
 * VIC II bank switching
+* Memory bank switching
 
 # Things Partially Implemented
 
