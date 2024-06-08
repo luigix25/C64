@@ -5,8 +5,7 @@ SDLManager::SDLManager(){
 
 	video_memory = new host_pixel_t[SCREEN_WIDTH * SCREEN_HEIGHT];
 
-	video_thread = new thread(&SDLManager::initialize_SDL,this);
-	video_thread->detach();
+	initialize_SDL();
 
 	total_redraws = 0;
 	start_time = chrono::steady_clock::now();
@@ -47,15 +46,14 @@ void SDLManager::checkFPS(){
 void SDLManager::initialize_SDL(){
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
-		cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
+		cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		return;
 	}
 
-
-	window = SDL_CreateWindow("Hello World!", 100, 100, SCREEN_WIDTH*2, SCREEN_HEIGHT*2, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("Hello World!", 100, 100, SCREEN_WIDTH*2, SCREEN_HEIGHT*2, SDL_WINDOW_OPENGL);
 	
 	if (window == nullptr){
-		cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
+		cerr << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
 		SDL_Quit();
 		return;
 	}
@@ -64,14 +62,23 @@ void SDLManager::initialize_SDL(){
 	
 	if (renderer == nullptr){
 		SDL_DestroyWindow(window);
-		cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+		cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 		SDL_Quit();
 		return;
 	}
 
 	texture = SDL_CreateTexture(renderer,PIXEL_FORMAT,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);
 
-	keyboard_loop();
+	if(texture == nullptr){
+		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer);
+		cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+		SDL_Quit();
+		return;
+	}
+
+	video_thread = new thread(&SDLManager::keyboard_loop,this);
+	video_thread->detach();
 
 }
 
@@ -87,7 +94,6 @@ void SDLManager::render_frame(){
 	SDL_RenderPresent( renderer );
 
 }
-
 
 host_pixel_t* SDLManager::getVideoMemoryPtr(){
 
