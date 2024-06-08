@@ -12,7 +12,7 @@ class Memory;
 #define HIRAM_MASK 0x2
 #define CHAREN_MASK 0x4
 
-#define VIDEO_MEM_START 
+#define VIDEO_MEM_START
 
 enum bankMode {RAM,ROM,IO,CARTRIDGE};
 

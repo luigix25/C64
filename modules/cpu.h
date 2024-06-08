@@ -54,7 +54,7 @@ class CPU
 
 		//Memory Addressing Modes
 		uint8_t immediate();
-		
+
 		uint16_t absolute();
 		uint16_t absolute(register_name);
 
@@ -84,12 +84,12 @@ class CPU
 		void RTI();
 
 		void PLA();
-		
+
 		void JMP(uint16_t);
 		void JSR(uint16_t);
 		void CMP_addr(uint16_t);
 		void CMP_data(uint8_t);
-		
+
 		void CPX(uint8_t);
 
 		void BNE(uint8_t);
@@ -120,7 +120,7 @@ class CPU
 
 		void left_shift_mem(uint16_t);
 		void right_shift_mem(uint16_t);
-		
+
 		void rotate_left_mem(uint16_t);
 		void rotate_right_mem(uint16_t);
 

@@ -86,7 +86,7 @@ class VIC {
 	public:
 		VIC();
 		~VIC();
-		
+
 		void clock();
 
 		void setMemory(Memory*);
@@ -98,6 +98,5 @@ class VIC {
 
 		uint8_t read_register(uint16_t);
 		void write_register(uint16_t,uint8_t);
-
 
 };

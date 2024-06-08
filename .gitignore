@@ -1,6 +1,7 @@
 main
 *.o
 .*
+!.gitattributes
 
 old/*
 

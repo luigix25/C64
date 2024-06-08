@@ -6,7 +6,6 @@ CIA2::CIA2(){
 
 }
 
-
 void CIA2::setCPU(CPU* cpu){
 
 	this->cpu = cpu;
@@ -27,7 +26,6 @@ uint8_t CIA2::read_register(uint16_t address){
 	return registers[address];
 
 }
-
 
 void CIA2::write_register(uint16_t address, uint8_t data){
 

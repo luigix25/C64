@@ -19,7 +19,7 @@ bool iterate = true;
 
 void dump_mem_handler(int s){
 	cout<<endl<<"Dump Video Mem.."<<endl;
-	//mem->dump_memory(0x400,1000);							//1000 byte not 1024!
+	//mem->dump_memory(0x400,1000);						//1000 byte not 1024!
 	mem->dump_color_memory();							//1000 byte not 1024!
 
 }
@@ -41,7 +41,7 @@ void chiudi(int s){
 
 int main(int argc, const char **argv){
 	//CTRL-Z
-//	signal(SIGTSTP,dump_mem_handler);
+	//signal(SIGTSTP,dump_mem_handler);
 
 	signal(SIGTSTP,dump_cpu_handler);
 	signal(SIGINT,chiudi);
@@ -80,7 +80,7 @@ int main(int argc, const char **argv){
 	if(argc > 1){
 		const string s = argv[1];
 		loader = new Loader(cpu,mem,s);
-	} 
+	}
 
 	while(iterate){
 		cpu->clock();
@@ -100,22 +100,19 @@ void test_cpu(CPU *cpu)
 	uint8_t opcode;
 	bool loop = true;
 
-	while(loop)
-	{
-		
-		if(pc == cpu->PC)
-		{
+	while(loop){
+
+		if(pc == cpu->PC){
 			cout<<"infinite loop at "<<hex<<unsigned(pc)<<endl;
 			break;
 
-		} else if(cpu->PC == 0x3463)
-		{
+		} else if(cpu->PC == 0x3463){
 			cout<<"test passed!"<<endl;
 			break;
 		}
-		
+
 		pc = cpu->PC;
-		
+
 		opcode = cpu->fetch();
 		cout<<"OPCODE: "<<hex<<unsigned(opcode)<<endl;
 

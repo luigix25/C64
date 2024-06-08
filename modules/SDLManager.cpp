@@ -1,6 +1,5 @@
 #include "SDLManager.h"
 
-
 SDLManager::SDLManager(){
 
 	video_memory = new host_pixel_t[SCREEN_WIDTH * SCREEN_HEIGHT];
@@ -51,7 +50,7 @@ void SDLManager::initialize_SDL(){
 	}
 
 	window = SDL_CreateWindow("Hello World!", 100, 100, SCREEN_WIDTH*2, SCREEN_HEIGHT*2, SDL_WINDOW_OPENGL);
-	
+
 	if (window == nullptr){
 		cerr << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
 		SDL_Quit();
@@ -59,7 +58,7 @@ void SDLManager::initialize_SDL(){
 	}
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	
+
 	if (renderer == nullptr){
 		SDL_DestroyWindow(window);
 		cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
@@ -107,7 +106,6 @@ SDL_PixelFormat* SDLManager::getPixelFormat(){
 
 }
 
-
 void SDLManager::terminate(){
 
 	SDL_DestroyRenderer(renderer);
@@ -119,7 +117,6 @@ void SDLManager::terminate(){
 	exit(-1);
 
 }
-
 
 void SDLManager::keyboard_loop(){
 
@@ -136,7 +133,7 @@ void SDLManager::keyboard_loop(){
 					cout<<"Key press detected: \n";
 					matrix = RowColFromScancode(event.key.keysym.scancode);
 					keyboard_matrix[matrix.row][matrix.col] = 0x00;
-					
+
 					//injecting shift
 					if(matrix.shift){
 						keyboard_matrix[7][1] = 0x00;
@@ -148,7 +145,7 @@ void SDLManager::keyboard_loop(){
 					cout<<"Key release detected\n";
 					matrix = RowColFromScancode(event.key.keysym.scancode);
 					keyboard_matrix[matrix.row][matrix.col] = 0xFF;
-					
+
 					if(matrix.shift){
 						keyboard_matrix[7][1] = 0xFF;
 					}
@@ -162,7 +159,7 @@ void SDLManager::keyboard_loop(){
 					break;
 
 				default:
-		    		break;
+					break;
 			}
 
 
@@ -173,7 +170,6 @@ void SDLManager::keyboard_loop(){
 
 }
 
-
 uint8_t SDLManager::getRowForCol(uint8_t col){
 
 	uint8_t result = 0xFF;
@@ -182,7 +178,7 @@ uint8_t SDLManager::getRowForCol(uint8_t col){
 		for(int j=0;j<8;j++){
 			if(GET_I_BIT(col,j) == 1)
 				continue;
-			
+
 			if(GET_I_BIT(result,i) == 1 and keyboard_matrix[i][j] == 0)
 				RESET_I_BIT(result,i);
 		}
@@ -212,7 +208,7 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.row = 4;
 			break;
 
-		case SDL_SCANCODE_D:	
+		case SDL_SCANCODE_D:
 			matrix.col = 2;
 			matrix.row = 2;
 			break;
@@ -244,27 +240,27 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 		case SDL_SCANCODE_J:
 			matrix.col = 4;
 			matrix.row = 2;
-			break;		
+			break;
 		case SDL_SCANCODE_K:
 			matrix.col = 4;
 			matrix.row = 5;
-			break;		
+			break;
 		case SDL_SCANCODE_L:
 			matrix.col = 5;
 			matrix.row = 2;
-			break;		
+			break;
 		case SDL_SCANCODE_M:
 			matrix.col = 4;
 			matrix.row = 4;
-			break;		
+			break;
 		case SDL_SCANCODE_N:
 			matrix.col = 4;
 			matrix.row = 7;
-			break;			
+			break;
 		case SDL_SCANCODE_O:
 			matrix.col = 4;
 			matrix.row = 6;
-			break;		
+			break;
 		case SDL_SCANCODE_P:
 			matrix.col = 5;
 			matrix.row = 1;
@@ -274,31 +270,31 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.col = 7;
 			matrix.row = 6;
 			break;
-					
+
 		case SDL_SCANCODE_R:
 			matrix.col = 2;
 			matrix.row = 1;
 			break;
-		
+
 		case SDL_SCANCODE_S:
 			matrix.col = 1;
 			matrix.row = 5;
 			break;
-		
+
 		case SDL_SCANCODE_T:
 			matrix.col = 2;
 			matrix.row = 6;
-			break;		
+			break;
 
 		case SDL_SCANCODE_U:
 			matrix.col = 3;
 			matrix.row = 6;
-			break;		
+			break;
 
 		case SDL_SCANCODE_V:
 			matrix.col = 3;
 			matrix.row = 7;
-			break;	
+			break;
 
 		case SDL_SCANCODE_W:
 			matrix.col = 1;
@@ -308,12 +304,12 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 		case SDL_SCANCODE_X:
 			matrix.col = 2;
 			matrix.row = 7;
-			break;	
+			break;
 
 		case SDL_SCANCODE_Y:
 			matrix.col = 3;
 			matrix.row = 1;
-			break;	
+			break;
 
 		case SDL_SCANCODE_Z:
 			matrix.col = 1;
@@ -329,7 +325,7 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.col = 7;
 			matrix.row = 0;
 			break;
-		
+
 		case SDL_SCANCODE_2:
 			matrix.col = 7;
 			matrix.row = 3;
@@ -339,7 +335,7 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.col = 1;
 			matrix.row = 0;
 			break;
-		
+
 		case SDL_SCANCODE_4:
 			matrix.col = 1;
 			matrix.row = 3;
@@ -379,7 +375,7 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.col = 5;
 			matrix.row = 7;
 			break;
-	
+
 		case SDL_SCANCODE_PERIOD:
 			matrix.col = 5;
 			matrix.row = 4;
@@ -409,7 +405,7 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			matrix.col = 0;
 			matrix.row = 7;
 			break;
-		
+
 		case SDL_SCANCODE_RIGHT:
 			matrix.col = 0;
 			matrix.row = 2;
@@ -430,12 +426,12 @@ KeyboardMatrix SDLManager::RowColFromScancode(uint16_t code){
 			break;
 	}
 
-	/*matrix.col =  (1 << matrix.col); 
-	matrix.row = (1 << matrix.row); 
+	/*matrix.col =  (1 << matrix.col);
+	matrix.row = (1 << matrix.row);
 
 	if(pressed){
-		matrix.col =  ~matrix.col; 
-		matrix.row = ~matrix.row; 
+		matrix.col =  ~matrix.col;
+		matrix.row = ~matrix.row;
 	}*/
 
 	return matrix;

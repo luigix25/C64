@@ -11,7 +11,6 @@ class SDLManager;
 #define KEYBOARD_COL_ADDR 0xDC00
 #define KEYBOARD_ROW_ADDR 0xDC01
 
-
 struct KeyboardMatrix{
 
 	uint8_t row;
@@ -39,7 +38,7 @@ class SDLManager{
 		void keyboard_loop();
 
 		void terminate();
-		
+
 		KeyboardMatrix RowColFromScancode(uint16_t);
 
 		thread *video_thread;

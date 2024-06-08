@@ -91,7 +91,7 @@ uint8_t CIA1::read_register(uint16_t address){
 			return return_value;
 
 		//Keyboard column
-		case KEYBOARD_ROW:		
+		case KEYBOARD_ROW:
 			return sdl->getRowForCol(registers[KEYBOARD_COL]);
 	}
 
@@ -111,10 +111,10 @@ void CIA1::write_register(uint16_t address, uint8_t data){
 	switch(address){
 		case IRQ_REG:
 
-		    if(GET_I_BIT(data,0))
+			if(GET_I_BIT(data,0))
 				timerA_irq_enabled = GET_I_BIT(data,7);
-			
-			if(GET_I_BIT(data,1)) 
+
+			if(GET_I_BIT(data,1))
 				timerB_irq_enabled = GET_I_BIT(data,7);
 
 			break;

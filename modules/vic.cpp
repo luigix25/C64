@@ -2,21 +2,21 @@
 
 VIC::VIC(){
 
-	registers = new uint8_t[0x400];    
+	registers = new uint8_t[0x400];
 
 	memset(registers,0,0x400);
 
 	registers[CTRL_REG_1_OFF] = 0x9B;
 	registers[CTRL_REG_2_OFF] = 0x08;
 
-    control_reg_one(0x9B);
-    control_reg_two(0x08);
+	control_reg_one(0x9B);
+	control_reg_two(0x08);
 
 	screen_memory_base_addr = 0x400;
 	char_memory_base_addr = 0xd000;
 	bitmap_memory_base_addr = 0x0;
 
-    registers[BASE_ADDR_REG - REG_START] = 0x14;
+	registers[BASE_ADDR_REG - REG_START] = 0x14;
 	registers[IRQ_REQ_REG - REG_START] = 0x0F;
 	registers[IRQ_EN_REG - REG_START] = 0x0;
 
@@ -38,7 +38,7 @@ VIC::~VIC(){
 
 void VIC::init_color_palette(){
 
-    SDL_PixelFormat *format = sdl->getPixelFormat();
+	SDL_PixelFormat *format = sdl->getPixelFormat();
 
 	color_palette[0] 	= SDL_MapRGB(format, 0x00, 0x00, 0x00);		//black
 	color_palette[1] 	= SDL_MapRGB(format, 0xFF, 0xFF, 0xFF);		//white
@@ -102,7 +102,7 @@ void VIC::draw_bitmap_mcm_line(uint8_t screen_ram, int X, int Y, int line_offset
 
 		if(switch_value == 0x00){
 			ptr[j] = ptr[j+1] = bg_color;
-			
+
 		} else if(switch_value == 0x01){
 			uint8_t color_idx = (screen_ram & 0xF0)>>4;
 			ptr[j] = ptr[j+1] = color_palette[color_idx];
@@ -110,7 +110,7 @@ void VIC::draw_bitmap_mcm_line(uint8_t screen_ram, int X, int Y, int line_offset
 		}else if(switch_value == 0x02){
 			uint8_t color_idx = (screen_ram & 0x0F);
 			ptr[j] = ptr[j+1] = color_palette[color_idx];
-		
+
 		} else if(switch_value == 0x03){
 			ptr[j] = ptr[j+1] = fg_color;
 		}
@@ -147,7 +147,7 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 		} else if(fg_color_idx >= 8 and graphic_mode == MCM_TEXT_MODE){			//MCM
 
 			uint8_t row_value = memory->VIC_read_byte(char_memory_base_addr + CHAR_WIDTH * offset + line_offset);
-			
+
 			//FE mask is to get only even numbers
 			uint8_t value = GET_TWO_BITS(row_value,(7-j) & 0xFE);
 
@@ -160,13 +160,12 @@ void VIC::show_char_line(uint8_t offset, int X, int Y, int line_offset){
 			} else if(value == 0x03){
 				ptr[j] = color_palette[fg_color_idx & 0x7];
 
-			}		
-		} 
+			}
+		}
 
 	}
 
 }
-
 
 void VIC::clock(){
 
@@ -206,7 +205,7 @@ void VIC::clock(){
 	//< not <= because are 200 not 201!
 	if(!(rasterline >= FIRST_SCREEN_LINE and rasterline < LAST_SCREEN_LINE))
 		return;
-	
+
 	//50 is the first visible rasterline;
 	uint16_t crt_row = rasterline - FIRST_SCREEN_LINE;
 	//Offset inside a character, eg: 2° pixel row of a letter ( each char is 8x8 pixels )
@@ -215,26 +214,25 @@ void VIC::clock(){
 	uint32_t cursorX = crt_row/8;
 
 	for(int i=0;i < 40; i++){
-		
+
 		uint32_t cursorY = i * 8;
 
 		//video memory, 40x25 byte matrix
 		uint8_t char_offset = memory->VIC_read_byte(screen_memory_base_addr + cursorX * 40 + i);
 
 		if(graphic_mode == MCM_TEXT_MODE or graphic_mode == CHAR_MODE){
-		
+
 			show_char_line(char_offset ,cursorX*8 , cursorY, row_offset);
-		
+
 		} else if(graphic_mode == BITMAP_MODE)
-		
+
 			draw_bitmap_line(char_offset, cursorX*8, cursorY, row_offset);
-		
+
 		else if(graphic_mode == MCB_BITMAP_MODE)
 
 			draw_bitmap_mcm_line(char_offset, cursorX*8, cursorY, row_offset);
 
 	}
-
 
 }
 
@@ -266,17 +264,17 @@ void VIC::setCIA2(CIA2 *cia2){
 
 }
 
-//TODO: 
+//TODO:
 uint8_t VIC::read_register(uint16_t addr){
-    
-    //DEBUG_PRINT("read from VIC memory"<<endl);
-    //DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
+
+	//DEBUG_PRINT("read from VIC memory"<<endl);
+	//DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
 
 	if(addr == RASTER_LINE){
 		return rasterline;
 	}
 
-    return registers[addr-IO_START];
+	return registers[addr-IO_START];
 
 }
 
@@ -285,26 +283,26 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 	//not mapped
 	//cout<<"PC"<<hex<<unsigned(cpu->regs.PC)<<endl;
 
-    //DEBUG_PRINT("write to VIC memory"<<endl);
-    //DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
+	//DEBUG_PRINT("write to VIC memory"<<endl);
+	//DEBUG_PRINT(hex<<unsigned(registers[addr-IO_START])<<endl);
 
-    switch(addr){
-        case CTRL_REG_1:
-            control_reg_one(data);
-            return;
+	switch(addr){
+		case CTRL_REG_1:
+			control_reg_one(data);
+			return;
 		case CTRL_REG_2:
 			control_reg_two(data);
 			return;
 		case BASE_ADDR_REG:
 			char_memory_base_addr   = (data & 0xE) << 10;
-    		screen_memory_base_addr = (data & 0xF0) << 6;
+			screen_memory_base_addr = (data & 0xF0) << 6;
 			bitmap_memory_base_addr = (data & 0x8) << 10;
 
-    		break;
+			break;
 
-    	case IRQ_EN_REG:
-    		interrupt_enabled = data;
-    		break;
+		case IRQ_EN_REG:
+			interrupt_enabled = data;
+			break;
 
 		case 0xD019:								//interrupt register
 			if(GET_I_BIT(data,0) == 0x0){			//answer to interrupt
@@ -317,19 +315,15 @@ void VIC::write_register(uint16_t addr, uint8_t data){
 			cout<<"writing to raster cnt"<<endl;
 			cout<<hex<<unsigned(data)<<endl;
 
+	}
 
-
-    }
-
-    addr -= IO_START;
-    registers[addr] = data;
-
+	addr -= IO_START;
+	registers[addr] = data;
 
 }
 
 void VIC::control_reg_one(uint8_t data){
 
-	
 	if(GET_I_BIT(data,3)){
 		visible_rows = 24;
 	} else {
@@ -359,8 +353,8 @@ void VIC::control_reg_two(uint8_t data){
 void VIC::set_graphic_mode(){
 
 	bool ecm = GET_I_BIT(registers[CTRL_REG_1_OFF],6);
-	bool bmm = GET_I_BIT(registers[CTRL_REG_1_OFF],5); 
-	bool mcm = GET_I_BIT(registers[CTRL_REG_2_OFF],4); 
+	bool bmm = GET_I_BIT(registers[CTRL_REG_1_OFF],5);
+	bool mcm = GET_I_BIT(registers[CTRL_REG_2_OFF],4);
 
 	if(!ecm && !bmm && !mcm){
 		cout<<"CHAR"<<endl;
@@ -382,7 +376,7 @@ void VIC::set_graphic_mode(){
 	//Unimplemented
 	/*else if(ecm && !bmm && !mcm)
 		graphic_mode_ = kExtBgMode;
-	else 
+	else
 		graphic_mode_ = kIllegalMode;
 	*/
 }

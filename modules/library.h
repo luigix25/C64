@@ -66,7 +66,7 @@ using namespace std;
 enum register_name
 {
 	regA,regX,regY
-	
+
 };
 
 struct registers{

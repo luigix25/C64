@@ -75,12 +75,12 @@ uint8_t Memory::read_byte(uint16_t addr){
 
 	//TODO: implementare cartridge!
 	if(addr >= BASIC_START and addr <= BASIC_END){
-		
+
 		if(LORAM_mode == RAM)
 			return memory[addr];
 		else
 			return basic[addr-BASIC_START];
-	
+
 	//I/O CHAR or RAM
 	} else if(addr >= IO_START and addr <= IO_END){
 
@@ -90,7 +90,7 @@ uint8_t Memory::read_byte(uint16_t addr){
 		else if(CHAR_mode == ROM)								//Charset
 			return charset[addr-IO_START];
 
-		else if(CHAR_mode == IO){								//Multiplexing on IO peripherals			
+		else if(CHAR_mode == IO){								//Multiplexing on IO peripherals
 
 			if(addr >= VIC_START && addr <= VIC_END){			//VIC
 
@@ -114,16 +114,16 @@ uint8_t Memory::read_byte(uint16_t addr){
 			}
 
 		}
-	
+
 	}  else if(addr >= KERNAL_START /*and addr <= KERNAL_END  inutile */){
-		
+
 		if(HIRAM_mode == RAM)
 			return memory[addr];
 		else
 			return kernal[addr-KERNAL_START];
-	
-	} 
-	
+
+	}
+
 	return memory[addr];
 }
 
@@ -141,31 +141,31 @@ uint16_t Memory::read_word(uint16_t addr){
 
 void Memory::write_byte(uint16_t addr, uint8_t data){
 
-  	uint16_t page = (addr & 0xff00) >> 8;
+	uint16_t page = (addr & 0xff00) >> 8;
 
-  	//Zero Page
-  	if(page == 0){
+	//Zero Page
+	if(page == 0){
 
-  		if(addr == MEMORY_LAYOUT_ADDR){
-  			bankSwitch(data);
-  		} else if(addr == 0xCC){
-  			//cout<<"scrivo blanking "<<hex<<unsigned(data)<<endl;
-  			//raise(SIGPIPE);
-  		} 
+		if(addr == MEMORY_LAYOUT_ADDR){
+			bankSwitch(data);
+		} else if(addr == 0xCC){
+			//cout<<"scrivo blanking "<<hex<<unsigned(data)<<endl;
+			//raise(SIGPIPE);
+		}
 
-  	} else if(addr >= VIC_START and addr <= VIC_END){
+	} else if(addr >= VIC_START and addr <= VIC_END){
 		if(CHAR_mode == IO){		//VIC
 			vic->write_register(addr,data);
 			return;
-		} 
+		}
 	} else if(addr >= CIA1_START and addr <= CIA1_END){
 		cia1->write_register(addr,data);
 		return;
-	
+
 	} else if(addr >= CIA2_START and addr <= CIA2_END){
 		cia2->write_register(addr,data);
 		return;
-	
+
 	} else if(addr >= COLOR_RAM_START and addr <= COLOR_RAM_END){
 		if(CHAR_mode == IO){
 			color_ram[addr - COLOR_RAM_START] = data;
@@ -186,15 +186,11 @@ uint8_t Memory::VIC_read_byte(uint16_t addr){
 
 	//cout<<"VIC READ "<<hex<<unsigned(addr)<<endl;
 
-
 	if(VICBank == 0 and addr >= 0x1000 and addr <= 0x1FFF){
 		//Charset mirroring
 		return charset[addr-0x1000];
-
 	} else if(VICBank == 2 and addr >= 0x9000 and addr <= 0x9FFF){
-
 		return charset[addr-0x9000];
-
 	} else {
 		return memory[addr];
 	}
@@ -202,7 +198,7 @@ uint8_t Memory::VIC_read_byte(uint16_t addr){
 }
 
 void Memory::bankSwitch(uint8_t value){
-  
+
 	bool loram_en  = ((value & LORAM_MASK) != 0);
 	bool hiram_en = ((value & HIRAM_MASK) != 0);
 	bool char_en = ((value & CHAREN_MASK) != 0);
@@ -226,9 +222,9 @@ void Memory::bankSwitch(uint8_t value){
 		CHAR_mode = IO;
 	else if(char_en && !loram_en && !hiram_en)
 		CHAR_mode = RAM;
-	else 
+	else
 		CHAR_mode = ROM;
-	
+
 	memory[MEMORY_LAYOUT_ADDR] = value;
 
 }
@@ -237,6 +233,11 @@ void Memory::load_kernal_and_basic(const string& filename){
 
 	streampos size;
 	uint8_t* rom = readBinFile(filename,size);
+
+	if(!rom){
+		cerr<<"Errore ROM"<<endl;
+		return;
+	}
 
 	//FIRST 8K are basic
 	memcpy(basic, rom, eightK);
@@ -251,9 +252,12 @@ void Memory::load_charset(const string& filename){
 	streampos size;
 
 	uint8_t* rom = readBinFile(filename,size);
-
+	if(!rom){
+		cout<<"Errore ROM"<<endl;
+		return;
+	}
 	memcpy(charset, rom, fourK);
-	
+
 	delete[] rom;
 }
 
@@ -304,4 +308,3 @@ uint8_t* Memory::getKerPointer(){
 uint8_t* Memory::getColorMemoryPtr(){
 	return color_ram;
 }
-
